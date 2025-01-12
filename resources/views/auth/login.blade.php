@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+<!-- Left Panel -->
 @section('content')
 <div class="auth-wrapper">
     <div class="split-container">
