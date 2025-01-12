@@ -13,7 +13,18 @@ class Report extends Model
     protected $table = 'reports';
 
     // Define the fillable fields to prevent mass assignment vulnerabilities
-    protected $fillable = ['title', 'description', 'user_id', 'status', 'category'];
+    protected $fillable = [
+        'user_id',
+        'employee_id',
+        'department',
+        'phone',
+        'non_compliance_type',
+        'location',
+        'incident_date',
+        'description',
+        'status',
+        'category'
+    ];
 
     // Relationship with the user
     public function user()

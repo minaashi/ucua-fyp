@@ -13,11 +13,16 @@ return new class extends Migration
 {
     Schema::create('reports', function (Blueprint $table) {
         $table->id();
-        $table->string('report_title');
-        $table->text('description');
-        $table->string('category'); // Unsafe Act or Condition
-        $table->enum('status', ['pending', 'review', 'resolved']);
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->string('employee_id');
+        $table->string('department');
+        $table->string('phone');
+        $table->string('non_compliance_type');
+        $table->string('location');
+        $table->datetime('incident_date');
+        $table->text('description');
+        $table->string('category')->nullable(); // Will be set by admin (Unsafe Act/Condition)
+        $table->enum('status', ['pending', 'review', 'resolved'])->default('pending');
         $table->timestamps();
     });
 }

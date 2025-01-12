@@ -52,16 +52,31 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'employee_id' => 'required|string',
+            'department' => 'required|string',
+            'phone' => 'required|string',
+            'non_compliance_type' => 'required|string',
+            'location' => 'required|string',
+            'incident_date' => 'required|date',
             'description' => 'required|string',
         ]);
 
-        $validated['user_id'] = Auth::id();
-        $validated['status'] = 'pending';  // Set default status
+        Report::create([
+            'user_id' => Auth::id(),
+            'employee_id' => $validated['employee_id'],
+            'department' => $validated['department'],
+            'phone' => $validated['phone'],
+            'non_compliance_type' => $validated['non_compliance_type'],
+            'location' => $validated['location'],
+            'incident_date' => $validated['incident_date'],
+            'description' => $validated['description'],
+            'status' => 'pending',
+            // Category will be set by admin later
+            'category' => null,
+        ]);
 
-        Report::create($validated);
-
-        return redirect()->route('reports.index')->with('success', 'Report submitted successfully!');
+        return redirect()->route('reports.index')
+            ->with('success', 'Report submitted successfully!');
     }
 
     // Show form to edit an existing report (Admin-side)
