@@ -13,7 +13,7 @@
                 <img src="{{ asset('images/auth-image.jpg') }}" alt="Welcome" class="welcome-image">
             </div>
         </div>
-
+<!-- Right Panel -->
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
