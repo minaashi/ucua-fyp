@@ -1,5 +1,9 @@
-@extends('layouts.app')
-<!-- Left Panel -->
+@extends('layouts.auth')
+
+@php
+use Illuminate\Support\Facades\Route;
+@endphp
+
 @section('content')
 <div class="auth-wrapper">
     <div class="split-container">
@@ -13,7 +17,7 @@
                 <img src="{{ asset('images/auth-image.jpg') }}" alt="Welcome" class="welcome-image">
             </div>
         </div>
-<!-- Right Panel -->
+
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
@@ -34,12 +38,12 @@
                         @enderror
                     </div>
 
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3 position-relative">
                         <input id="password" type="password" 
                             class="form-control @error('password') is-invalid @enderror" 
                             name="password" placeholder="Password" required>
                         <label for="password">Password</label>
-                        <i class="fas fa-eye password-toggle" data-target="password"></i>
+                        <i class="fas fa-eye password-toggle" aria-hidden="true"></i>
                         @error('password')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -53,8 +57,7 @@
                                 id="remember" {{ old('remember') ? 'checked' : '' }}>
                             <label class="form-check-label" for="remember">Remember Me</label>
                         </div>
-                        @if (\Illuminate\Support\Facades\Route::has('password.request'))
-
+                        @if (Route::has('password.request'))
                             <a href="{{ route('password.request') }}" class="text-decoration-none">
                                 Forgot Password?
                             </a>
