@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@php
-use Illuminate\Support\Facades\Request;
-@endphp
-
 @section('content')
 <div class="min-h-screen flex">
     <!-- Sidebar -->
@@ -60,20 +56,20 @@ use Illuminate\Support\Facades\Request;
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1">
+    <div class="flex-1 flex flex-col">
         <!-- Header -->
         <header class="bg-blue-800 text-white p-4">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold">User Dashboard</h1>
                 <div class="flex items-center space-x-4">
-                <span>Welcome, {{ $user->name }}</span>
+                    <span>Welcome, {{ auth()->user()->name }}</span>
                     <img src="{{ asset('images/profile.png') }}" alt="Profile" class="rounded-full w-8 h-8">
                 </div>
             </div>
         </header>
 
         <!-- Main Content Area -->
-        <main class="p-6 bg-gray-100">
+        <main class="p-6 bg-gray-100 flex-1">
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <!-- Total Reports -->
@@ -116,7 +112,7 @@ use Illuminate\Support\Facades\Request;
         </main>
 
         <!-- Footer -->
-        <footer class="bg-blue-800 text-white p-4 mt-auto">
+        <footer class="bg-blue-800 text-white p-4">
             <p class="text-center">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
         </footer>
     </div>
