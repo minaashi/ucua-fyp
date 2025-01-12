@@ -23,9 +23,14 @@ Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logou
 // User Dashboard and Related Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    Route::get('/submit-report', [DashboardController::class, 'submitReport'])->name('reports.submit');
-    Route::get('/track-report', [DashboardController::class, 'trackReport'])->name('reports.track');
+    
+    // Report Routes
+    Route::get('/submit-report', [ReportController::class, 'create'])->name('reports.create');
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/track-report', [ReportController::class, 'trackStatus'])->name('reports.track');
     Route::get('/report-history', [DashboardController::class, 'reportHistory'])->name('reports.history');
+    
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });

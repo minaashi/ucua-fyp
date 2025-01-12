@@ -45,7 +45,7 @@ class ReportController extends Controller
     // Show form for creating a new report (User-side)
     public function create()
     {
-        return view('create');  // Return create view
+        return view('reports.create');  // Make sure this view exists at resources/views/reports/create.blade.php
     }
 
     // Store a new report in the database (User-side)
@@ -56,16 +56,12 @@ class ReportController extends Controller
             'description' => 'required|string',
         ]);
 
-        // Associate the report with the logged-in user
         $validated['user_id'] = Auth::id();
-        Report::create($validated);  // Create the report in the database
+        $validated['status'] = 'pending';  // Set default status
 
-        // Redirect to the correct report page based on the user type
-        if (auth()->user()->hasRole('admin')) {
-            return redirect()->route('admin.reports.index');  // Redirect to admin reports list
-        } else {
-            return redirect()->route('reports.index');  // Redirect to user reports list
-        }
+        Report::create($validated);
+
+        return redirect()->route('reports.index')->with('success', 'Report submitted successfully!');
     }
 
     // Show form to edit an existing report (Admin-side)
