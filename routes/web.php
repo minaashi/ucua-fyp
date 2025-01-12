@@ -7,7 +7,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 
-// Default route for home page
+// Home/Hero page route
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -15,8 +15,10 @@ Route::get('/', function () {
 // Authentication routes
 Auth::routes();
 
-// Logout route (manual route addition)
-Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+// Explicitly define logout route
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])
+    ->name('logout')
+    ->middleware('auth');
 
 // User Dashboard and Related Routes
 Route::middleware(['auth'])->group(function () {
@@ -45,12 +47,3 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/send-warning-letters', [AdminDashboardController::class, 'sendWarningLetters'])
         ->name('admin.sendWarningLetters');
 });
-
-// Redirect After Login
-Route::get('/redirect-after-login', function () {
-    return auth()->user()->hasRole('admin')
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('dashboard');
-})->middleware(['auth'])->name('redirect-after-login');
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
