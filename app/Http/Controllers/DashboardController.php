@@ -15,7 +15,6 @@ class DashboardController extends Controller
 
     public function dashboard()
     {
-        // Get authenticated user
         $user = Auth::user();
         
         // Fetch all statistics for the authenticated user
@@ -35,8 +34,7 @@ class DashboardController extends Controller
                               ->take(5)
                               ->get();
 
-        // Return view with all necessary data
-        return view('dashboard', compact('stats', 'recentReports', 'user'));
+        return view('dashboard', compact('stats', 'recentReports'));
     }
 
     public function submitReport()
