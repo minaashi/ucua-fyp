@@ -71,12 +71,11 @@ class ReportController extends Controller
             'incident_date' => $validated['incident_date'],
             'description' => $validated['description'],
             'status' => 'pending',
-            // Category will be set by admin later
             'category' => null,
         ]);
 
-        return redirect()->route('reports.index')
-            ->with('success', 'Report submitted successfully!');
+        return redirect()->route('reports.track')
+            ->with('success', 'Your report has been submitted successfully!');
     }
 
     // Show form to edit an existing report (Admin-side)

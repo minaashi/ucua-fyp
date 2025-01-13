@@ -107,10 +107,15 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <div class="mt-6">
+                <!-- Submit and Cancel Buttons -->
+                <div class="mt-6 flex gap-4">
+                    <button type="button" 
+                            onclick="window.location.href='{{ route('dashboard') }}'"
+                            class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                        Cancel
+                    </button>
                     <button type="submit" 
-                            class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
                         Submit Report
                     </button>
                 </div>
