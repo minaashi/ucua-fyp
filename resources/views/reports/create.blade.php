@@ -9,7 +9,7 @@
                 <div class="flex items-center">
                     <i class="fas fa-exclamation-triangle text-white mr-3 text-xl"></i>
                     <h1 class="text-xl font-bold text-white">UCUA Incident Report</h1>
-                </div>
+            </div>
                 <p class="text-blue-100 text-sm mt-1">Report unsafe conditions and acts to maintain workplace safety</p>
             </div>
 
@@ -114,8 +114,8 @@
                         Submit Report
                     </button>
                 </div>
-            </form>
+        </form>
         </div>
     </div>
-</div>
+    </div>
 @endsection
