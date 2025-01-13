@@ -37,13 +37,6 @@ use Illuminate\Support\Facades\Request;
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('reports.history') }}" 
-                       class="flex items-center px-4 py-2 {{ Request::routeIs('reports.history') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
-                        <i class="fas fa-history w-5"></i>
-                        <span>Report History</span>
-                    </a>
-                </li>
-                <li>
                     <a href="{{ route('profile.show') }}" 
                        class="flex items-center px-4 py-2 {{ Request::routeIs('profile.show') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-cog w-5"></i>
