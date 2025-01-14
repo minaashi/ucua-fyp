@@ -9,12 +9,12 @@
                 <div class="flex items-center">
                     <i class="fas fa-exclamation-triangle text-white mr-3 text-xl"></i>
                     <h1 class="text-xl font-bold text-white">UCUA Incident Report</h1>
-            </div>
+                </div>
                 <p class="text-blue-100 text-sm mt-1">Report unsafe conditions and acts to maintain workplace safety</p>
             </div>
 
             <!-- Form -->
-            <form action="{{ route('reports.store') }}" method="POST" class="p-6">
+            <form method="POST" action="{{ route('reports.store') }}" class="p-6">
                 @csrf
                 
                 <!-- Personal Information Section -->
@@ -119,8 +119,8 @@
                         Submit Report
                     </button>
                 </div>
-        </form>
+            </form>
         </div>
     </div>
-    </div>
+</div>
 @endsection

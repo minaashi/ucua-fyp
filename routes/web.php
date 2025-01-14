@@ -13,21 +13,17 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authentication routes (including register, login, etc. for user authentication)
+// Authentication routes
 Auth::routes();
 
-// Explicitly define logout route for authenticated users
-Route::post('/logout', [LoginController::class, 'logout'])
-    ->name('logout')
-    ->middleware('auth');
-
-// User Routes (authenticated routes for users)
+// User-Specific Routes
 Route::middleware(['auth'])->group(function () {
+    // User Dashboard
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     
     // Report Routes
     Route::get('/submit-report', [ReportController::class, 'create'])->name('reports.create');
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::post('/reports/store', [ReportController::class, 'store'])->name('reports.store');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/track-report', [ReportController::class, 'trackStatus'])->name('reports.track');
     Route::get('/report-history', [DashboardController::class, 'reportHistory'])->name('reports.history');
@@ -37,31 +33,49 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Admin Dummy Registration Route
-Route::get('/admin/register', function () {
-    return view('admin.register');  // Admin dummy registration view
-})->name('admin.register');
+// Admin Routes
+Route::prefix('admin')->group(function () {
+    // Guest Admin Routes
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+        Route::post('/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
+        Route::get('/register', function () {
+            return view('admin.register');
+        })->name('admin.register');
+        Route::post('/register', function () {
+            return redirect()->route('admin.dashboard.dummy');
+        })->name('admin.register.submit');
+    });
 
-// Handle Admin Dummy Registration Form Submission (no data saving)
-Route::post('/admin/register', function () {
-    return redirect()->route('admin.dashboard');  // Redirect to admin dashboard (no saving)
-})->name('admin.register.submit');
+    // Admin Dummy Pages (no auth required for demo)
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard.dummy');
+    })->name('admin.dashboard.dummy');
 
-// Admin Routes (Dummy Admin Pages)
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    // Admin Dashboard Route (Dummy page only)
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    // Admin Reports Route (Dummy page only)
+    // Admin Reports Routes
     Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
-    // Admin Send Warning Letters (Dummy functionality)
-    Route::post('/send-warning-letters', [AdminDashboardController::class, 'sendWarningLetters'])
-        ->name('admin.sendWarningLetters');
+    Route::get('/reports/create', [AdminReportController::class, 'create'])->name('admin.reports.create');
+    Route::post('/reports', [AdminReportController::class, 'store'])->name('admin.reports.store');
+    Route::get('/reports/{report}', [AdminReportController::class, 'show'])->name('admin.reports.show');
+    Route::get('/reports/{report}/edit', [AdminReportController::class, 'edit'])->name('admin.reports.edit');
+    Route::put('/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
+    Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
+
+    Route::get('/users', function () {
+        return view('admin.users.dummy');
+    })->name('admin.users.dummy');
+
+    Route::get('/warnings', function () {
+        return view('admin.warnings.dummy');
+    })->name('admin.warnings.dummy');
+
+    Route::get('/settings', function () {
+        return view('admin.settings.dummy');
+    })->name('admin.settings.dummy');
 });
 
-// Admin Login Routes (Only for guests, means not logged in users)
-Route::middleware('guest')->prefix('admin')->group(function () {
-    Route::get('/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
-    Route::post('/login', function () {
-        return redirect()->route('admin.dashboard'); // Redirect to the dummy admin dashboard immediately
-    })->name('admin.login.submit');
-});
+// Explicit logout route
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->name('logout')
+    ->middleware('auth');
+

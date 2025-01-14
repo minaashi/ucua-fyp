@@ -12,27 +12,26 @@ use Illuminate\Support\Facades\Auth;
 class AdminDashboardController extends Controller
 {
     /**
-     * Initialize the controller with authentication (simplified for now)
+     * Initialize the controller with authentication middleware.
      */
     public function __construct()
     {
-        // Only authenticated users are allowed to access admin dashboard
-        $this->middleware('auth');
+        // Only authenticated admins should access admin dashboard functionality
+        $this->middleware(['auth', 'role:admin']);
     }
 
     /**
-     * Show the admin dashboard with non-pending unsafe act reports.
+     * Display the admin dashboard with non-pending reports for unsafe acts.
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        // Fetch 'unsafe_act' reports that are not 'pending'
+        // Fetch all 'unsafe_act' reports that are not 'pending'
         $reports = Report::where('category', 'unsafe_act')
                          ->where('status', '!=', 'pending')
                          ->get();
 
-        // Return the dashboard view with the fetched reports
         return view('admin.dashboard', compact('reports'));
     }
 
@@ -44,27 +43,27 @@ class AdminDashboardController extends Controller
      */
     public function sendWarningLetters(Request $request)
     {
-        // Fetch reports excluding 'pending' status
+        // Simulate sending warning letters for dummy use
         $reports = Report::where('category', 'unsafe_act')
                          ->where('status', '!=', 'pending')
                          ->get();
 
-        // Group reports by user ID and send notifications
+        // Mock grouped notifications
         $groupedReports = $reports->groupBy('user_id');
         foreach ($groupedReports as $userId => $userReports) {
             $user = User::find($userId);
             if ($user) {
-                // Send notification to the user with the reports (this can be mocked during dummy use)
+                // Send dummy notification (can log this instead)
                 Notification::send($user, new WarningLetterNotification($userReports));
             }
         }
 
-        // Redirect back with a success message (change this for dummy if needed)
-        return redirect()->route('admin.dashboard')->with('status', 'Warning letters sent successfully.');
+        // Dummy response for warning letters sent
+        return redirect()->route('admin.dashboard')->with('status', 'Dummy: Warning letters sent successfully.');
     }
 
     /**
-     * Send a warning letter for a specific report.
+     * Send a warning letter for a specific report (mocked).
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -72,16 +71,16 @@ class AdminDashboardController extends Controller
      */
     public function sendWarningLetter(Request $request, $id)
     {
-        // Fetch a specific report and related user
+        // Fetch the report and associated user
         $report = Report::findOrFail($id);
-        $user = $report->user;  // Get the user who created the report
+        $user = $report->user;
 
         if ($user) {
-            // Send notification to the user with the specific report (this can be mocked)
+            // Mock notification (for dummy)
             Notification::send($user, new WarningLetterNotification($report));
         }
 
-        // Redirect back with a success message (dummy use: confirmation feedback)
-        return redirect()->route('admin.dashboard')->with('status', 'Warning letter sent successfully.');
+        // Dummy confirmation response
+        return redirect()->route('admin.dashboard')->with('status', 'Dummy: Warning letter sent successfully.');
     }
 }
