@@ -5,27 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\WarningLetterNotification;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Traits\HasRoles;
 
 class AdminDashboardController extends Controller
 {
+    /**
+     * Initialize the controller with authentication (simplified for now)
+     */
     public function __construct()
     {
+        // Only authenticated users are allowed to access admin dashboard
         $this->middleware('auth');
-        $this->middleware('role:admin');
     }
 
+    /**
+     * Show the admin dashboard with non-pending unsafe act reports.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
-        if (!Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action.');
-        }
-
+        // Fetch 'unsafe_act' reports that are not 'pending'
         $reports = Report::where('category', 'unsafe_act')
-                        ->where('status', '!=', 'pending')
-                        ->get();
+                         ->where('status', '!=', 'pending')
+                         ->get();
 
+        // Return the dashboard view with the fetched reports
         return view('admin.dashboard', compact('reports'));
     }
 
@@ -47,12 +54,12 @@ class AdminDashboardController extends Controller
         foreach ($groupedReports as $userId => $userReports) {
             $user = User::find($userId);
             if ($user) {
-                // Send notification to the user with the reports
+                // Send notification to the user with the reports (this can be mocked during dummy use)
                 Notification::send($user, new WarningLetterNotification($userReports));
             }
         }
 
-        // Redirect back with a success message
+        // Redirect back with a success message (change this for dummy if needed)
         return redirect()->route('admin.dashboard')->with('status', 'Warning letters sent successfully.');
     }
 
@@ -70,11 +77,11 @@ class AdminDashboardController extends Controller
         $user = $report->user;  // Get the user who created the report
 
         if ($user) {
-            // Send notification to the user with the specific report
+            // Send notification to the user with the specific report (this can be mocked)
             Notification::send($user, new WarningLetterNotification($report));
         }
 
-        // Redirect back with a success message
+        // Redirect back with a success message (dummy use: confirmation feedback)
         return redirect()->route('admin.dashboard')->with('status', 'Warning letter sent successfully.');
     }
 }

@@ -13,8 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authentication routes (including register, login, etc.)
-// These routes are related to user authentication (register, login, etc.)
+// Authentication routes (including register, login, etc. for user authentication)
 Auth::routes();
 
 // Explicitly define logout route for authenticated users
@@ -48,7 +47,7 @@ Route::post('/admin/register', function () {
     return redirect()->route('admin.dashboard');  // Redirect to admin dashboard (no saving)
 })->name('admin.register.submit');
 
-// Admin Routes (Dummy Admin Pages, using middleware 'auth' and role 'admin')
+// Admin Routes (Dummy Admin Pages)
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Admin Dashboard Route (Dummy page only)
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -62,6 +61,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 // Admin Login Routes (Only for guests, means not logged in users)
 Route::middleware('guest')->prefix('admin')->group(function () {
     Route::get('/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
-    Route::post('/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
+    Route::post('/login', function () {
+        return redirect()->route('admin.dashboard'); // Redirect to the dummy admin dashboard immediately
+    })->name('admin.login.submit');
 });
-
