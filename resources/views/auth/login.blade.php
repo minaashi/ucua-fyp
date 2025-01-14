@@ -75,6 +75,11 @@ use Illuminate\Support\Facades\Route;
                         <p class="text-sm text-gray-600">Are you an administrator?</p>
                         <a href="{{ route('admin.login') }}" class="btn btn-outline-primary">
                             Admin Login <i class="fas fa-arrow-right ms-1"></i>
+
+                            <!-- Link to Login as Admin (Redirect to Dummy Admin Login Page) -->
+                            <div class="text-center">
+                        <a href="{{ route('admin.login') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-right me-1"></i> Login as Admin (Dummy Page)
                         </a>
                     </div>
                 </form>
