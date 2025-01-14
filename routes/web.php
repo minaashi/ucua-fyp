@@ -1,22 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\Auth\LoginController;
 
 // Home/Hero page route
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authentication routes
+// Authentication routes (including register, login, etc.)
 Auth::routes();
 
 // Explicitly define logout route
-Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])
+Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
@@ -31,24 +32,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/track-report', [ReportController::class, 'trackStatus'])->name('reports.track');
     Route::get('/report-history', [DashboardController::class, 'reportHistory'])->name('reports.history');
     
+    // User Profile Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Admin Routes
+// Admin Routes (with role-based middleware for admin users)
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    
-    Route::resource('admin/reports', ReportController::class)->names([
-        'index' => 'admin.reports.index',
-        'create' => 'admin.reports.create',
-        'store' => 'admin.reports.store',
-        'show' => 'admin.reports.show',
-        'edit' => 'admin.reports.edit',
-        'update' => 'admin.reports.update',
-        'destroy' => 'admin.reports.destroy',
-    ]);
-    
+    Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
     Route::post('/admin/send-warning-letters', [AdminDashboardController::class, 'sendWarningLetters'])
         ->name('admin.sendWarningLetters');
+});
+
+// Admin Login Routes (only accessible by guests)
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [LoginController::class, 'showAdminLoginForm'])
+        ->name('admin.login');
+
+    Route::post('/admin/login', [LoginController::class, 'adminLogin'])
+        ->name('admin.login.submit');
 });

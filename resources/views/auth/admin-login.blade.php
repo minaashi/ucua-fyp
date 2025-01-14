@@ -1,9 +1,5 @@
 @extends('layouts.auth')
 
-@php
-use Illuminate\Support\Facades\Route;
-@endphp
-
 @section('content')
 <div class="auth-wrapper">
     <div class="split-container">
@@ -11,18 +7,25 @@ use Illuminate\Support\Facades\Route;
         <div class="left-panel">
             <div class="brand-header">
                 <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
-                <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Reporting System</h4>
+                <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Admin Portal</h4>
             </div>
             <div class="image-container">
-                <img src="{{ asset('images/auth-image.jpg') }}" alt="Welcome" class="welcome-image">
+                <img src="{{ asset('images/admin-auth.jpg') }}" alt="Admin Portal" class="welcome-image">
             </div>
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
-                <h3 class="text-center fw-bold mb-4">Sign In</h3>
-                <form method="POST" action="{{ route('login') }}">
+                <h3 class="text-center fw-bold mb-4">Administrator Login</h3>
+                
+                @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.login.submit') }}">
                     @csrf
 
                     <div class="form-floating mb-3">
@@ -30,7 +33,7 @@ use Illuminate\Support\Facades\Route;
                             class="form-control @error('email') is-invalid @enderror" 
                             name="email" value="{{ old('email') }}" 
                             placeholder="name@example.com" required>
-                        <label for="email">Email Address</label>
+                        <label for="email">Admin Email</label>
                         @error('email')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -38,7 +41,7 @@ use Illuminate\Support\Facades\Route;
                         @enderror
                     </div>
 
-                    <div class="form-floating mb-3 position-relative">
+                    <div class="form-floating mb-4 position-relative">
                         <input id="password" type="password" 
                             class="form-control @error('password') is-invalid @enderror" 
                             name="password" placeholder="Password" required>
@@ -51,30 +54,13 @@ use Illuminate\Support\Facades\Route;
                         @enderror
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="remember" 
-                                id="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="remember">Remember Me</label>
-                        </div>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-decoration-none">
-                                Forgot Password?
-                            </a>
-                        @endif
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-3 mb-4">Sign In</button>
+                    <button type="submit" class="btn btn-primary w-100 py-3 mb-4">
+                        Login as Administrator
+                    </button>
 
                     <div class="text-center">
-                        <p class="mb-2">
-                            Don't have an account? 
-                            <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-bold">Create Account</a>
-                        </p>
-                        <div class="border-t border-gray-200 my-3"></div>
-                        <p class="text-sm text-gray-600">Are you an administrator?</p>
-                        <a href="{{ route('admin.login') }}" class="btn btn-outline-primary">
-                            Admin Login <i class="fas fa-arrow-right ms-1"></i>
+                        <a href="{{ route('login') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i> Back to User Login
                         </a>
                     </div>
                 </form>
@@ -86,4 +72,4 @@ use Illuminate\Support\Facades\Route;
         <p class="mb-0">&copy; {{ date('Y') }} Copyright: Nursyahmina Mosdy, Dr Cik Feresa Mohd Foozy</p>
     </footer>
 </div>
-@endsection
+@endsection 
