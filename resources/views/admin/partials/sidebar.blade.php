@@ -8,35 +8,35 @@
         <ul class="nav flex-column px-2">
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.dashboard.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.dashboard.dummy') }}">
+                   href="{{ route('admin.dashboard') }}">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Dashboard
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.reports.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.reports.dummy') }}">
+                   href="{{ route('admin.reports.index') }}">
                     <i class="fas fa-file-alt me-2"></i>
                     Report Management
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.users.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.users.dummy') }}">
+                   href="{{ route('admin.users') }}">
                     <i class="fas fa-users me-2"></i>
                     User Management
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.warnings.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.warnings.dummy') }}">
+                   href="{{ route('admin.warnings') }}">
                     <i class="fas fa-envelope me-2"></i>
                     Warning Letters
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.settings.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.settings.dummy') }}">
+                   href="{{ route('admin.settings') }}">
                     <i class="fas fa-cog me-2"></i>
                     Admin Settings
                 </a>

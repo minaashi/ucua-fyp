@@ -14,7 +14,7 @@
                 <!-- Sidebar menu -->
                 <li><a href="{{ route('admin.dashboard') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Dashboard</a></li>
                 <li><a href="{{ route('admin.reports.index') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Report Management</a></li>
-                <li><a href="{{ route('admin.sendWarningLetters') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Send Warning Letters</a></li>
+                <li><a href="{{ route('admin.warnings') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Send Warning Letters</a></li>
                 <li><a href="{{ route('admin.settings') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Admin Settings</a></li>
             </ul>
         </nav>

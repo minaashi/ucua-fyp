@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AdminController;
 
 // Home/Hero page route
 Route::get('/', function () {
@@ -37,41 +38,37 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('admin')->group(function () {
     // Guest Admin Routes
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
-        Route::post('/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
+        Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+        Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'adminLogin']);
         Route::get('/register', function () {
-            return view('admin.register');
+            return view('admin.auth.register');
         })->name('admin.register');
-        Route::post('/register', function () {
-            return redirect()->route('admin.dashboard.dummy');
-        })->name('admin.register.submit');
+        Route::post('/register', [AdminController::class, 'register'])->name('admin.register.submit');
     });
 
-    // Admin Dummy Pages (no auth required for demo)
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard.dummy');
-    })->name('admin.dashboard.dummy');
+    // Protected Admin Routes
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+        Route::get('/dashboard', function() {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
 
-    // Admin Reports Routes
-    Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
-    Route::get('/reports/create', [AdminReportController::class, 'create'])->name('admin.reports.create');
-    Route::post('/reports', [AdminReportController::class, 'store'])->name('admin.reports.store');
-    Route::get('/reports/{report}', [AdminReportController::class, 'show'])->name('admin.reports.show');
-    Route::get('/reports/{report}/edit', [AdminReportController::class, 'edit'])->name('admin.reports.edit');
-    Route::put('/reports/{report}', [AdminReportController::class, 'update'])->name('admin.reports.update');
-    Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
 
-    Route::get('/users', function () {
-        return view('admin.users.dummy');
-    })->name('admin.users.dummy');
+        Route::get('/reports', function(){
+            return view('admin.reports');
+        })->name('admin.reports.index');
 
-    Route::get('/warnings', function () {
-        return view('admin.warnings.dummy');
-    })->name('admin.warnings.dummy');
+        Route::get('/users', function () {
+            return view('admin.users');
+        })->name('admin.users');
+        
+        Route::get('/warnings', function () {
+            return view('admin.warnings');
+        })->name('admin.warnings');
 
-    Route::get('/settings', function () {
-        return view('admin.settings.dummy');
-    })->name('admin.settings.dummy');
+        Route::get('/settings', function() {
+            return view('admin.settings');
+        })->name('admin.settings');
+    });
 });
 
 // Explicit logout route
