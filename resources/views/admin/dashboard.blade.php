@@ -1,85 +1,100 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
-<!-- Main dashboard layout -->
-<div class="flex h-screen">
+<div class="d-flex flex-column min-vh-100">
+    <div class="container-fluid flex-grow-1">
+        <div class="row h-100">
+            <!-- Include the sidebar partial -->
+            @include('admin.partials.sidebar')
 
-    <!-- Sidebar -->
-    <div class="w-64 bg-gray-800 text-white">
-        <div class="h-16 bg-gray-900 flex items-center justify-center">
-            <h1 class="text-2xl font-bold text-white">Admin Panel</h1>
-        </div>
-        <nav class="mt-4">
-            <ul>
-                <!-- Sidebar menu -->
-                <li><a href="{{ route('admin.dashboard') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Dashboard</a></li>
-                <li><a href="{{ route('admin.reports.index') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Report Management</a></li>
-                <li><a href="{{ route('admin.warnings') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Send Warning Letters</a></li>
-                <li><a href="{{ route('admin.settings') }}" class="block py-2 px-4 text-lg text-gray-300 hover:bg-gray-700">Admin Settings</a></li>
-            </ul>
-        </nav>
-    </div>
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 ms-sm-auto px-0 main-content">
+                <div class="content-wrapper px-md-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Admin Dashboard</h1>
+                        <div>
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-danger">Logout</button>
+                            </form>
+                        </div>
+                    </div>
 
-    <!-- Main content -->
-    <div class="flex-1 bg-gray-100">
-        <!-- Header -->
-        <header class="bg-white shadow-md px-4 py-2">
-            <div class="flex justify-between items-center">
-                <div class="text-xl font-semibold text-gray-800">Admin Dashboard</div>
-                <div>
-                    <!-- User Info / Logout button -->
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="text-sm text-blue-500 hover:underline">Logout</button>
-                    </form>
+                    <!-- Dashboard Statistics -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Reports</h5>
+                                    <p class="display-6 fw-bold">{{ rand(50, 200) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Reports</h5>
+                                    <p class="display-6 fw-bold">{{ rand(10, 50) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title">Resolved Cases</h5>
+                                    <p class="display-6 fw-bold">{{ rand(30, 150) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Overview -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Recent Reports</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Unsafe Condition Report #{{ rand(1000, 9999) }}
+                                    <span class="badge bg-warning">Pending</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Equipment Malfunction #{{ rand(1000, 9999) }}
+                                    <span class="badge bg-success">Resolved</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Hazardous Material Leak #{{ rand(1000, 9999) }}
+                                    <span class="badge bg-danger">Critical</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Manage Reports</h5>
+                                    <a href="{{ route('admin.reports.index') }}" class="btn btn-primary">Go to Reports</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Admin Settings</h5>
+                                    <a href="{{ route('admin.settings') }}" class="btn btn-secondary">Settings</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </header>
-
-        <!-- Main content section -->
-        <div class="p-8">
-            <h2 class="text-2xl font-semibold mb-6">Reports Overview (Dummy Page)</h2>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-medium text-gray-800">Pending Reports (Dummy Data)</h3>
-                <div class="mt-4">
-                    <!-- Dummy Report List (static content for now) -->
-                    <div class="border-b border-gray-300 py-2">
-                        <p><strong>Unsafe Condition Report #1</strong></p>
-                        <p>Status: Pending</p>
-                    </div>
-                    <div class="border-b border-gray-300 py-2">
-                        <p><strong>Unsafe Act Report #2</strong></p>
-                        <p>Status: Pending</p>
-                    </div>
-                    <div class="border-b border-gray-300 py-2">
-                        <p><strong>Unsafe Act Report #3</strong></p>
-                        <p>Status: Pending</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Send Warning Letter Section -->
-            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h3 class="text-xl font-medium text-gray-800">Send Warning Letters (Dummy Functionality)</h3>
-                <p class="mt-4">Select reports to send warning letters (this is just a dummy functionality for now).</p>
-                <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Send All Warning Letters</button>
-            </div>
-
-            <!-- Admin Settings Section -->
-            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h3 class="text-xl font-medium text-gray-800">Admin Settings (Dummy Page)</h3>
-                <p class="mt-4">Manage your admin settings here (this is just a dummy functionality for now).</p>
-                <button class="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Manage Settings</button>
-            </div>
+            </main>
         </div>
-        
     </div>
+    @include('admin.partials.footer')
 </div>
-
-<!-- Footer (optional) -->
-<footer class="bg-gray-800 text-white py-4">
-    <div class="text-center">
-        &copy; {{ date('Y') }} Admin Panel. All rights reserved.
-    </div>
-</footer>
 @endsection

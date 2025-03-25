@@ -76,7 +76,7 @@
                                     <tbody>
                                         <tr>
                                             <td>WL001</td>
-                                            <td>John Doe</td>
+                                            <td>Syahmina</td>
                                             <td>#001</td>
                                             <td><span class="badge bg-success">Delivered</span></td>
                                             <td>2024-02-20</td>

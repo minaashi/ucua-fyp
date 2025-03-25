@@ -14,9 +14,7 @@
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                         <h1 class="h2">Report Management</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-plus me-1"></i> New Report
-                            </button>
+                        
                         </div>
                     </div>
 
@@ -27,8 +25,8 @@
                                 <div class="col-md-3">
                                     <select class="form-select">
                                         <option>All Categories</option>
-                                        <option>Safety Violation</option>
-                                        <option>Equipment Issue</option>
+                                        <option>Unsafe Act</option>
+                                        <option>Unsafe Condition</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
