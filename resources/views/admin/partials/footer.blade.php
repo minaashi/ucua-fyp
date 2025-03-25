@@ -1,11 +1,9 @@
 <footer class="footer py-3 bg-light">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
-                <p class="mb-0">&copy; {{ date('Y') }} UCUA Reporting System. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <p class="mb-0">Developed by: Nursyahmina Mosdy, Dr Cik Feresa Mohd Foozy</p>
+            
+            <div class="col-md-8 text-md-end">
+                <p class="mb-0">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
             </div>
         </div>
     </div>
@@ -17,8 +15,8 @@
     bottom: 0;
     width: calc(100% - 250px);
     margin-left: 250px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
+    background-color:rgb(3, 17, 31);
+    border-top: 1px solid rgb(3, 17, 31);
     z-index: 1020;
 }
 </style> 

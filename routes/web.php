@@ -39,7 +39,10 @@ Route::prefix('admin')->group(function () {
     // Guest Admin Routes
     Route::middleware('guest')->group(function () {
         Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm'])->name('admin.login');
-        Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'adminLogin']);
+
+       Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'adminLogin'])
+        ->name('admin.login.submit');
+
         Route::get('/register', function () {
             return view('admin.auth.register');
         })->name('admin.register');
