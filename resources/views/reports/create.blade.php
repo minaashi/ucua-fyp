@@ -14,8 +14,7 @@
             </div>
 
             <!-- Form -->
-            <form method="POST" action="{{ route('reports.store') }}" class="p-6">
-                @csrf
+            <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-6">
                 
                 <!-- Personal Information Section -->
                 <div class="mb-8">
@@ -104,6 +103,16 @@
                                       placeholder="Please provide specific details about the incident..."
                                       required></textarea>
                         </div>
+                        <div>
+             <label class="block text-sm font-medium text-gray-700 mb-1" for="attachment">
+              Upload Attachment*
+            </label>
+             <input type="file" id="attachment" name="attachment"
+           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+             <p class="text-xs text-gray-500 mt-1">Supported formats: JPG, PNG, PDF, DOC (Max: 5MB)</p>
+            </div>
+
                     </div>
                 </div>
 

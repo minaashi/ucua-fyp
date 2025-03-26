@@ -59,7 +59,10 @@ class ReportController extends Controller
             'location' => 'required|string',
             'incident_date' => 'required|date',
             'description' => 'required|string',
+            'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:5120', // 5MB max
         ]);
+
+        $attachmentPath = null;
 
         Report::create([
             'user_id' => Auth::id(),
@@ -70,6 +73,7 @@ class ReportController extends Controller
             'location' => $validated['location'],
             'incident_date' => $validated['incident_date'],
             'description' => $validated['description'],
+            'attachment' => $attachmentPath,
             'status' => 'pending',
             'category' => null,
         ]);
