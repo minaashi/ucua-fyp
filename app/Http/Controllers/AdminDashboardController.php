@@ -8,15 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\WarningLetterNotification;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AdminDashboardController extends Controller
 {
-    /**
-     * Initialize the controller with authentication middleware.
-     */
     public function __construct()
     {
-        // Only authenticated admins should access admin dashboard functionality
         $this->middleware(['auth', 'role:admin']);
     }
 
@@ -27,12 +25,27 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
-        // Fetch all 'unsafe_act' reports that are not 'pending'
-        $reports = Report::where('category', 'unsafe_act')
-                         ->where('status', '!=', 'pending')
-                         ->get();
+        // Get total reports count
+        $totalReports = Report::count();
+        
+        // Get pending reports count
+        $pendingReports = Report::where('status', 'pending')->count();
+        
+        // Get resolved reports count
+        $resolvedReports = Report::where('status', 'resolved')->count();
+        
+        // Get recent reports (last 5)
+        $recentReports = Report::with('user')
+            ->latest()
+            ->take(5)
+            ->get();
 
-        return view('admin.dashboard', compact('reports'));
+        return view('admin.dashboard', compact(
+            'totalReports',
+            'pendingReports',
+            'resolvedReports',
+            'recentReports'
+        ));
     }
 
     /**

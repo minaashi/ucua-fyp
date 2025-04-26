@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
+
 
 // Home/Hero page route
 Route::get('/', function () {
@@ -34,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
+    
+
 // Admin Routes
 Route::prefix('admin')->group(function () {
     // Guest Admin Routes
@@ -51,19 +55,22 @@ Route::prefix('admin')->group(function () {
 
     // Protected Admin Routes
     Route::middleware(['auth', 'role:admin'])->group(function () {
-        Route::get('/dashboard', function() {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+        // Reports Routes
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+        Route::post('/reports/{report}/update-status', [AdminReportController::class, 'updateStatus'])->name('admin.reports.update-status');
+        Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
 
-        Route::get('/reports', function(){
-            return view('admin.reports');
-        })->name('admin.reports.index');
-
+        // User Management Routes
         Route::get('/users', function () {
-            return view('admin.users');
-        })->name('admin.users');
-        
+            return view('admin.users');  
+            })->name('admin.users');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+
+
         Route::get('/warnings', function () {
             return view('admin.warnings');
         })->name('admin.warnings');

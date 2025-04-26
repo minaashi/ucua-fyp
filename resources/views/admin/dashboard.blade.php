@@ -27,7 +27,7 @@
                             <div class="card shadow-sm border-0">
                                 <div class="card-body">
                                     <h5 class="card-title">Total Reports</h5>
-                                    <p class="display-6 fw-bold">{{ rand(50, 200) }}</p>
+                                    <p class="display-6 fw-bold">{{ $totalReports }}</p>
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                             <div class="card shadow-sm border-0">
                                 <div class="card-body">
                                     <h5 class="card-title">Pending Reports</h5>
-                                    <p class="display-6 fw-bold">{{ rand(10, 50) }}</p>
+                                    <p class="display-6 fw-bold">{{ $pendingReports }}</p>
                                 </div>
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                             <div class="card shadow-sm border-0">
                                 <div class="card-body">
                                     <h5 class="card-title">Resolved Cases</h5>
-                                    <p class="display-6 fw-bold">{{ rand(30, 150) }}</p>
+                                    <p class="display-6 fw-bold">{{ $resolvedReports }}</p>
                                 </div>
                             </div>
                         </div>
@@ -56,18 +56,16 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-group">
+                                @forelse($recentReports as $report)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Unsafe Condition Report #{{ rand(1000, 9999) }}
-                                    <span class="badge bg-warning">Pending</span>
+                                    {{ $report->non_compliance_type }} - {{ $report->location }}
+                                    <span class="badge bg-{{ $report->status === 'pending' ? 'warning' : ($report->status === 'resolved' ? 'success' : 'danger') }}">
+                                        {{ ucfirst($report->status) }}
+                                    </span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Equipment Malfunction #{{ rand(1000, 9999) }}
-                                    <span class="badge bg-success">Resolved</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Hazardous Material Leak #{{ rand(1000, 9999) }}
-                                    <span class="badge bg-danger">Critical</span>
-                                </li>
+                                @empty
+                                <li class="list-group-item text-center">No reports found</li>
+                                @endforelse
                             </ul>
                         </div>
                     </div>
