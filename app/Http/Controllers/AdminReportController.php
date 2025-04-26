@@ -7,10 +7,44 @@ use Illuminate\Http\Request;
 
 class AdminReportController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        $reports = Report::latest()->get();
-        return view('admin.reports.index', compact('reports'));
+        $this->middleware(['auth', 'role:admin']);
+    }
+
+    public function index(Request $request)
+    {
+        $query = Report::with('user')->latest();
+
+        // Apply filters if provided
+        if ($request->has('category') && $request->category !== 'All Categories') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->has('status') && $request->status !== 'All Status') {
+            $query->where('status', strtolower($request->status));
+        }
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('non_compliance_type', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $reports = $query->paginate(10);
+        $totalReports = Report::count();
+        $pendingReports = Report::where('status', 'pending')->count();
+        $resolvedReports = Report::where('status', 'resolved')->count();
+
+        return view('admin.reports', compact(
+            'reports',
+            'totalReports',
+            'pendingReports',
+            'resolvedReports'
+        ));
     }
 
     public function create()
@@ -72,11 +106,24 @@ class AdminReportController extends Controller
             ->with('success', 'Report updated successfully');
     }
 
+    public function updateStatus(Request $request, Report $report)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,review,resolved',
+            'category' => 'required|in:unsafe_act,unsafe_condition'
+        ]);
+
+        $report->update([
+            'status' => $request->status,
+            'category' => $request->category
+        ]);
+
+        return redirect()->back()->with('success', 'Report status updated successfully.');
+    }
+
     public function destroy(Report $report)
     {
         $report->delete();
-
-        return redirect()->route('admin.reports.index')
-            ->with('success', 'Report deleted successfully');
+        return redirect()->back()->with('success', 'Report deleted successfully.');
     }
 }
