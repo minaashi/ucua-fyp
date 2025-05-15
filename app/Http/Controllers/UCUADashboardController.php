@@ -23,7 +23,7 @@ class UCUADashboardController extends Controller
 
         // Get recent reports with pagination
         $recentReports = Report::latest()
-            ->with(['user', 'department'])
+            ->with(['user', 'handlingDepartment'])
             ->paginate(10);
 
         return view('ucua-officer.dashboard', compact(
@@ -153,5 +153,13 @@ class UCUADashboardController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Failed to send reminder. Please try again.');
         }
+    }
+
+    public function assignDepartmentsPage()
+    {
+        // Fetch reports that are pending assignment (status = 'pending')
+        $reports = \App\Models\Report::where('status', 'pending')->get();
+        $departments = \App\Models\Department::where('is_active', true)->get();
+        return view('ucua-officer.assign-departments', compact('reports', 'departments'));
     }
 } 

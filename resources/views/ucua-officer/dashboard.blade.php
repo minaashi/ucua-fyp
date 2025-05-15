@@ -19,7 +19,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" 
+                    <a href="{{ route('ucua.assign-departments-page') }}" 
                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-tasks w-5"></i>
                         <span>Assign Departments</span>
@@ -125,7 +125,7 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $report->handling_department ?? 'Not Assigned' }}
+                                        {{ $report->handling_department ?? $report->department ?? 'Not Assigned' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $report->deadline ? $report->deadline->format('Y-m-d') : 'No Deadline' }}

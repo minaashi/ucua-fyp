@@ -9,6 +9,11 @@ use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminWarningController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\UCUAOfficerController;
+use App\Http\Controllers\Auth\UCUALoginController;
+use App\Http\Controllers\UCUADashboardController;
 
 
 // Home/Hero page route
@@ -63,23 +68,50 @@ Route::prefix('admin')->group(function () {
         Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
 
         // User Management Routes
-        Route::get('/users', function () {
-            return view('admin.users');  
-            })->name('admin.users');
-        Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
-        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/users', [AdminUserController::class, 'index'])
+            ->name('admin.users.index');
+        Route::post('/users', [AdminUserController::class, 'store'])
+            ->name('admin.users.store');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])
+            ->name('admin.users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
+            ->name('admin.users.destroy');
 
+        // Department Management Routes
+        Route::get('/departments', [DepartmentController::class, 'index'])->name('admin.departments.index');
+        Route::post('/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');
+        Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('admin.departments.update');
+        Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
+        Route::get('/departments/{department}/staff', [DepartmentController::class, 'getDepartmentStaff'])->name('admin.departments.staff');
 
-        Route::get('/warnings', function () {
-            return view('admin.warnings');
-        })->name('admin.warnings');
+        // Warning Management Routes
+        Route::get('/warnings', [AdminWarningController::class, 'index'])
+            ->name('admin.warnings');
+        Route::post('/warnings', [AdminWarningController::class, 'store'])
+            ->name('admin.warnings.store');
+        Route::post('/warnings/{warning}/resend', [AdminWarningController::class, 'resend'])
+            ->name('admin.warnings.resend');
 
         Route::get('/settings', function() {
             return view('admin.settings');
         })->name('admin.settings');
     });
 });
+
+// UCUA Officer Routes
+Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
+    Route::get('/dashboard', [UCUADashboardController::class, 'index'])->name('dashboard');
+    Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
+    Route::post('/assign-department', [UCUADashboardController::class, 'assignDepartment'])->name('assign-department');
+    Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');
+    Route::post('/suggest-warning', [UCUADashboardController::class, 'suggestWarning'])->name('suggest-warning');
+    Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
+});
+
+// UCUA Officer Login Routes
+Route::get('/ucua/login', [UCUALoginController::class, 'showLoginForm'])->name('ucua.login');
+Route::post('/ucua/login', [UCUALoginController::class, 'login']);
+Route::post('/ucua/logout', [UCUALoginController::class, 'logout'])->name('ucua.logout');
 
 // Explicit logout route
 Route::post('/logout', [LoginController::class, 'logout'])
