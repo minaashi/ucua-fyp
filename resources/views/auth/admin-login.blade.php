@@ -7,7 +7,7 @@
         <!-- Left Panel -->
         <div class="left-panel">
             <div class="brand-header">
-                <img src="{{ asset('images/ucua-logo.png') }}" alt="UCPU Logo" height="45">
+                <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
                 <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Admin Portal</h4>
             </div>
             <div class="image-container">

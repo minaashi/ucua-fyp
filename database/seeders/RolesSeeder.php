@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
+// use Spatie\Permission\Models\Role;
+// use Spatie\Permission\Models\Permission;
 
 class RolesSeeder extends Seeder
 {
@@ -12,10 +13,16 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create the admin role
-        Role::create(['name' => 'admin']);
-        
-        // Create the port_worker role
-        Role::create(['name' => 'port_worker']);
+        // Reset cached roles and permissions
+        // app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Create roles
+        // ...
+
+        // Create permissions
+        // ...
+
+        // Assign permissions to roles
+        // ...
     }
 }

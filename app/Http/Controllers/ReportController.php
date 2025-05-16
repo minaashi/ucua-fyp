@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -45,7 +46,8 @@ class ReportController extends Controller
     // Show form for creating a new report (User-side)
     public function create()
     {
-        return view('reports.create');  // Make sure this view exists at resources/views/reports/create.blade.php
+        $departments = \App\Models\Department::where('is_active', true)->get();
+        return view('reports.create', compact('departments'));
     }
 
     // Store a new report in the database (User-side)
@@ -135,5 +137,42 @@ class ReportController extends Controller
 
         // Return the view with both the pending and solved reports
         return view('reports.status', compact('pendingReports', 'solvedReports'));  // Pass both to the view
+    }
+
+    public function assignDepartment(Request $request)
+    {
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'department' => 'required|string',
+            'deadline' => 'required|date|after:today',
+            'initial_remarks' => 'nullable|string|max:1000'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($request->report_id);
+
+            // Update with department name, deadline, and status
+            $report->update([
+                'handling_department' => $request->department,
+                'deadline' => $request->deadline,
+                'status' => 'in_progress'
+            ]);
+
+            if ($request->initial_remarks) {
+                $report->remarks()->create([
+                    'content' => $request->initial_remarks,
+                    'user_id' => Auth::id()
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Department assigned successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to assign department. Please try again.');
+        }
     }
 }

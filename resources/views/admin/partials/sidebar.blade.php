@@ -22,7 +22,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Route::is('admin.users.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.users') }}">
+                   href="{{ route('admin.users.index') }}">
                     <i class="fas fa-users me-2"></i>
                     User Management
                 </a>
@@ -48,14 +48,26 @@
 
 <style>
 .sidebar {
-    height: 100vh;
+    height: 100vh; /* Ensures it spans full screen height */
     width: 250px;
     z-index: 1030;
     position: fixed;
     left: 0;
     top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures full height usage */
 }
 
+.position-sticky {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav{
+    flex-grow: 1;
+}
 .nav-link {
     cursor: pointer;
     transition: all 0.3s;

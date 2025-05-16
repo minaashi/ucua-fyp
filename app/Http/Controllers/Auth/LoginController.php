@@ -7,6 +7,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class LoginController extends Controller
 {
@@ -21,33 +23,31 @@ class LoginController extends Controller
 
     public function showAdminLoginForm()
     {
-        return view('auth.admin-login');
+        return view('admin.auth.login');
     }
 
     public function adminLogin(Request $request)
     {
         $this->validate($request, [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
-            if ($user->hasRole('admin')) {
+        if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = auth()->user();
+            if ($user->is_admin && $user->hasRole('admin')) {
                 return redirect()->route('admin.dashboard');
             }
-            Auth::logout();
-            return back()->withErrors(['email' => 'Invalid admin credentials.']);
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials.']);
+        return back()->withErrors(['email' => 'These credentials do not match our records.']);
     }
 
     protected function authenticated(Request $request, $user)
     {
-        if ($user->hasRole('admin')) {
-            return redirect()->route('admin.dashboard');
+        if ($user->is_admin && $user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard'); //admin dashboard
         }
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard'); // user dashboard
     }
 }

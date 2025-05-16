@@ -79,7 +79,9 @@ Route::prefix('admin')->group(function () {
 
         // Department Management Routes
         Route::get('/departments', [DepartmentController::class, 'index'])->name('admin.departments.index');
+        Route::get('/departments/create', [DepartmentController::class, 'create'])->name('admin.departments.create');
         Route::post('/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');
+        Route::get('/departments/{department}/edit', [DepartmentController::class, 'edit'])->name('admin.departments.edit'); 
         Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('admin.departments.update');
         Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
         Route::get('/departments/{department}/staff', [DepartmentController::class, 'getDepartmentStaff'])->name('admin.departments.staff');
@@ -106,6 +108,8 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
     Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');
     Route::post('/suggest-warning', [UCUADashboardController::class, 'suggestWarning'])->name('suggest-warning');
     Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
+    Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');
+    Route::get('/reminders', [UCUADashboardController::class, 'remindersPage'])->name('reminders');
 });
 
 // UCUA Officer Login Routes

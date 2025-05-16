@@ -3,56 +3,31 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+// use Spatie\Permission\Models\Role;
+// use Spatie\Permission\Models\Permission;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $portWorkerRole = Role::firstOrCreate(['name' => 'port_worker']);
-        $ucuaOfficerRole = Role::firstOrCreate(['name' => 'ucua_officer']);
-
         // Create permissions
-        $permissions = [
-            'view_reports',
-            'create_reports',
-            'edit_reports',
-            'delete_reports',
-            'assign_department',
-            'add_remarks',
-            'suggest_warning',
-            'send_reminders',
-            'view_dashboard',
-            'manage_users',
-            'manage_departments',
-            'manage_warnings',
-            'approve_warnings'
-        ];
+        // $permissions = [
+        //     'manage users',
+        //     'view reports',
+        //     'issue warnings',
+        //     'send reminders',
+        // ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
+        // $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        // $officerRole = Role::create(['name' => 'ucua_officer', 'guard_name' => 'web']);
+        // $workerRole = Role::create(['name' => 'port_worker', 'guard_name' => 'web']);
 
-        // Assign permissions to roles
-        $adminRole->givePermissionTo($permissions);
-        
-        $portWorkerRole->givePermissionTo([
-            'view_reports',
-            'create_reports',
-            'view_dashboard'
-        ]);
+        // foreach ($permissions as $permission) {
+        //     Permission::create(['name' => $permission, 'guard_name' => 'web']);
+        // }
 
-        $ucuaOfficerRole->givePermissionTo([
-            'view_reports',
-            'edit_reports',
-            'assign_department',
-            'add_remarks',
-            'suggest_warning',
-            'send_reminders',
-            'view_dashboard'
-        ]);
+        // $adminRole->givePermissionTo($permissions);
+        // $officerRole->givePermissionTo(['view reports', 'issue warnings', 'send reminders']);
+        // $workerRole->givePermissionTo(['view reports']);
     }
 } 

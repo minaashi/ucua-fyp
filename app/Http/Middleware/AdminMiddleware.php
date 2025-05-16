@@ -1,9 +1,27 @@
-public function handle($request, Closure $next)
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+
+class AdminMiddleware
 {
-    if (auth()->user() && auth()->user()->hasRole('admin')) {
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        if (!auth()->check() || !auth()->user()->is_admin || !auth()->user()->hasRole('admin')) {
+            return redirect('/')->with('error', 'Unauthorized access.');
+        }
+
         return $next($request);
     }
-
-    // Redirect or send error if user is not admin
-    return redirect('/dashboard'); // Or wherever else you'd like to redirect non-admin users
 }

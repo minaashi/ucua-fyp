@@ -47,6 +47,26 @@
                         @enderror
                     </div>
 
+                    <div class="form-floating mb-3">
+                        <select id="department" name="department" 
+                            class="form-control @error('department') is-invalid @enderror" 
+                            required>
+                            <option value="">Select Department</option>
+                            <option value="operations">Operations</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="security">Security</option>
+                            <option value="safety">Safety</option>
+                            <option value="hr">Human Resources</option>
+                            <option value="it">Information Technology</option>
+                        </select>
+                        <label for="department">Department</label>
+                        @error('department')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
                     <div class="form-floating mb-3 position-relative">
                         <input id="password" type="password" 
                             class="form-control @error('password') is-invalid @enderror" 

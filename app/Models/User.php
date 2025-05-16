@@ -9,7 +9,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    // Use the HasRoles trait for role functionality
     use HasFactory, Notifiable, HasRoles;
 
     /**
@@ -21,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -47,11 +47,26 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all the reports associated with the user.
+     * A user can have many reports.
      */
     public function reports()
-{
-    return $this->hasMany(Report::class); //A user can have many reports
-}
+    {
+        return $this->hasMany(Report::class);
+    }
 
+    /**
+     * A user belongs to a department.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin()
+    {
+        return $this->is_admin == 1;
+    }
 }

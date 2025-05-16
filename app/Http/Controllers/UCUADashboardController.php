@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\Department;
+use App\Models\Warning;
+use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +40,7 @@ class UCUADashboardController extends Controller
 
     public function assignDepartment(Request $request)
     {
+        dd('Controller reached', $request->all());
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'department' => 'required|string',
@@ -48,7 +52,8 @@ class UCUADashboardController extends Controller
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
-            
+
+            // Update with department name, deadline, and status
             $report->update([
                 'handling_department' => $request->department,
                 'deadline' => $request->deadline,
@@ -158,8 +163,32 @@ class UCUADashboardController extends Controller
     public function assignDepartmentsPage()
     {
         // Fetch reports that are pending assignment (status = 'pending')
-        $reports = \App\Models\Report::where('status', 'pending')->get();
-        $departments = \App\Models\Department::where('is_active', true)->get();
+        $reports = Report::where('status', 'pending')->get();
+        $departments = Department::where('is_active', true)->get();
         return view('ucua-officer.assign-departments', compact('reports', 'departments'));
+    }
+
+    public function warningsPage()
+    {
+        $warnings = Warning::with(['report', 'suggestedBy'])
+            ->latest()
+            ->paginate(10);
+
+        $totalWarnings = Warning::count();
+        $pendingWarnings = Warning::where('status', 'pending')->count();
+
+        return view('ucua-officer.warnings', compact('warnings', 'totalWarnings', 'pendingWarnings'));
+    }
+
+    public function remindersPage()
+    {
+        $reminders = Reminder::with(['report', 'sentBy'])
+            ->latest()
+            ->paginate(10);
+
+        $totalReminders = Reminder::count();
+        $recentReminders = Reminder::where('created_at', '>=', now()->subDays(7))->count();
+
+        return view('ucua-officer.reminders', compact('reminders', 'totalReminders', 'recentReminders'));
     }
 } 

@@ -1,4 +1,4 @@
-<footer class="footer py-3 bg-light">
+<footer class="footer py-3 bg-blue-800">
     <div class="container-fluid">
         <div class="row">
             

@@ -26,17 +26,19 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" 
-                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
-                        <i class="fas fa-exclamation-triangle w-5"></i>
-                        <span>Warning Letters</span>
+                    <a href="{{ route('ucua.warnings') }}" 
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800 transition-colors duration-200">
+                        <i class="fas fa-exclamation-triangle w-5 animate-pulse text-yellow-500"></i>
+                        <span class="ml-2 font-semibold">Warning Letters</span>
+                        <span class="ml-2 bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">NEW</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" 
-                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
-                        <i class="fas fa-bell w-5"></i>
-                        <span>Reminders</span>
+                    <a href="{{ route('ucua.reminders') }}" 
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
+                        <i class="fas fa-bell w-5 animate-bounce text-red-500"></i>
+                        <span class="ml-2 font-semibold">Reminders</span>
+                        <span class="ml-2 bg-red-200 text-red-700 text-xs px-2 py-1 rounded-full">ALERTS</span>
                     </a>
                 </li>
             </ul>

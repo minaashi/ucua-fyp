@@ -12,16 +12,14 @@ return new class extends Migration
     public function up()
 {
     Schema::table('reports', function (Blueprint $table) {
-        // Add status column with a default value of 'pending'
-        $table->string('status')->default('pending');
+        $table->string('attachment')->nullable()->after('description');
     });
 }
 
 public function down()
 {
     Schema::table('reports', function (Blueprint $table) {
-        // Rollback the change by dropping the 'status' column
-        $table->dropColumn('status');
+        $table->dropColumn('attachment');
     });
 }
 
