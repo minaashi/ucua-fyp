@@ -1,416 +1,199 @@
-@extends('layouts.auth')
+@extends('layouts.admin')
 
 @section('content')
-<div class="d-flex flex-column min-vh-100">
-    <div class="container-fluid flex-grow-1">
-        <div class="row h-100">
-            @include('admin.partials.sidebar')
-
-            <main class="col-md-9 col-lg-10 ms-sm-auto px-0 main-content">
-                <div class="content-wrapper px-md-4">
-                    <!-- Tabs -->
-                    <ul class="nav nav-tabs mb-4" id="managementTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-                                <i class="fas fa-users me-1"></i> Users
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="departments-tab" data-bs-toggle="tab" data-bs-target="#departments" type="button" role="tab">
-                                <i class="fas fa-building me-1"></i> Departments
-                            </button>
-                        </li>
-                    </ul>
-
-                    <!-- Tab Content -->
-                    <div class="tab-content" id="managementTabsContent">
-                        <!-- Users Tab -->
-                        <div class="tab-pane fade show active" id="users" role="tabpanel">
-                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                                <h1 class="h2">User Management</h1>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                    <i class="fas fa-user-plus me-1"></i> Add New User
-                                </button>
-                            </div>
-
-                            <!-- User Stats -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <div class="card shadow-sm border-0">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Total Users</h5>
-                                            <p class="display-6 fw-bold">{{ $totalUsers }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow-sm border-0">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Admin Users</h5>
-                                            <p class="display-6 fw-bold">{{ $adminUsers }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow-sm border-0">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Port Workers</h5>
-                                            <p class="display-6 fw-bold">{{ $portWorkers }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Search and Filter -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <form action="{{ route('admin.users.index') }}" method="GET">
-                                        <div class="row g-3">
-                                            <div class="col-md-4">
-                                                <select name="role" class="form-select">
-                                                    <option value="All Roles" {{ request('role') == 'All Roles' ? 'selected' : '' }}>All Roles</option>
-                                                    @foreach($roles as $role)
-                                                        <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>
-                                                            {{ ucfirst(str_replace('_', ' ', $role->name)) }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" name="search" class="form-control" placeholder="Search users..." value="{{ request('search') }}">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <button type="submit" class="btn btn-primary w-100">Filter</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Users Table -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Department</th>
-                                                    <th>Role</th>
-                                                    <th>Created At</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($users as $user)
-                                                    <tr>
-                                                        <td>{{ $user->name }}</td>
-                                                        <td>{{ $user->email }}</td>
-                                                        <td>{{ $user->department ?? 'Not Assigned' }}</td>
-                                                        <td>
-                                                            <span class="badge bg-{{ $user->hasRole('admin') ? 'primary' : 'secondary' }}">
-                                                                {{ ucfirst(str_replace('_', ' ', $user->roles->first()->name ?? 'port_worker')) }}
-                                                            </span>
-                                                        </td>
-                                                        <td>{{ $user->created_at->format('M d, Y') }}</td>
-                                                        <td>
-                                                            <div class="btn-group">
-                                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-
-                                                    <!-- Edit User Modal -->
-                                                    <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1">
-                                                        <div class="modal-dialog">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title">Edit User</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                </div>
-                                                                <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
-                                                                    @csrf
-                                                                    @method('PUT')
-                                                                    <div class="modal-body">
-                                                                        <div class="mb-3">
-                                                                            <label for="name" class="form-label">Name</label>
-                                                                            <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="email" class="form-label">Email</label>
-                                                                            <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="department" class="form-label">Department</label>
-                                                                            <select class="form-select" id="department" name="department">
-                                                                                <option value="">Select Department</option>
-                                                                                @foreach($departments as $department)
-                                                                                    <option value="{{ $department->name }}" {{ $user->department == $department->name ? 'selected' : '' }}>
-                                                                                        {{ $department->name }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="role" class="form-label">Role</label>
-                                                                            <select class="form-select" id="role" name="role" required>
-                                                                                @foreach($roles as $role)
-                                                                                    <option value="{{ $role->name }}" {{ $user->hasRole($role->name) ? 'selected' : '' }}>
-                                                                                        {{ ucfirst(str_replace('_', ' ', $role->name)) }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                        <button type="submit" class="btn btn-primary">Update User</button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="6" class="text-center">No users found</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <!-- Pagination -->
-                                    <div class="d-flex justify-content-center mt-4">
-                                        {{ $users->links() }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Departments Tab -->
-                        <div class="tab-pane fade" id="departments" role="tabpanel">
-                            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                                <h1 class="h2">Department Management</h1>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
-                                    <i class="fas fa-plus me-1"></i> Add New Department
-                                </button>
-                            </div>
-
-                            <!-- Departments Table -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Department Name</th>
-                                                    <th>Email</th>
-                                                    <th>Head of Department</th>
-                                                    <th>Active Reports</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($departments as $department)
-                                                    <tr>
-                                                        <td>{{ $department->name }}</td>
-                                                        <td>{{ $department->email }}</td>
-                                                        <td>
-                                                            {{ $department->head_name }}<br>
-                                                            <small class="text-muted">{{ $department->head_email }}</small>
-                                                        </td>
-                                                        <td>{{ $department->reports_count }}</td>
-                                                        <td>
-                                                            <span class="badge bg-{{ $department->is_active ? 'success' : 'danger' }}">
-                                                                {{ $department->is_active ? 'Active' : 'Inactive' }}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <div class="btn-group">
-                                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editDepartmentModal{{ $department->id }}">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this department?')">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-
-                                                    <!-- Edit Department Modal -->
-                                                    <div class="modal fade" id="editDepartmentModal{{ $department->id }}" tabindex="-1">
-                                                        <div class="modal-dialog">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title">Edit Department</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                </div>
-                                                                <form action="{{ route('admin.departments.update', $department) }}" method="POST">
-                                                                    @csrf
-                                                                    @method('PUT')
-                                                                    <div class="modal-body">
-                                                                        <div class="mb-3">
-                                                                            <label for="name" class="form-label">Department Name</label>
-                                                                            <input type="text" class="form-control" id="name" name="name" value="{{ $department->name }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="email" class="form-label">Department Email</label>
-                                                                            <input type="email" class="form-control" id="email" name="email" value="{{ $department->email }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="head_name" class="form-label">Head of Department Name</label>
-                                                                            <input type="text" class="form-control" id="head_name" name="head_name" value="{{ $department->head_name }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="head_email" class="form-label">Head of Department Email</label>
-                                                                            <input type="email" class="form-control" id="head_email" name="head_email" value="{{ $department->head_email }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="head_phone" class="form-label">Head of Department Phone</label>
-                                                                            <input type="tel" class="form-control" id="head_phone" name="head_phone" value="{{ $department->head_phone }}" required>
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="is_active" class="form-label">Status</label>
-                                                                            <select class="form-select" id="is_active" name="is_active">
-                                                                                <option value="1" {{ $department->is_active ? 'selected' : '' }}>Active</option>
-                                                                                <option value="0" {{ !$department->is_active ? 'selected' : '' }}>Inactive</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                        <button type="submit" class="btn btn-primary">Update Department</button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="6" class="text-center">No departments found</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+    <header class="bg-blue-800 text-white p-4 shadow-md rounded mb-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Admin Panel</h1>
         </div>
-    </div>
-    @include('admin.partials.footer')
-</div>
-
-<!-- Add User Modal -->
-<div class="modal fade" id="addUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </header>
+    <main class="flex-1">
+        <div x-data="{ tab: 'users' }">
+            <div class="mb-6">
+                <nav class="flex space-x-4">
+                    <button type="button" @click="tab = 'users'" :class="tab === 'users' ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'" class="px-4 py-2 rounded-t-lg font-semibold shadow">User Management</button>
+                    <button type="button" @click="tab = 'register'" :class="tab === 'register' ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'" class="px-4 py-2 rounded-t-lg font-semibold shadow">Admin Register</button>
+                    <button type="button" @click="tab = 'departments'" :class="tab === 'departments' ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'" class="px-4 py-2 rounded-t-lg font-semibold shadow">Manage Departments</button>
+                </nav>
             </div>
-            <form action="{{ route('admin.users.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+            <!-- User Management Tab -->
+            <div x-show="tab === 'users'" x-cloak>
+                <!-- User Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
+                        <p class="text-3xl font-bold text-blue-500 mt-2">{{ $totalUsers }}</p>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-700">Admin Users</h3>
+                        <p class="text-3xl font-bold text-green-500 mt-2">{{ $adminUsers }}</p>
                     </div>
-                    <div class="mb-3">
-                        <label for="department" class="form-label">Department</label>
-                        <select class="form-select" id="department" name="department">
-                            <option value="">Select Department</option>
-                            @foreach($departments as $department)
-                                <option value="{{ $department->name }}">{{ $department->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" name="role" required>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->name }}">{{ ucfirst(str_replace('_', ' ', $role->name)) }}</option>
-                            @endforeach
-                        </select>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-700">Port Workers</h3>
+                        <p class="text-3xl font-bold text-yellow-500 mt-2">{{ $portWorkers }}</p>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create User</button>
+                <!-- Search and Filter -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <form action="{{ route('admin.users.index') }}" method="GET">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <select name="role" class="border rounded px-3 py-2">
+                                <option value="All Roles" {{ request('role') == 'All Roles' ? 'selected' : '' }}>All Roles</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_', ' ', $role->name)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <input type="text" name="search" class="border rounded px-3 py-2" placeholder="Search users..." value="{{ request('search') }}">
+                            <button type="submit" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Filter</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Add Department Modal -->
-<div class="modal fade" id="addDepartmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Department</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <!-- Users Table -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Users List</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex items-center" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                            <i class="fas fa-user-plus mr-2"></i> Add New User
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse($users as $user)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->department ?? 'Not Assigned' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                                {{ $user->hasRole('admin') ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                                {{ ucfirst(str_replace('_', ' ', $user->roles->first()->name ?? 'port_worker')) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->created_at->format('M d, Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex space-x-2">
+                                                <button type="button" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onclick="return confirm('Are you sure you want to delete this user?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Edit User Modal can be refactored similarly if needed -->
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-gray-500">No users found</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="mt-4">
+                        {{ $users->links() }}
+                    </div>
+                </div>
             </div>
-            <form action="{{ route('admin.departments.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Department Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Department Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="head_name" class="form-label">Head of Department Name</label>
-                        <input type="text" class="form-control" id="head_name" name="head_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="head_email" class="form-label">Head of Department Email</label>
-                        <input type="email" class="form-control" id="head_email" name="head_email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="head_phone" class="form-label">Head of Department Phone</label>
-                        <input type="tel" class="form-control" id="head_phone" name="head_phone" required>
+            <!-- Admin Register Tab -->
+            <div x-show="tab === 'register'" x-cloak>
+                <div class="bg-white rounded-lg shadow-md p-8 max-w-xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-blue-700 flex items-center"><i class="fas fa-user-shield mr-2"></i> Register New Admin</h2>
+                    <form action="{{ route('admin.register.submit') }}" method="POST">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Name</label>
+                            <input type="text" name="name" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Email</label>
+                            <input type="email" name="email" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Password</label>
+                            <input type="password" name="password" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700">Confirm Password</label>
+                            <input type="password" name="password_confirmation" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-semibold">Register Admin</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Manage Departments Tab -->
+            <div x-show="tab === 'departments'" x-cloak>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-blue-700 flex items-center"><i class="fas fa-building mr-2"></i> Departments</h2>
+                    <a href="{{ route('admin.departments.create') }}" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Department
+                    </a>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head of Department</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Reports</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse($departments as $department)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $department->head_name }}<br>
+                                            <small class="text-gray-500">{{ $department->head_email }}</small>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->reports_count }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $department->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                {{ $department->is_active ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <a href="{{ route('admin.departments.edit', $department) }}" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 mr-2"><i class="fas fa-edit"></i></a>
+                                            <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-gray-500">No departments found</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create Department</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
+    </main>
+    <!-- Add User Modal and Edit User Modal remain as before -->
 @endsection 

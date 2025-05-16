@@ -1,50 +1,52 @@
-<nav class="col-md-3 col-lg-2 px-0 bg-primary position-fixed sidebar">
-    <div class="position-sticky">
-        <div class="text-center py-4">
-            <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
-            <h5 class="text-white mt-2">Admin Panel</h5>
-        </div>
-        
-        <ul class="nav flex-column px-2">
-            <li class="nav-item">
-                <a class="nav-link {{ Route::is('admin.dashboard.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-tachometer-alt me-2"></i>
+<aside class="w-64 bg-white text-gray-900 flex flex-col border-r border-gray-200">
+    <div class="p-6 flex flex-col items-center border-b border-gray-200">
+        <img src="{{ asset('images/ucua-logo.png') }}" alt="JohorPort Logo" class="h-12 mb-2">
+        <span class="font-bold text-lg">Admin Panel</span>
+    </div>
+    <nav class="flex-1 mt-6">
+        <ul class="space-y-2">
+            <li>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.dashboard') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-tachometer-alt w-5 mr-3"></i>
                     Dashboard
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::is('admin.reports.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.reports.index') }}">
-                    <i class="fas fa-file-alt me-2"></i>
+            <li>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.reports.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-file-alt w-5 mr-3"></i>
                     Report Management
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::is('admin.users.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.users.index') }}">
-                    <i class="fas fa-users me-2"></i>
+            <li>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.users.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-users w-5 mr-3"></i>
                     User Management
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::is('admin.warnings.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.warnings') }}">
-                    <i class="fas fa-envelope me-2"></i>
+            <li>
+                <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-envelope w-5 mr-3"></i>
                     Warning Letters
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::is('admin.settings.dummy') ? 'active' : '' }} text-white" 
-                   href="{{ route('admin.settings') }}">
-                    <i class="fas fa-cog me-2"></i>
+            <li>
+                <a href="{{ route('admin.settings') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.settings') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-cog w-5 mr-3"></i>
                     Admin Settings
                 </a>
             </li>
-            
+            <li class="mt-4">
+                <form method="POST" action="{{ route('logout') }}" class="px-6">
+                    @csrf
+                    <button type="submit" class="flex items-center w-full px-4 py-2 text-red-600 bg-gray-100 hover:bg-red-200 rounded transition font-medium">
+                        <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                        Logout
+                    </button>
+                </form>
+            </li>
         </ul>
-    </div>
-</nav>
+    </nav>
+</aside>
 
 <style>
 .sidebar {

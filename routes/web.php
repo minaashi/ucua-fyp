@@ -88,7 +88,7 @@ Route::prefix('admin')->group(function () {
 
         // Warning Management Routes
         Route::get('/warnings', [AdminWarningController::class, 'index'])
-            ->name('admin.warnings');
+            ->name('admin.warnings.index');
         Route::post('/warnings', [AdminWarningController::class, 'store'])
             ->name('admin.warnings.store');
         Route::post('/warnings/{warning}/resend', [AdminWarningController::class, 'resend'])
