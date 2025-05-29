@@ -32,21 +32,11 @@
                     <!-- Left Column - Profile Details -->
                     <div class="md:col-span-2">
                         <h2 class="text-lg font-semibold mb-4">Profile Details</h2>
+                        <!-- Profile picture UI removed -->
+
                         <form action="{{ route('profile.update') }}" method="POST">
                             @csrf
                             
-                            <!-- Profile Picture -->
-                            <div class="mb-6">
-                                <div class="flex items-center">
-                                    <img src="{{ asset('images/profile.png') }}" alt="Profile Picture" 
-                                         class="w-16 h-16 rounded-full">
-                                    <button type="button" 
-                                            class="ml-4 px-3 py-1 text-sm text-blue-600 hover:text-blue-700">
-                                        Change
-                                    </button>
-                                </div>
-                            </div>
-
                             <!-- Name -->
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -117,4 +107,15 @@
         </div>
     </footer>
 </div>
+
+@push('scripts')
+<script>
+    // Show file name when selected
+    document.getElementById('profile_picture').addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            this.form.submit();
+        }
+    });
+</script>
+@endpush
 @endsection 
