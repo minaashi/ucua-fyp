@@ -1,99 +1,118 @@
-@extends('layouts.auth')
+@extends('layouts.admin')
 
 @section('content')
-<div class="d-flex flex-column min-vh-100">
-    <div class="container-fluid flex-grow-1">
-        <div class="row h-100">
-            @include('admin.partials.sidebar')
-
-            <main class="col-md-9 col-lg-10 ms-sm-auto px-0 main-content">
-                <div class="content-wrapper px-md-4">
-                    <!-- Header -->
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Department Management</h1>
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <a href="{{ route('admin.departments.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-1"></i> Add New Department
-                            </a>
-                        </div>
-                    </div>
-
-                    @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <!-- Departments Table -->
-                    <div class="card">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">Departments List</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Department Name</th>
-                                            <th>Department Email</th>
-                                            <th>Head of Department</th>
-                                            <th>Active Reports</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($departments as $department)
-                                            <tr>
-                                                <td>{{ $department->name }}</td>
-                                                <td>{{ $department->email }}</td>
-                                                <td>
-                                                    {{ $department->head_name }}<br>
-                                                    <small class="text-muted">{{ $department->head_email }}</small>
-                                                </td>
-                                                <td>{{ $department->reports_count }}</td>
-                                                <td>
-                                                    <span class="badge bg-{{ $department->is_active ? 'success' : 'danger' }}">
-                                                        {{ $department->is_active ? 'Active' : 'Inactive' }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('admin.departments.edit', $department) }}" 
-                                                       class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form action="{{ route('admin.departments.destroy', $department) }}" 
-                                                          method="POST" 
-                                                          class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this department?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" class="text-center">No departments found</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-    @include('admin.partials.footer')
+<div class="mb-6 flex justify-between items-center w-full">
+    <h1 class="text-2xl font-bold">Department Management</h1>
+    <a href="{{ route('admin.departments.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex items-center">
+        <i class="fas fa-plus mr-2"></i> Add New Department
+    </a>
 </div>
+@if(session('success'))
+    <div class="alert alert-success w-full">
+        {{ session('success') }}
+    </div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger w-full">
+        {{ session('error') }}
+    </div>
+@endif
+<div class="bg-white rounded-lg shadow-md p-6 w-full">
+    <div class="overflow-x-auto w-full">
+        <table class="min-w-full w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head of Department</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Reports</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($departments as $department)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->email }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ $department->head_name }}<br>
+                            <small class="text-gray-500">{{ $department->head_email }}</small>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->reports_count }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $department->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ $department->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button type="button" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 mr-2" data-toggle="modal" data-target="#editDepartmentModal{{ $department->id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-gray-500">No departments found</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@foreach($departments as $department)
+<div class="modal fade" id="editDepartmentModal{{ $department->id }}" tabindex="-1" role="dialog" aria-labelledby="editDepartmentModalLabel{{ $department->id }}" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form action="{{ route('admin.departments.update', $department) }}" method="POST" class="modal-content">
+      @csrf
+      @method('PUT')
+      <div class="modal-header">
+        <h5 class="modal-title" id="editDepartmentModalLabel{{ $department->id }}">Edit Department</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Department Name</label>
+          <input type="text" name="name" class="form-control" value="{{ $department->name }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Department Email</label>
+          <input type="email" name="email" class="form-control" value="{{ $department->email }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Head of Department Name</label>
+          <input type="text" name="head_name" class="form-control" value="{{ $department->head_name }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Head of Department Email</label>
+          <input type="email" name="head_email" class="form-control" value="{{ $department->head_email }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Head of Department Phone</label>
+          <input type="tel" name="head_phone" class="form-control" value="{{ $department->head_phone }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Active Status</label>
+          <select name="is_active" class="form-control">
+            <option value="1" {{ $department->is_active ? 'selected' : '' }}>Active</option>
+            <option value="0" {{ !$department->is_active ? 'selected' : '' }}>Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Department</button>
+      </div>
+    </form>
+  </div>
+</div>
+@endforeach
 @endsection 

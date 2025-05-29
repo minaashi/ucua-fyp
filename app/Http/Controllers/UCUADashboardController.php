@@ -40,7 +40,6 @@ class UCUADashboardController extends Controller
 
     public function assignDepartment(Request $request)
     {
-        dd('Controller reached', $request->all());
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'department' => 'required|string',

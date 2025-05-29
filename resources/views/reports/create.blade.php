@@ -67,34 +67,65 @@
                 <!-- Incident Information Section -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-700 mb-4">Incident Information</h2>
-                    
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1" for="non_compliance_type">
-                                Type of Non-Compliance*
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="unsafe_condition">
+                                Unsafe Conditions*
                             </label>
-                            <select id="non_compliance_type" name="non_compliance_type" 
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required>
-                                <option value="">Select a category...</option>
-                                <option value="smoking">Smoking in Restricted Areas</option>
-                                <option value="ppe">Failure to Wear PPE</option>
-                                <option value="driving">Reckless Driving</option>
-                                <option value="walkways">Slippery Walkways</option>
-                                <option value="leaks">Gas and Electrical Leaks</option>
-                                <option value="other">Other</option>
+                            <select id="unsafe_condition" name="unsafe_condition" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
+                                <option value="">Select Unsafe Condition...</option>
+                                <option value="Slippery floor surface">Slippery floor surface - Permukaan lantai licin</option>
+                                <option value="Exposed live wire (Electrical)">Exposed live wire (Electrical)- Penebat wayar elektrik terdedah</option>
+                                <option value="Fire & explosion hazards">Fire & explosion hazards - Bahaya kebakaran & letupan</option>
+                                <option value="Other">Other</option>
                             </select>
+                            <div id="otherUnsafeConditionDiv" style="display:none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="other_unsafe_condition">
+                                    Please specify other unsafe condition
+                                </label>
+                                <textarea id="other_unsafe_condition" name="other_unsafe_condition" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Please state here"></textarea>
+                            </div>
                         </div>
-
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="unsafe_act">
+                                Unsafe Acts*
+                            </label>
+                            <select id="unsafe_act" name="unsafe_act" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
+                                <option value="">Select Unsafe Act...</option>
+                                <option value="Not wearing proper Personal Protective Equipment (PPE)">Not wearing proper Personal Protective Equipment (PPE)- Tidak memakai Alat Pelindung Diri (PPE) yang betul</option>
+                                <option value="Speeding inside premise">Speeding inside premise - Memandu laju di dalam premis</option>
+                                <option value="Working under the influence of alcohol and/or other drugs">Working under the influence of alcohol and/or other drugs - Bekerja di bawah pengaruh alkohol dan/atau Dadah</option>
+                                <option value="Smoking at prohibited area">Smoking at prohibited area - Merokok ditempat yang dilarang</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div id="otherUnsafeActDiv" style="display:none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="other_unsafe_act">
+                                    Please specify other unsafe act
+                                </label>
+                                <textarea id="other_unsafe_act" name="other_unsafe_act" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Please state here"></textarea>
+                            </div>
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="location">
                                 Location of Incident*
                             </label>
-                            <input type="text" id="location" name="location" 
-                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   placeholder="Building/Area/Floor" required>
+                            <select id="location" name="location" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
+                                <option value="">Select the location of incident</option>
+                                <option value="Building A">Building A - Bangunan A</option>
+                                <option value="Building B">Building B - Bangunan B</option>
+                                <option value="Building C">Building C - Bangunan C</option>
+                                <option value="Loading dock">Loading dock - Kawasan Pemuat</option>
+                                <option value="Cointaner Yard">Cointaner Yard - Kawasan Kontena</option>
+                                <option value="Security Checkpoint">Security Checkpoint - Pusat Pemeriksaan Keselamatan</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div id="otherLocationDiv" style="display:none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="other_location">
+                                    Please specify other location
+                                </label>
+                                <textarea id="other_location" name="other_location" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Please state here"></textarea>
+                            </div>
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="incident_date">
                                 Date and Time of Incident*
@@ -103,17 +134,18 @@
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                    required>
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="description">
-                                Detailed Description*
-                            </label>
-                            <textarea id="description" name="description" rows="4" 
-                                      class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                      placeholder="Please provide specific details about the incident..."
-                                      required></textarea>
-                        </div>
+                             
+                                <label for="description" class="block text-sm font-medium text-gray-700">
+    Detailed Description*
+</label>
+<textarea id="description" name="description" rows="4"
+          class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          placeholder="Please provide specific details about the incident..."
+          oninput="this.value = this.value.toUpperCase();" required></textarea>
 
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="attachment">
                                 Upload Attachment*
@@ -142,4 +174,30 @@
         </div>
     </div>
 </div>
+<script>
+function toggleOtherField() {
+    const unsafeCondition = document.getElementById('unsafe_condition');
+    const unsafeAct = document.getElementById('unsafe_act');
+    const location = document.getElementById('location').value;
+    // Show/hide 'Other' textareas
+    document.getElementById('otherUnsafeConditionDiv').style.display = (unsafeCondition.value === 'Other') ? '' : 'none';
+    document.getElementById('otherUnsafeActDiv').style.display = (unsafeAct.value === 'Other') ? '' : 'none';
+    document.getElementById('otherLocationDiv').style.display = (location === 'Other') ? '' : 'none';
+    // Mutual exclusion logic
+    if (unsafeCondition.value && unsafeCondition.value !== '') {
+        unsafeAct.value = '';
+        unsafeAct.disabled = true;
+        document.getElementById('otherUnsafeActDiv').style.display = 'none';
+    } else {
+        unsafeAct.disabled = false;
+    }
+    if (unsafeAct.value && unsafeAct.value !== '') {
+        unsafeCondition.value = '';
+        unsafeCondition.disabled = true;
+        document.getElementById('otherUnsafeConditionDiv').style.display = 'none';
+    } else {
+        unsafeCondition.disabled = false;
+    }
+}
+</script>
 @endsection

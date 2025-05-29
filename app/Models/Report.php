@@ -18,8 +18,12 @@ class Report extends Model
         'employee_id',
         'department',
         'phone',
-        'non_compliance_type',
+        'unsafe_condition',
+        'other_unsafe_condition',
+        'unsafe_act',
+        'other_unsafe_act',
         'location',
+        'other_location',
         'incident_date',
         'description',
         'status',
@@ -28,7 +32,8 @@ class Report extends Model
         'handling_department',
         'handling_staff_id',
         'remarks',
-        'deadline'
+        'deadline',
+        'attachment'
     ];
 
     protected $casts = [

@@ -66,6 +66,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
         Route::post('/reports/{report}/update-status', [AdminReportController::class, 'updateStatus'])->name('admin.reports.update-status');
         Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
+        Route::put('/admin/reports/{report}', [App\Http\Controllers\AdminReportController::class, 'update'])->name('admin.reports.update');
 
         // User Management Routes
         Route::get('/users', [AdminUserController::class, 'index'])

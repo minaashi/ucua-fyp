@@ -68,10 +68,15 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->non_compliance_type }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->location }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {{ $report->category == 'unsafe_act' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ ucfirst(str_replace('_', ' ', $report->category)) }}
-                                </span>
+                                <form action="{{ route('admin.reports.update', $report->id) }}" method="POST" class="flex items-center">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="category" class="border rounded px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500" onchange="this.form.submit()">
+                                        <option value="unsafe_act" {{ $report->category == 'unsafe_act' ? 'selected' : '' }}>Unsafe Act</option>
+                                        <option value="unsafe_condition" {{ $report->category == 'unsafe_condition' ? 'selected' : '' }}>Unsafe Condition</option>
+                                    </select>
+                                    <input type="hidden" name="status" value="{{ $report->status }}">
+                                </form>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full

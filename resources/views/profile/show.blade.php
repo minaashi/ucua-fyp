@@ -103,17 +103,7 @@
                             </form>
                         </div>
 
-                        <!-- Close Account Section -->
-                        <div>
-                            <h2 class="text-lg font-semibold text-red-600 mb-4">Close account</h2>
-                            <p class="text-sm text-gray-600 mb-4">
-                                Permanently delete your account and all associated data
-                            </p>
-                            <button type="button"
-                                    class="w-full px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                                Close Account
-                            </button>
-                        </div>
+        
                     </div>
                 </div>
             </div>
