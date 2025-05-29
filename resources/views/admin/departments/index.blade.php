@@ -3,9 +3,9 @@
 @section('content')
 <div class="mb-6 flex justify-between items-center w-full">
     <h1 class="text-2xl font-bold">Department Management</h1>
-    <a href="{{ route('admin.departments.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex items-center">
+    <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex items-center" data-toggle="modal" data-target="#addDepartmentModal">
         <i class="fas fa-plus mr-2"></i> Add New Department
-    </a>
+    </button>
 </div>
 @if(session('success'))
     <div class="alert alert-success w-full">
@@ -115,4 +115,56 @@
   </div>
 </div>
 @endforeach
+
+<!-- Add Department Modal -->
+<div class="modal fade" id="addDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="addDepartmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <form action="{{ route('admin.departments.store') }}" method="POST" class="modal-content">
+      @csrf
+      <div class="modal-header">
+        <h5 class="modal-title text-blue-800 font-bold" id="addDepartmentModalLabel">
+            <i class="fas fa-building mr-2"></i> Add New Department
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Department Name</label>
+                <input type="text" name="name" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Department Email</label>
+                <input type="email" name="email" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Head of Department Name</label>
+                <input type="text" name="head_name" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Head of Department Email</label>
+                <input type="email" name="head_email" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Head of Department Phone</label>
+                <input type="tel" name="head_phone" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Active Status</label>
+                <select name="is_active" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-center gap-4">
+        <button type="button" class="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 font-semibold transition" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 font-bold shadow transition">Create Department</button>
+      </div>
+    </form>
+  </div>
+</div>
 @endsection 

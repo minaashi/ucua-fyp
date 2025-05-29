@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+<div class="flex-1 flex flex-col">
     <!-- Header -->
     <header class="bg-blue-800 text-white p-4 shadow-md rounded mb-6">
         <div class="flex justify-between items-center">
@@ -59,15 +60,5 @@
             </tbody>
         </table>
     </div>
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <a href="{{ route('admin.reports.index') }}" class="bg-blue-500 text-white rounded shadow p-6 flex items-center justify-between hover:bg-blue-600 transition">
-            <span class="font-semibold">Go to Reports</span>
-            <i class="fas fa-arrow-right"></i>
-        </a>
-        <a href="{{ route('admin.users.index') }}" class="bg-gray-500 text-white rounded shadow p-6 flex items-center justify-between hover:bg-gray-600 transition">
-            <span class="font-semibold">Manage Users</span>
-            <i class="fas fa-users"></i>
-        </a>
-    </div>
+</div>
 @endsection

@@ -74,9 +74,7 @@
                         </a>
                         
                         <div class="border-t border-gray-200 my-3"></div>
-                        
-                        <p class="text-sm text-gray-600 mb-2">Need an admin account?</p>
-                        {{-- Remove the link to admin.register --}}
+                    
                     </div>
                 </form>
             </div>

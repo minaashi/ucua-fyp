@@ -72,9 +72,9 @@ use Illuminate\Support\Facades\Route;
                             <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-bold">Create Account</a>
                         </p>
                         <div class="border-t border-gray-200 my-3"></div>
-                        <p class="text-sm text-gray-600">Are you an administrator?</p>
+                        <p class="text-sm text-gray-600">Are you an UCUA officer?</p>
                         <a href="{{ route('admin.login') }}" class="btn btn-outline-primary">
-                            Admin Login <i class="fas fa-arrow-right ms-1"></i>
+                            PIC Login <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                           
                 </form>

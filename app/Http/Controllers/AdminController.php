@@ -16,7 +16,13 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'admin_code' => 'required|string',
         ]);
+
+        // Check the admin registration code
+        if ($request->admin_code !== 'UCUA-Admin@Secure') {
+            return back()->withInput()->withErrors(['admin_code' => 'The admin registration code is incorrect.']);
+        }
 
         $user = User::create([
             'name' => $request->name,
