@@ -30,78 +30,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
-    @if(auth()->check() && auth()->user()->isAdmin())
-        <!-- Admin Layout with Sidebar -->
-        <div class="min-h-screen flex">
-            <!-- Sidebar -->
-            <aside class="w-64 bg-white shadow-md" style="min-width: 16rem;">
-                <div class="p-4 border-b">
-                    <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" class="h-12 mx-auto">
-                    <h2 class="text-xl font-bold text-center text-gray-800 mt-2">UCUA Admin Dashboard</h2>
-                </div>
-
-                <nav class="mt-6">
-                    <ul class="list-unstyled pl-3 pr-3">
-                        <li class="mb-2">
-                            <a href="{{ route('admin.dashboard') }}" 
-                               class="flex items-center px-4 py-2 rounded 
-                                      {{ Request::routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} 
-                                      hover:bg-blue-50 hover:text-blue-600">
-                                <i class="fas fa-chart-line w-5 mr-3"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ route('admin.reports.index') }}" 
-                               class="flex items-center px-4 py-2 rounded 
-                                      {{ Request::routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} 
-                                      hover:bg-blue-50 hover:text-blue-600">
-                                <i class="fas fa-file-alt w-5 mr-3"></i>
-                                <span>Manage Reports</span>
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ route('admin.settings') }}" 
-                               class="flex items-center px-4 py-2 rounded 
-                                      {{ Request::routeIs('admin.settings') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} 
-                                      hover:bg-blue-50 hover:text-blue-600">
-                                <i class="fas fa-cog w-5 mr-3"></i>
-                                <span>Admin Settings</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <div class="flex-1 flex flex-column">
-                <!-- Header -->
-                <header class="bg-primary text-white p-4 shadow-md">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="text-2xl font-bold m-0">@yield('page-title', 'UCUA Admin')</h1>
-                        <div class="d-flex align-items-center">
-                            <span class="mr-3">Welcome, {{ auth()->user()->name }}</span>
-                            <form action="{{ route('logout') }}" method="POST" class="m-0">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-light">
-                                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </header>
-
-                <!-- Main Content -->
-                <main class="flex-grow-1 p-4 bg-light">
-                    @yield('content')
-                </main>
-            </div>
-        </div>
-    @else
-        <!-- Regular Layout (for non-admin pages) -->
-        <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen flex">
+        @include('partials.sidebar')
+        <div class="flex-1 flex flex-col">
             @yield('content')
+            @include('partials.footer')
         </div>
-    @endif
+    </div>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

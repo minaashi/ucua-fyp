@@ -1,19 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
+<div class="flex-1 flex flex-col min-h-0">
     <header class="bg-blue-800 text-white p-4 shadow-md rounded mb-6">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Admin Panel</h1>
         </div>
     </header>
-    <div class="flex flex-col flex-1">
-        <div class="mb-6">
-            <nav class="flex space-x-4">
-                <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.users.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">User Management</a>
-                <a href="{{ route('admin.register') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.register') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Admin Register</a>
-                <a href="{{ route('admin.departments.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.departments.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Manage Departments</a>
-            </nav>
-        </div>
+    <div>
+        <nav class="flex space-x-4 mb-6">
+            <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.users.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">User Management</a>
+            <a href="{{ route('admin.register') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.register') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Admin Register</a>
+            <a href="{{ route('admin.departments.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.departments.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Manage Departments</a>
+        </nav>
         <!-- User Management Section Only -->
         <div>
             <!-- User Stats -->
@@ -160,7 +159,6 @@
       </div>
     </div>
     @endforeach
-
     <!-- Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">

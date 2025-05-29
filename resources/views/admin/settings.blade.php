@@ -47,14 +47,7 @@
                         <label class="block text-gray-700">Report Auto-Archive (days)</label>
                         <input type="number" class="mt-1 block w-full border rounded px-3 py-2" value="30">
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700">System Theme</label>
-                        <select class="mt-1 block w-full border rounded px-3 py-2">
-                            <option>Light</option>
-                            <option>Dark</option>
-                            <option>System Default</option>
-                        </select>
-                    </div>
+                   
                 </form>
             </div>
         </div>

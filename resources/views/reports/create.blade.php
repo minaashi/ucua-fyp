@@ -76,7 +76,7 @@
                                 <option value="">Select Unsafe Condition...</option>
                                 <option value="Slippery floor surface">Slippery floor surface - Permukaan lantai licin</option>
                                 <option value="Exposed live wire (Electrical)">Exposed live wire (Electrical)- Penebat wayar elektrik terdedah</option>
-                                <option value="Fire & explosion hazards">Fire & explosion hazards - Bahaya kebakaran & letupan</option>
+                                <option value="Fire & explosion hazards">Gas leak - Kebocoran gas</option>
                                 <option value="Other">Other</option>
                             </select>
                             <div id="otherUnsafeConditionDiv" style="display:none;">
@@ -94,7 +94,6 @@
                                 <option value="">Select Unsafe Act...</option>
                                 <option value="Not wearing proper Personal Protective Equipment (PPE)">Not wearing proper Personal Protective Equipment (PPE)- Tidak memakai Alat Pelindung Diri (PPE) yang betul</option>
                                 <option value="Speeding inside premise">Speeding inside premise - Memandu laju di dalam premis</option>
-                                <option value="Working under the influence of alcohol and/or other drugs">Working under the influence of alcohol and/or other drugs - Bekerja di bawah pengaruh alkohol dan/atau Dadah</option>
                                 <option value="Smoking at prohibited area">Smoking at prohibited area - Merokok ditempat yang dilarang</option>
                                 <option value="Other">Other</option>
                             </select>
@@ -107,10 +106,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="location">
-                                Location of Incident*
+                                Location of event *
                             </label>
                             <select id="location" name="location" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
-                                <option value="">Select the location of incident</option>
+                                <option value="">Select the location of event...</option>
                                 <option value="Building A">Building A - Bangunan A</option>
                                 <option value="Building B">Building B - Bangunan B</option>
                                 <option value="Building C">Building C - Bangunan C</option>
@@ -128,7 +127,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="incident_date">
-                                Date and Time of Incident*
+                                Date and Time of Event*
                             </label>
                             <input type="datetime-local" id="incident_date" name="incident_date" 
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -142,7 +141,7 @@
 </label>
 <textarea id="description" name="description" rows="4"
           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Please provide specific details about the incident..."
+          placeholder="Please provide specific details about the event..."
           oninput="this.value = this.value.toUpperCase();" required></textarea>
 
                         </div>
