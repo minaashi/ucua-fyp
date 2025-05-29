@@ -76,9 +76,7 @@
                         <div class="border-t border-gray-200 my-3"></div>
                         
                         <p class="text-sm text-gray-600 mb-2">Need an admin account?</p>
-                        <a href="{{ route('admin.register') }}" class="btn btn-outline-secondary">
-                            Register as Admin <i class="fas fa-arrow-right ms-1"></i>
-                        </a>
+                        {{-- Remove the link to admin.register --}}
                     </div>
                 </form>
             </div>

@@ -52,9 +52,6 @@ Route::prefix('admin')->group(function () {
        Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'adminLogin'])
         ->name('admin.login.submit');
 
-        Route::get('/register', function () {
-            return view('admin.auth.register');
-        })->name('admin.register');
         Route::post('/register', [AdminController::class, 'register'])->name('admin.register.submit');
     });
 

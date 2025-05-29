@@ -10,7 +10,7 @@
     <div>
         <nav class="flex space-x-4 mb-6">
             <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.users.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">User Management</a>
-            <a href="{{ route('admin.register') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.register') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Admin Register</a>
+            <button type="button" class="px-4 py-2 rounded-lg font-semibold shadow bg-white text-blue-600" data-toggle="modal" data-target="#adminRegisterModal">Admin Register</button>
             <a href="{{ route('admin.departments.index') }}" class="px-4 py-2 rounded-lg font-semibold shadow {{ request()->routeIs('admin.departments.index') ? 'bg-blue-600 text-white' : 'bg-white text-blue-600' }}">Manage Departments</a>
         </nav>
         <!-- User Management Section Only -->
@@ -207,5 +207,65 @@
         </form>
       </div>
     </div>
+    <!-- Admin Register Modal -->
+    <div class="modal fade" id="adminRegisterModal" tabindex="-1" role="dialog" aria-labelledby="adminRegisterModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form method="POST" action="{{ route('admin.register.submit') }}" class="modal-content needs-validation" novalidate>
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="adminRegisterModalLabel">Admin Registration</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+            </div>
+            <div class="mb-3 position-relative">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+              <i class="fas fa-eye password-toggle position-absolute" style="top: 38px; right: 16px; cursor: pointer;"></i>
+            </div>
+            <div class="mb-3 position-relative">
+              <label for="password_confirmation" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password" required>
+              <i class="fas fa-eye password-toggle position-absolute" style="top: 38px; right: 16px; cursor: pointer;"></i>
+            </div>
+            <div class="mb-3">
+              <label for="admin_code" class="form-label">Admin Registration Code</label>
+              <input type="text" class="form-control" id="admin_code" name="admin_code" placeholder="Admin Registration Code" required>
+              <small class="text-muted">Enter the provided admin registration code</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Register as Administrator</button>
+          </div>
+        </form>
+      </div>
+    </div>
 </div>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle for modal
+    document.querySelectorAll('#adminRegisterModal .password-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    });
+});
+</script>
+@endpush 
