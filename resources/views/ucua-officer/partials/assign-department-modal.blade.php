@@ -16,12 +16,9 @@
                         <label for="department">Select Department</label>
                         <select name="department" id="department" class="form-control" required>
                             <option value="">Select a department...</option>
-                            <option value="SS Department">SS Department</option>
-                            <option value="Engineering">Engineering Department</option>
-                            <option value="Operations">Operations Department</option>
-                            <option value="Safety">Safety Department</option>
-                            <option value="Security">Security Department</option>
-                            <option value="IT">IT Department</option>
+                            <option value="Port Security & Safety (PSS)">Security & Safety Department</option>
+                            <option value="Maintenance & Repair (M&R)">Maintenance & Repair Department</option>
+                            <option value="Electrical & Service)">Electrical & Service Department</option>
                         </select>
                     </div>
                     <div class="form-group mt-3">
