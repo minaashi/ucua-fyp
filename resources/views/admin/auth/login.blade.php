@@ -75,6 +75,9 @@
                         
                         <div class="border-t border-gray-200 my-3"></div>
                     
+                        <a href="{{ route('ucua.login') }}" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-user-shield me-1"></i> UCUA Officer Login
+                        </a>
                     </div>
                 </form>
             </div>
