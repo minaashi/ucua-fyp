@@ -14,12 +14,33 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\UCUAOfficerController;
 use App\Http\Controllers\Auth\UCUALoginController;
 use App\Http\Controllers\UCUADashboardController;
-
+use App\Http\Controllers\Department\AuthController as DepartmentAuthController;
+use App\Http\Controllers\Department\DashboardController as DepartmentDashboardController;
 
 // Home/Hero page route
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Department Routes
+Route::prefix('department')->group(function () {
+    // Authentication
+    Route::get('login', [DepartmentAuthController::class, 'showLoginForm'])->name('department.login');
+    Route::post('login', [DepartmentAuthController::class, 'login']);
+    Route::post('logout', [DepartmentAuthController::class, 'logout'])->name('department.logout');
+
+    // Protected Routes
+    Route::middleware(['auth:department'])->group(function () {
+        Route::get('dashboard', [DepartmentDashboardController::class, 'index'])->name('department.dashboard');
+        Route::get('pending-reports', [DepartmentDashboardController::class, 'pendingReports'])->name('department.pending-reports');
+        Route::get('resolved-reports', [DepartmentDashboardController::class, 'resolvedReports'])->name('department.resolved-reports');
+        
+        // Report Actions
+        Route::get('reports/{report}', [DepartmentDashboardController::class, 'showReport'])->name('department.show-report');
+        Route::post('resolve-report', [DepartmentDashboardController::class, 'resolveReport'])->name('department.resolve-report');
+        Route::post('add-remarks', [DepartmentDashboardController::class, 'addRemarks'])->name('department.add-remarks');
+    });
+});
 
 // Authentication routes
 Auth::routes();

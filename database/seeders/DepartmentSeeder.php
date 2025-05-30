@@ -4,11 +4,18 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Department;
+use Spatie\Permission\Models\Role;
 
 class DepartmentSeeder extends Seeder
 {
     public function run(): void
     {
+        // Create department role if it doesn't exist
+        $departmentRole = Role::firstOrCreate(
+            ['name' => 'department'],
+            ['guard_name' => 'department']
+        );
+
         $departments = [
             [
                 'name' => 'SS Department',
@@ -68,8 +75,9 @@ class DepartmentSeeder extends Seeder
             ]
         ];
 
-        foreach ($departments as $department) {
-            Department::create($department);
+        foreach ($departments as $departmentData) {
+            $department = Department::create($departmentData);
+            $department->assignRole($departmentRole);
         }
     }
 } 
