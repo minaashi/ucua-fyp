@@ -54,12 +54,7 @@
                                    required>
                         </div>
 
-                        <div class="flex items-center mt-4">
-                            <input type="checkbox" id="is_anonymous" name="is_anonymous" 
-                                   class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <label for="is_anonymous" class="ml-2 block text-sm text-gray-700">
-                                I want my information to be anonymous
-                            </label>
+                        
                         </div>
                     </div>
                 </div>
