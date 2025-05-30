@@ -9,13 +9,28 @@ class DepartmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:admin']);
+        $this->middleware(['auth', 'department.head']);
     }
 
     public function index()
     {
-        $departments = Department::withCount('reports')->get();
-        return view('admin.departments.index', compact('departments'));
+        $department = auth()->user()->department;
+        $reports = $department->reports()->with('user')->latest()->get();
+        return view('admin.departments.index', compact('department', 'reports'));
+    }
+
+    public function show(Department $department)
+    {
+        // Middleware will ensure they can only access their own department
+        $reports = $department->reports()->with('user')->latest()->get();
+        return view('admin.departments.show', compact('department', 'reports'));
+    }
+
+    public function getDepartmentReports(Department $department)
+    {
+        // Middleware will ensure they can only access their own department's reports
+        $reports = $department->reports()->with('user')->latest()->get();
+        return response()->json($reports);
     }
 
     public function create()

@@ -42,7 +42,7 @@
         <!-- Header -->
         <header class="bg-blue-800 text-white p-4 shadow-md">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Port Security & Safety (PSD) Dashboard</h1>
+                <h1 class="text-2xl font-bold">{{ auth()->guard('department')->user()->name }} Dashboard</h1>
                 <div class="flex items-center space-x-4">
                     <span>Welcome, {{ auth()->guard('department')->user()->head_name }}</span>
                     <form action="{{ route('department.logout') }}" method="POST" class="inline">
@@ -62,25 +62,31 @@
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <!-- Total Reports Card -->
-                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500">
-                    <h3 class="text-lg font-semibold text-gray-700">Total Reports</h3>
-                    <p class="text-3xl font-bold text-blue-500 mt-2">{{ $totalReports }}</p>
-                    <p class="text-sm text-gray-500 mt-1">All reports assigned to department</p>
-                </div>
+                <a href="{{ route('department.dashboard') }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Reports</h3>
+                        <p class="text-3xl font-bold text-blue-500 mt-2">{{ $totalReports }}</p>
+                        <p class="text-sm text-gray-500 mt-1">All reports assigned to department</p>
+                    </div>
+                </a>
 
                 <!-- Pending Reports Card -->
-                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-yellow-500">
-                    <h3 class="text-lg font-semibold text-gray-700">Pending Reports</h3>
-                    <p class="text-3xl font-bold text-yellow-500 mt-2">{{ $pendingReports }}</p>
-                    <p class="text-sm text-gray-500 mt-1">Awaiting resolution</p>
-                </div>
+                <a href="{{ route('department.pending-reports') }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-yellow-500 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Pending Reports</h3>
+                        <p class="text-3xl font-bold text-yellow-500 mt-2">{{ $pendingReports }}</p>
+                        <p class="text-sm text-gray-500 mt-1">Awaiting resolution</p>
+                    </div>
+                </a>
 
                 <!-- Resolved Reports Card -->
-                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-green-500">
-                    <h3 class="text-lg font-semibold text-gray-700">Resolved Reports</h3>
-                    <p class="text-3xl font-bold text-green-500 mt-2">{{ $resolvedReports }}</p>
-                    <p class="text-sm text-gray-500 mt-1">Successfully handled</p>
-                </div>
+                <a href="{{ route('department.resolved-reports') }}" class="block">
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-green-500 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Resolved Reports</h3>
+                        <p class="text-3xl font-bold text-green-500 mt-2">{{ $resolvedReports }}</p>
+                        <p class="text-sm text-gray-500 mt-1">Successfully handled</p>
+                    </div>
+                </a>
             </div>
 
             <!-- Recent Reports Table -->
