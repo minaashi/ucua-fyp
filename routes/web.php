@@ -86,6 +86,10 @@ Route::prefix('admin')->group(function () {
         Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
         Route::put('/admin/reports/{report}', [App\Http\Controllers\AdminReportController::class, 'update'])->name('admin.reports.update');
 
+        // New routes for accepting and rejecting reports
+        Route::post('/reports/{report}/accept', [AdminReportController::class, 'acceptReport'])->name('admin.reports.accept');
+        Route::post('/reports/{report}/reject', [AdminReportController::class, 'rejectReport'])->name('admin.reports.reject');
+
         // User Management Routes
         Route::get('/users', [AdminUserController::class, 'index'])
             ->name('admin.users.index');

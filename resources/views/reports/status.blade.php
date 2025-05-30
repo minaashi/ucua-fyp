@@ -24,15 +24,28 @@
             <h1 class="text-2xl font-bold mb-6">Report Tracking</h1>
 
             <!-- Report Card -->
-            @foreach($pendingReports as $report)
+            @forelse($reports as $report)
             <div class="bg-white border rounded-lg shadow-sm p-6 mb-6">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h2 class="text-xl font-semibold">{{ $report->non_compliance_type }}</h2>
                         <p class="text-gray-600">Report ID: RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</p>
                     </div>
-                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                        {{ ucfirst($report->status) }}
+                    <span class="px-3 py-1 rounded-full text-sm
+                        @if($report->status == 'pending')
+                            bg-yellow-100 text-yellow-800
+                        @elseif($report->status == 'review')
+                            bg-blue-100 text-blue-800
+                        @elseif($report->status == 'resolved')
+                            bg-green-100 text-green-800
+                        @elseif($report->status == 'rejected')
+                            bg-red-100 text-red-800
+                        @endif">
+                        @if($report->status == 'review')
+                            Under Review
+                        @else
+                            {{ ucfirst($report->status) }}
+                        @endif
                     </span>
                 </div>
 
@@ -46,33 +59,41 @@
                             </div>
                             <p class="text-sm mt-2">Submitted</p>
                         </div>
-                        <div class="flex-1 h-1 bg-green-500 mx-2"></div>
-                        
+                        <div class="flex-1 h-1 {{ $report->status != 'pending' ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+
                         <!-- Under Review -->
                         <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 {{ $report->status != 'pending' ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
+                            <div class="w-10 h-10 {{ ($report->status == 'review' || $report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
                                 <i class="fas fa-search text-white"></i>
                             </div>
                             <p class="text-sm mt-2">Under Review</p>
                         </div>
-                        <div class="flex-1 h-1 {{ $report->status != 'pending' ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                        
-                        <!-- Investigation -->
+                        <div class="flex-1 h-1 {{ ($report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+
+                        <!-- Resolved/Rejected -->
                         <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 {{ $report->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
-                                <i class="fas fa-clipboard-check text-white"></i>
+                            <div class="w-10 h-10 {{ ($report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
+                                @if($report->status == 'resolved')
+                                    <i class="fas fa-check text-white"></i>
+                                @elseif($report->status == 'rejected')
+                                    <i class="fas fa-times text-white"></i>
+                                @else
+                                    <i class="fas fa-clipboard-check text-white"></i>
+                                @endif
                             </div>
-                            <p class="text-sm mt-2">Investigation</p>
+                            <p class="text-sm mt-2">{{ ($report->status == 'resolved') ? 'Resolved' : (($report->status == 'rejected') ? 'Rejected' : 'Investigation') }}</p>
                         </div>
-                        <div class="flex-1 h-1 {{ $report->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                        
-                        <!-- Action Taken -->
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 {{ $report->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
-                                <i class="fas fa-check text-white"></i>
-                            </div>
-                            <p class="text-sm mt-2">Action Taken</p>
-                        </div>
+
+                         {{-- No line after the last step --}}
+                         <div class="flex-1 h-1 bg-gray-300 mx-2 invisible"></div>
+
+                        <!-- Action Taken (Placeholder for potential future steps) -->
+                         <div class="flex flex-col items-center invisible">
+                             <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                                 <i class="fas fa-check text-white"></i>
+                             </div>
+                             <p class="text-sm mt-2">Action Taken</p>
+                         </div>
                     </div>
                 </div>
 
@@ -92,14 +113,19 @@
                     <h3 class="font-semibold mb-2">Description</h3>
                     <p class="text-gray-600">{{ $report->description }}</p>
                 </div>
-            </div>
-            @endforeach
 
-            @if($pendingReports->isEmpty())
+                @if($report->status == 'rejected' && $report->remarks)
+                <div class="mt-4">
+                    <h3 class="font-semibold mb-2 text-red-700">Rejection Remarks</h3>
+                    <p class="text-red-600">{{ $report->remarks }}</p>
+                </div>
+                @endif
+            </div>
+            @empty
             <div class="text-center py-8">
                 <p class="text-gray-500">No reports found.</p>
             </div>
-            @endif
+            @endforelse
         </div>
     </div>
 

@@ -132,11 +132,10 @@ class ReportController extends Controller
     // Track Report Status: Show reports based on their status (for User-side)
     public function trackStatus()
     {
-        $pendingReports = auth()->user()->reports()->where('status', 'pending')->get(); // Get pending reports
-        $solvedReports = auth()->user()->reports()->where('status', 'solved')->get();  // Get solved reports
+        $reports = auth()->user()->reports()->orderBy('created_at', 'desc')->get();
 
-        // Return the view with both the pending and solved reports
-        return view('reports.status', compact('pendingReports', 'solvedReports'));  // Pass both to the view
+        // Return the view with all the user's reports
+        return view('reports.status', compact('reports'));
     }
 
     public function assignDepartment(Request $request)

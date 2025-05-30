@@ -90,8 +90,14 @@
                                     <button type="button" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-bs-toggle="modal" data-bs-target="#viewReportModal{{ $report->id }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button type="button" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600" data-bs-toggle="modal" data-bs-target="#updateStatusModal{{ $report->id }}">
-                                        <i class="fas fa-edit"></i>
+                                    <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onclick="return confirm('Are you sure you want to accept this report?')">
+                                            Accept
+                                        </button>
+                                    </form>
+                                    <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" data-bs-toggle="modal" data-bs-target="#rejectReportModal{{ $report->id }}">
+                                        Reject
                                     </button>
                                     <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST" class="inline">
                                         @csrf
@@ -104,6 +110,31 @@
                             </td>
                         </tr>
                         <!-- Modals for view and update status can be refactored similarly if needed -->
+
+                        <!-- Reject Report Modal -->
+                        <div class="modal fade" id="rejectReportModal{{ $report->id }}" tabindex="-1" aria-labelledby="rejectReportModalLabel{{ $report->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="rejectReportModalLabel{{ $report->id }}">Reject Report RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ route('admin.reports.reject', $report->id) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="remarks{{ $report->id }}" class="form-label">Remarks</label>
+                                                <textarea class="form-control" id="remarks{{ $report->id }}" name="remarks" rows="4" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-danger">Reject Report</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @empty
                         <tr>
                             <td colspan="7" class="text-center py-4 text-gray-500">No reports found</td>

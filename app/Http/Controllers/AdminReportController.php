@@ -126,4 +126,42 @@ class AdminReportController extends Controller
         $report->delete();
         return redirect()->back()->with('success', 'Report deleted successfully.');
     }
+
+    /**
+     * Accept a report.
+     *
+     * @param  \App\Models\Report  $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function acceptReport(Report $report)
+    {
+        $report->update([
+            'status' => 'review',
+        ]);
+
+        return redirect()->route('admin.reports.index')
+            ->with('success', 'Report accepted successfully.');
+    }
+
+    /**
+     * Reject a report with remarks.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Report  $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function rejectReport(Request $request, Report $report)
+    {
+        $request->validate([
+            'remarks' => 'required|string',
+        ]);
+
+        $report->update([
+            'status' => 'rejected',
+            'remarks' => $request->remarks,
+        ]);
+
+        return redirect()->route('admin.reports.index')
+            ->with('success', 'Report rejected successfully.');
+    }
 }
