@@ -29,7 +29,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h2 class="text-xl font-semibold">{{ $report->non_compliance_type }}</h2>
-                        <p class="text-gray-600">Report ID: RPT-{{ date('Y') }}-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-gray-600">Report ID: RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</p>
                     </div>
                     <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
                         {{ ucfirst($report->status) }}
