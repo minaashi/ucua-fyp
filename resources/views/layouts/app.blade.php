@@ -31,9 +31,7 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
-        @if(auth()->check() && auth()->user()->hasRole('ucua_officer'))
-            {{-- Do not include the user sidebar for UCUA officers --}}
-        @else
+        @if(auth()->guard('web')->check())
             @include('partials.sidebar')
         @endif
         <div class="flex-1 flex flex-col">

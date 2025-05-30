@@ -2,31 +2,33 @@
 
 @section('content')
 <div class="min-h-screen flex">
-    <!-- Sidebar -->
+    {{-- Removed the first sidebar --}}
+
+    <!-- Department Sidebar -->
     <aside class="w-64 bg-white shadow-md">
         <div class="p-4 border-b">
             <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" class="h-12 mx-auto">
             <h2 class="text-xl font-bold text-center text-gray-800 mt-2">{{ auth()->guard('department')->user()->name }} Dashboard</h2>
         </div>
-        
+
         <nav class="mt-6">
             <ul class="space-y-2">
                 <li>
-                    <a href="{{ route('department.dashboard') }}" 
+                    <a href="{{ route('department.dashboard') }}"
                        class="flex items-center px-4 py-2 {{ Request::routeIs('department.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-chart-line w-5"></i>
                         <span>Report Overview</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('department.pending-reports') }}" 
+                    <a href="{{ route('department.pending-reports') }}"
                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800">
                         <i class="fas fa-clock w-5"></i>
                         <span>Pending Reports</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('department.resolved-reports') }}" 
+                    <a href="{{ route('department.resolved-reports') }}"
                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-green-100 hover:text-green-800">
                         <i class="fas fa-check-circle w-5"></i>
                         <span>Resolved Reports</span>
@@ -40,7 +42,7 @@
         <!-- Header -->
         <header class="bg-blue-800 text-white p-4 shadow-md">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold">{{ auth()->guard('department')->user()->name }} Dashboard</h1>
+                <h1 class="text-2xl font-bold">Port Security & Safety (PSD) Dashboard</h1>
                 <div class="flex items-center space-x-4">
                     <span>Welcome, {{ auth()->guard('department')->user()->head_name }}</span>
                     <form action="{{ route('department.logout') }}" method="POST" class="inline">
@@ -55,6 +57,8 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-6 bg-gray-100">
+            
+
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <!-- Total Reports Card -->
