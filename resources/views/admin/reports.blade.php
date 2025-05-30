@@ -87,7 +87,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex space-x-2">
-                                    <button type="button" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-bs-toggle="modal" data-bs-target="#viewReportModal{{ $report->id }}">
+                                    <button type="button" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-toggle="modal" data-target="#viewReportModal{{ $report->id }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST" class="inline">
@@ -96,7 +96,7 @@
                                             Accept
                                         </button>
                                     </form>
-                                    <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" data-bs-toggle="modal" data-bs-target="#rejectReportModal{{ $report->id }}">
+                                    <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" data-toggle="modal" data-target="#rejectReportModal{{ $report->id }}">
                                         Reject
                                     </button>
                                     <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST" class="inline">
