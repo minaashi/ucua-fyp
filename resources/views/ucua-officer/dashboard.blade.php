@@ -115,8 +115,9 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($recentReports as $report)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->id }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->title }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
