@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\UCUALoginController;
 use App\Http\Controllers\UCUADashboardController;
 use App\Http\Controllers\Department\AuthController as DepartmentAuthController;
 use App\Http\Controllers\Department\DashboardController as DepartmentDashboardController;
+use App\Http\Controllers\OtpVerificationController;
 
 // Home/Hero page route
 Route::get('/', function () {
@@ -124,7 +125,7 @@ Route::prefix('admin')->group(function () {
 });
 
 // UCUA Officer Routes
-Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
+Route::middleware(['auth:ucua', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
     Route::get('/dashboard', [UCUADashboardController::class, 'index'])->name('dashboard');
     Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
     Route::post('/assign-department', [UCUADashboardController::class, 'assignDepartment'])->name('assign-department');
@@ -136,12 +137,22 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
 });
 
 // UCUA Officer Login Routes
-Route::get('/ucua/login', [UCUALoginController::class, 'showLoginForm'])->name('ucua.login');
-Route::post('/ucua/login', [UCUALoginController::class, 'login']);
+Route::middleware(['guest:ucua'])->group(function () {
+    Route::get('/ucua/login', [UCUALoginController::class, 'showLoginForm'])->name('ucua.login');
+    Route::post('/ucua/login', [UCUALoginController::class, 'login']);
+});
 Route::post('/ucua/logout', [UCUALoginController::class, 'logout'])->name('ucua.logout');
 
 // Explicit logout route
 Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
+
+// OTP Verification Routes
+Route::get('/email/verify', function () {
+    return view('auth.verify-otp-notice'); // Create this view next
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->middleware('auth')->name('otp.form');
+Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->middleware('auth')->name('otp.verify');
 
