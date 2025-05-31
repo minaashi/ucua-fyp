@@ -4,8 +4,8 @@
 <div class="min-h-screen bg-gray-100 py-10">
     <div class="max-w-6xl mx-auto px-4">
         <div class="bg-blue-800 rounded-t-lg px-8 py-6 shadow-md">
-            <h1 class="text-2xl font-bold text-white mb-1">Assign Departments to Reports</h1>
-            <p class="text-blue-100 text-base">Select a department and deadline for each pending report below.</p>
+            <h1 class="text-2xl font-bold text-white mb-1">Assign Case Of Reports</h1>
+            <p class="text-blue-100 text-base">Please select a department and deadline for each pending report below.</p>
         </div>
         <div class="bg-white rounded-b-lg shadow-md p-8">
             @if ($errors->any())
@@ -26,7 +26,12 @@
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs text-gray-400">Report ID: <span class="font-semibold text-gray-700">#{{ $report->id }}</span></span>
-                                <span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold">Pending</span>
+                                <span class="inline-block px-2 py-1 text-xs rounded 
+                                    {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                       ($report->status === 'review' ? 'bg-blue-100 text-blue-800' : 
+                                        'bg-gray-100 text-gray-800') }} font-semibold">
+                                    {{ ucfirst($report->status) }}
+                                </span>
                             </div>
                             <div class="mb-2">
                                 <span class="block text-sm text-gray-500">Employee ID:</span>
