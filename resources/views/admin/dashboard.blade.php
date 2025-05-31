@@ -33,7 +33,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="text-left py-2">Type</th>
+                    <th class="text-left py-2">Report ID</th>
                     <th class="text-left py-2">Location</th>
                     <th class="text-left py-2">Status</th>
                     <th class="text-left py-2">Date</th>
@@ -42,7 +42,7 @@
             <tbody>
                 @forelse($recentReports as $report)
                 <tr>
-                    <td class="py-2">{{ $report->non_compliance_type }}</td>
+                    <td class="py-2">RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td class="py-2">{{ $report->location }}</td>
                     <td class="py-2">
                         <span class="px-2 py-1 rounded text-xs font-semibold

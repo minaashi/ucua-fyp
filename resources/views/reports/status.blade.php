@@ -63,16 +63,16 @@
 
                         <!-- Under Review -->
                         <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 {{ ($report->status == 'review' || $report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
+                            <div class="w-10 h-10 {{ ($report->status == 'review' || $report->status == 'in_progress' || $report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
                                 <i class="fas fa-search text-white"></i>
                             </div>
                             <p class="text-sm mt-2">Under Review</p>
                         </div>
-                        <div class="flex-1 h-1 {{ ($report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+                        <div class="flex-1 h-1 {{ ($report->status == 'in_progress' || $report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
 
-                        <!-- Resolved/Rejected -->
+                        <!-- Investigation/Resolved/Rejected -->
                         <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 {{ ($report->status == 'resolved' || $report->status == 'rejected') ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center">
+                            <div class="w-10 h-10 {{ ($report->status == 'in_progress' || $report->status == 'resolved') ? 'bg-blue-500' : ($report->status == 'rejected' ? 'bg-red-500' : 'bg-gray-300') }} rounded-full flex items-center justify-center">
                                 @if($report->status == 'resolved')
                                     <i class="fas fa-check text-white"></i>
                                 @elseif($report->status == 'rejected')

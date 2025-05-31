@@ -76,13 +76,7 @@ use Illuminate\Support\Facades\Route;
                         <a href="{{ route('admin.login') }}" class="btn btn-outline-primary">
                             PIC Login <i class="fas fa-arrow-right ms-1"></i>
                         </a>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <a href="{{ route('admin.login') }}" class="text-decoration-none">
-                            <i class="fas fa-user-shield me-1"></i> PIC Login
-                        </a>
-                    </div>
+                    
                 </form>
             </div>
         </div>

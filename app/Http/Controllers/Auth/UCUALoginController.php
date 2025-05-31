@@ -25,21 +25,21 @@ class UCUALoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+        if (Auth::guard('ucua')->attempt($credentials)) {
+            $user = Auth::guard('ucua')->user();
             
             if ($user->hasRole('ucua_officer')) {
                 $request->session()->regenerate();
                 return redirect()->intended('ucua/dashboard');
             } else {
                 Auth::logout();
-                return back()->withErrors([
+                return redirect()->route('ucua.login')->withErrors([
                     'email' => 'You do not have permission to access the UCUA Officer portal.',
                 ]);
             }
         }
 
-        return back()->withErrors([
+        return redirect()->route('ucua.login')->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ]);
     }

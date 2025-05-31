@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'department.auth' => \App\Http\Middleware\DepartmentAuth::class,
         'department.head' => \App\Http\Middleware\DepartmentHeadMiddleware::class,
+        'department.login' => \App\Http\Middleware\EnsureDepartmentLogin::class,
     ];
 }

@@ -38,7 +38,9 @@
                     <option value="All Status" {{ request('status') == 'All Status' ? 'selected' : '' }}>All Status</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="review" {{ request('status') == 'review' ? 'selected' : '' }}>Review</option>
+                    <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                     <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
                 <input type="text" name="search" class="border rounded px-3 py-2" placeholder="Search reports..." value="{{ request('search') }}">
                 <button type="submit" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Filter</button>
@@ -53,7 +55,6 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -65,7 +66,6 @@
                     @forelse($reports as $report)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $report->non_compliance_type }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->location }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <form action="{{ route('admin.reports.update', $report->id) }}" method="POST" class="flex items-center">
@@ -80,16 +80,23 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {{ $report->status == 'pending' ? 'bg-yellow-100 text-yellow-800' : ($report->status == 'resolved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800') }}">
-                                    {{ ucfirst($report->status) }}
+                                    @if($report->status == 'pending') bg-yellow-100 text-yellow-800
+                                    @elseif($report->status == 'review') bg-blue-100 text-blue-800
+                                    @elseif($report->status == 'in_progress') bg-purple-100 text-purple-800
+                                    @elseif($report->status == 'resolved') bg-green-100 text-green-800
+                                    @elseif($report->status == 'rejected') bg-red-100 text-red-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
+                                    {{ ucfirst(str_replace('_', ' ', $report->status)) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex space-x-2">
-                                    <button type="button" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-toggle="modal" data-target="#viewReportModal{{ $report->id }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <a href="{{ route('admin.reports.show', $report->id) }}" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 inline-flex items-center" title="Review Report">
+                                        <i class="fas fa-eye mr-1"></i>
+                                        Review
+                                    </a>
                                     <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onclick="return confirm('Are you sure you want to accept this report?')">
@@ -137,7 +144,7 @@
                         </div>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-gray-500">No reports found</td>
+                            <td colspan="6" class="text-center py-4 text-gray-500">No reports found</td>
                         </tr>
                     @endforelse
                 </tbody>

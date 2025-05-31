@@ -85,6 +85,33 @@ class AdminReportController extends Controller
 
     public function show(Report $report)
     {
+        // Load the report with all related data, ensuring relationships are always loaded
+        $report->load([
+            'user',
+            'handlingDepartment',
+            'handlingStaff',
+            'remarks' => function($query) {
+                $query->with('user')->orderBy('created_at', 'desc');
+            },
+            'warnings' => function($query) {
+                $query->with('suggestedBy')->orderBy('created_at', 'desc');
+            },
+            'reminders' => function($query) {
+                $query->with('sentBy')->orderBy('created_at', 'desc');
+            }
+        ]);
+
+        // Ensure relationships are collections, not null
+        if (!$report->relationLoaded('remarks')) {
+            $report->setRelation('remarks', collect());
+        }
+        if (!$report->relationLoaded('warnings')) {
+            $report->setRelation('warnings', collect());
+        }
+        if (!$report->relationLoaded('reminders')) {
+            $report->setRelation('reminders', collect());
+        }
+
         return view('admin.reports.show', compact('report'));
     }
 
@@ -96,7 +123,7 @@ class AdminReportController extends Controller
     public function update(Request $request, Report $report)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,review,resolved',
+            'status' => 'required|in:pending,review,in_progress,resolved',
             'category' => 'required|string',
         ]);
 
@@ -109,7 +136,7 @@ class AdminReportController extends Controller
     public function updateStatus(Request $request, Report $report)
     {
         $request->validate([
-            'status' => 'required|in:pending,review,resolved',
+            'status' => 'required|in:pending,review,in_progress,resolved',
             'category' => 'required|in:unsafe_act,unsafe_condition'
         ]);
 

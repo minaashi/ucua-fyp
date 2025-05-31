@@ -100,7 +100,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                    
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -112,14 +112,12 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $report->title }}
-                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                                                ($report->status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                                                'bg-gray-100 text-gray-800') }}">
+                                                ($report->status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
+                                                'bg-gray-100 text-gray-800')) }}">
                                             {{ ucfirst($report->status) }}
                                         </span>
                                     </td>
@@ -142,7 +140,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                         No reports found
                                     </td>
                                 </tr>

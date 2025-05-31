@@ -27,12 +27,14 @@
     </style>
 
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
         @if(auth()->guard('web')->check())
             @include('partials.sidebar')
+        @elseif(auth()->guard('ucua')->check())
+            @include('ucua-officer.partials.sidebar')
         @endif
         <div class="flex-1 flex flex-col">
             @yield('content')

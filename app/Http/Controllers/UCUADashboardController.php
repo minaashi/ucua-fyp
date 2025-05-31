@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\ReportAssignedToDepartmentNotification;
+use Illuminate\Support\Facades\Log;
 
 class UCUADashboardController extends Controller
 {
@@ -58,6 +59,8 @@ class UCUADashboardController extends Controller
             $report->status = 'investigation';
             $report->save();
 
+            Log::info('Report ' . $report->id . ' updated with department ' . $request->department_id . ' and deadline ' . $request->deadline . '. New status: ' . $report->status);
+
             if ($request->initial_remarks) {
                 $report->remarks()->create([
                     'content' => $request->initial_remarks,
@@ -80,12 +83,13 @@ class UCUADashboardController extends Controller
             }
 
             DB::commit();
+            Log::info('Report assignment and notification transaction committed successfully for report ' . $report->id);
 
             return redirect()->route('ucua.dashboard')->with('success', 'Report assigned successfully to ' . $department->name . '. Deadline: ' . \Carbon\Carbon::parse($request->deadline)->format('d/m/Y') . '.');
         } catch (\Exception $e) {
             DB::rollBack();
             // Log the exception for debugging
-            \Log::error('Failed to assign department or send notification: ' . $e->getMessage());
+            \Log::error('Failed to assign department or send notification for report ' . ($report->id ?? 'N/A') . ': ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to assign department. Please try again.');
         }
     }

@@ -74,6 +74,26 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // If AJAX request, return JSON
+        if (request()->ajax()) {
+            $report->load(['remarks.user']); // eager load remarks and user
+            return response()->json([
+                'id' => $report->id,
+                'title' => $report->title,
+                'description' => $report->description,
+                'status' => $report->status,
+                'deadline' => $report->deadline,
+                'remarks' => $report->remarks->map(function($remark) {
+                    return [
+                        'content' => $remark->content,
+                        'user_name' => $remark->user->name ?? 'Unknown',
+                        'created_at' => $remark->created_at,
+                    ];
+                }),
+            ]);
+        }
+
+        // Otherwise, fallback to the view (if needed elsewhere)
         return view('department.show-report', compact('report', 'department'));
     }
 

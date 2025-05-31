@@ -22,7 +22,7 @@ return new class extends Migration
             $table->datetime('incident_date');
             $table->text('description');
             $table->string('category')->nullable(); // Will be set by admin (Unsafe Act/Condition)
-            $table->enum('status', ['pending', 'review', 'resolved'])->default('pending');
+            $table->enum('status', ['pending', 'review', 'in_progress', 'resolved', 'rejected'])->default('pending');
             $table->boolean('is_anonymous')->default(false);
             $table->foreignId('handling_department_id')->nullable()->constrained('departments');
             $table->foreignId('handling_staff_id')->nullable()->constrained('users');

@@ -24,14 +24,14 @@ Route::get('/', function () {
 })->name('home');
 
 // Department Routes
-Route::prefix('department')->group(function () {
-    // Authentication
+Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
+    // Public routes (no auth required)
     Route::get('login', [DepartmentAuthController::class, 'showLoginForm'])->name('department.login');
-    Route::post('login', [DepartmentAuthController::class, 'login']);
+    Route::post('login', [DepartmentAuthController::class, 'login'])->name('department.login.submit');
     Route::post('logout', [DepartmentAuthController::class, 'logout'])->name('department.logout');
 
-    // Protected Routes
-    Route::middleware(['auth:department', 'department.head'])->group(function () {
+    // Protected routes (require department auth)
+    Route::middleware(['auth:department'])->group(function () {
         Route::get('dashboard', [DepartmentDashboardController::class, 'index'])->name('department.dashboard');
         Route::get('pending-reports', [DepartmentDashboardController::class, 'pendingReports'])->name('department.pending-reports');
         Route::get('resolved-reports', [DepartmentDashboardController::class, 'resolvedReports'])->name('department.resolved-reports');
@@ -83,6 +83,7 @@ Route::prefix('admin')->group(function () {
 
         // Reports Routes
         Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+        Route::get('/reports/{report}', [AdminReportController::class, 'show'])->name('admin.reports.show');
         Route::post('/reports/{report}/update-status', [AdminReportController::class, 'updateStatus'])->name('admin.reports.update-status');
         Route::delete('/reports/{report}', [AdminReportController::class, 'destroy'])->name('admin.reports.destroy');
         Route::put('/admin/reports/{report}', [App\Http\Controllers\AdminReportController::class, 'update'])->name('admin.reports.update');

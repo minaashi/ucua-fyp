@@ -193,8 +193,8 @@ class ReportController extends Controller
 
             return redirect()->back()->with('success', 'Department assigned successfully.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to assign department. Please try again.');
+           // DB::rollBack();
+        //return redirect()->back()->with('error', 'Failed to assign department. Please try again.');
         }
     }
 }

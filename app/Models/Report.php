@@ -31,7 +31,7 @@ class Report extends Model
         'status',
         'category',
         'is_anonymous',
-        'handling_department',
+        'handling_department_id',
         'handling_staff_id',
         'remarks',
         'deadline',
@@ -96,5 +96,39 @@ class Report extends Model
             return null;
         }
         return now()->diffInDays($this->deadline, false);
+    }
+
+    /**
+     * Get the count of remarks safely
+     */
+    public function getRemarksCount()
+    {
+        return $this->remarks ? $this->remarks->count() : 0;
+    }
+
+    /**
+     * Get the count of warnings safely
+     */
+    public function getWarningsCount()
+    {
+        return $this->warnings ? $this->warnings->count() : 0;
+    }
+
+    /**
+     * Get the count of reminders safely
+     */
+    public function getRemindersCount()
+    {
+        return $this->reminders ? $this->reminders->count() : 0;
+    }
+
+    /**
+     * Check if the report has any activity (remarks, warnings, or reminders)
+     */
+    public function hasActivity()
+    {
+        return $this->getRemarksCount() > 0 ||
+               $this->getWarningsCount() > 0 ||
+               $this->getRemindersCount() > 0;
     }
 }
