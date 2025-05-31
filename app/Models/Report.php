@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\UnsafeActDetails;
+use App\Models\UnsafeConditionDetails;
 
 class Report extends Model
 {
@@ -56,6 +58,16 @@ class Report extends Model
     public function handlingStaff()
     {
         return $this->belongsTo(User::class, 'handling_staff_id');
+    }
+
+    public function unsafeActDetails()
+    {
+        return $this->hasOne(UnsafeActDetails::class);
+    }
+
+    public function unsafeConditionDetails()
+    {
+        return $this->hasOne(UnsafeConditionDetails::class);
     }
 
     public function remarks()

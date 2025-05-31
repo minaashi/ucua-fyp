@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            if (!Schema::hasColumn('reports', 'remarks')) {
-                $table->text('remarks')->nullable();
-            }
+            $table->dropColumn(['unsafe_condition', 'other_unsafe_condition', 'unsafe_act', 'other_unsafe_act', 'other_location']);
         });
     }
 
@@ -24,7 +22,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            $table->dropColumn('remarks');
+            // We would typically re-add the columns here if rolling back
+            // However, since we are replacing them with new tables,
+            // re-adding them in the down method is not necessary for this specific refactor.
+            // If you need to roll back completely, you would need to add the column definitions here.
         });
     }
 };

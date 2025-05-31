@@ -59,26 +59,55 @@ class ReportController extends Controller
             'phone' => 'required|string',
             'non_compliance_type' => 'required|string',
             'location' => 'required|string',
+            'other_location' => 'nullable|string',
             'incident_date' => 'required|date',
             'description' => 'required|string',
             'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:5120', // 5MB max
+            'unsafe_condition' => 'nullable|string',
+            'other_unsafe_condition' => 'nullable|string',
+            'unsafe_act' => 'nullable|string',
+            'other_unsafe_act' => 'nullable|string',
         ]);
 
-        $attachmentPath = null;
+        // Validate that either unsafe_condition or unsafe_act is provided, but not both
+        $request->validate([
+            'unsafe_condition' => 'required_without:unsafe_act',
+            'unsafe_act' => 'required_without:unsafe_condition',
+        ]);
 
-        Report::create([
+        // Handle file upload
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('reports', 'public'); // Store in public/reports directory
+        }
+
+        // Create the main report record
+        $report = Report::create([
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
             'department' => $validated['department'],
             'phone' => $validated['phone'],
             'non_compliance_type' => $validated['non_compliance_type'],
-            'location' => $validated['location'],
+            'location' => $validated['location'] === 'Other' ? $validated['other_location'] : $validated['location'],
             'incident_date' => $validated['incident_date'],
             'description' => $validated['description'],
             'attachment' => $attachmentPath,
             'status' => 'pending',
             'category' => null,
         ]);
+
+        // Create associated detail records based on user input
+        if ($validated['unsafe_condition']) {
+            $report->unsafeConditionDetails()->create([
+                'condition_type' => $validated['unsafe_condition'] === 'Other' ? null : $validated['unsafe_condition'],
+                'other_condition_details' => $validated['other_unsafe_condition'],
+            ]);
+        } elseif ($validated['unsafe_act']) {
+             $report->unsafeActDetails()->create([
+                'act_type' => $validated['unsafe_act'] === 'Other' ? null : $validated['unsafe_act'],
+                'other_act_details' => $validated['other_unsafe_act'],
+            ]);
+        }
 
         return redirect()->route('reports.track')
             ->with('success', 'Your report has been submitted successfully!');
