@@ -13,6 +13,18 @@
                 <p class="text-blue-100 text-sm mt-1">Report unsafe conditions and acts to maintain workplace safety</p>
             </div>
 
+            {{-- Show all error messages --}}
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>There were some problems with your input:</strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- Form -->
             <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-6">
                 @csrf
@@ -56,14 +68,30 @@
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-700 mb-4">Incident Information</h2>
                     <div class="space-y-4">
-                        <div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category*</label>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="category_type" value="unsafe_condition" onclick="toggleCategory()" required>
+                                    <span class="ml-2">Unsafe Condition</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="category_type" value="unsafe_act" onclick="toggleCategory()" required>
+                                    <span class="ml-2">Unsafe Act</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Unsafe Conditions Section -->
+                        <div id="unsafeConditionSection" style="display: none;">
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="unsafe_condition">
                                 Unsafe Conditions*
                             </label>
-                            <select id="unsafe_condition" name="unsafe_condition" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
+                            <select id="unsafe_condition" name="unsafe_condition" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" onchange="toggleOtherField()">
                                 <option value="">Select Unsafe Condition...</option>
                                 <option value="Slippery floor surface">Slippery floor surface - Permukaan lantai licin</option>
-                                <option value="Exposed live wire (Electrical)">Exposed live wire (Electrical)- Penebat wayar elektrik terdedah</option>
+                                <option value="Exposed live wire (Electrical)">Exposed live wire (Electrical) - Penebat wayar elektrik terdedah</option>
                                 <option value="Fire & explosion hazards">Gas leak - Kebocoran gas</option>
                                 <option value="Other">Other</option>
                             </select>
@@ -74,13 +102,15 @@
                                 <textarea id="other_unsafe_condition" name="other_unsafe_condition" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Please state here"></textarea>
                             </div>
                         </div>
-                        <div>
+
+                        <!-- Unsafe Acts Section -->
+                        <div id="unsafeActSection" style="display: none;">
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="unsafe_act">
                                 Unsafe Acts*
                             </label>
-                            <select id="unsafe_act" name="unsafe_act" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required onchange="toggleOtherField()">
+                            <select id="unsafe_act" name="unsafe_act" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" onchange="toggleOtherField()">
                                 <option value="">Select Unsafe Act...</option>
-                                <option value="Not wearing proper Personal Protective Equipment (PPE)">Not wearing proper Personal Protective Equipment (PPE)- Tidak memakai Alat Pelindung Diri (PPE) yang betul</option>
+                                <option value="Not wearing proper Personal Protective Equipment (PPE)">Not wearing proper PPE - Tidak memakai PPE yang betul</option>
                                 <option value="Speeding inside premise">Speeding inside premise - Memandu laju di dalam premis</option>
                                 <option value="Smoking at prohibited area">Smoking at prohibited area - Merokok ditempat yang dilarang</option>
                                 <option value="Other">Other</option>
@@ -92,6 +122,7 @@
                                 <textarea id="other_unsafe_act" name="other_unsafe_act" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Please state here"></textarea>
                             </div>
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="location">
                                 Location of event *
@@ -125,12 +156,12 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="description">
                              
                                 <label for="description" class="block text-sm font-medium text-gray-700">
-    Detailed Description*
-</label>
-<textarea id="description" name="description" rows="4"
-          class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Please provide specific details about the event..."
-          oninput="this.value = this.value.toUpperCase();" required></textarea>
+                            Detailed Description*
+                        </label>
+                        <textarea id="description" name="description" rows="4"
+                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Please provide specific details about the event..."
+                                oninput="this.value = this.value.toUpperCase();" required></textarea>
 
                         </div>
                         <div>
@@ -161,30 +192,32 @@
         </div>
     </div>
 </div>
+
 <script>
+function toggleCategory() {
+    const selectedCategory = document.querySelector('input[name="category_type"]:checked').value;
+    
+    document.getElementById('unsafeConditionSection').style.display = (selectedCategory === 'unsafe_condition') ? 'block' : 'none';
+    document.getElementById('unsafeActSection').style.display = (selectedCategory === 'unsafe_act') ? 'block' : 'none';
+
+    // Reset values when hidden
+    if (selectedCategory === 'unsafe_condition') {
+        document.getElementById('unsafe_act').value = '';
+        document.getElementById('otherUnsafeActDiv').style.display = 'none';
+    } else {
+        document.getElementById('unsafe_condition').value = '';
+        document.getElementById('otherUnsafeConditionDiv').style.display = 'none';
+    }
+}
+
 function toggleOtherField() {
     const unsafeCondition = document.getElementById('unsafe_condition');
     const unsafeAct = document.getElementById('unsafe_act');
     const location = document.getElementById('location').value;
-    // Show/hide 'Other' textareas
-    document.getElementById('otherUnsafeConditionDiv').style.display = (unsafeCondition.value === 'Other') ? '' : 'none';
-    document.getElementById('otherUnsafeActDiv').style.display = (unsafeAct.value === 'Other') ? '' : 'none';
+
+    document.getElementById('otherUnsafeConditionDiv').style.display = (unsafeCondition && unsafeCondition.value === 'Other') ? '' : 'none';
+    document.getElementById('otherUnsafeActDiv').style.display = (unsafeAct && unsafeAct.value === 'Other') ? '' : 'none';
     document.getElementById('otherLocationDiv').style.display = (location === 'Other') ? '' : 'none';
-    // Mutual exclusion logic
-    if (unsafeCondition.value && unsafeCondition.value !== '') {
-        unsafeAct.value = '';
-        unsafeAct.disabled = true;
-        document.getElementById('otherUnsafeActDiv').style.display = 'none';
-    } else {
-        unsafeAct.disabled = false;
-    }
-    if (unsafeAct.value && unsafeAct.value !== '') {
-        unsafeCondition.value = '';
-        unsafeCondition.disabled = true;
-        document.getElementById('otherUnsafeConditionDiv').style.display = 'none';
-    } else {
-        unsafeCondition.disabled = false;
-    }
 }
 </script>
 @endsection

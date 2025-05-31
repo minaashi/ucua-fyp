@@ -56,22 +56,16 @@ class ReportController extends Controller
         $validated = $request->validate([
             'employee_id' => 'required|string',
             'phone' => 'required|string',
-            'non_compliance_type' => 'required|string',
             'location' => 'required|string',
             'other_location' => 'nullable|string',
             'incident_date' => 'required|date',
             'description' => 'required|string',
             'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:5120', // 5MB max
-            'unsafe_condition' => 'nullable|string',
-            'other_unsafe_condition' => 'nullable|string',
-            'unsafe_act' => 'nullable|string',
-            'other_unsafe_act' => 'nullable|string',
-        ]);
-
-        // Validate that either unsafe_condition or unsafe_act is provided, but not both
-        $request->validate([
-            'unsafe_condition' => 'required_without:unsafe_act',
-            'unsafe_act' => 'required_without:unsafe_condition',
+            'category_type' => 'required|string|in:unsafe_condition,unsafe_act',
+            'unsafe_condition' => 'required_if:category_type,unsafe_condition|string|nullable',
+            'other_unsafe_condition' => 'required_if:unsafe_condition,Other|string|nullable',
+            'unsafe_act' => 'required_if:category_type,unsafe_act|string|nullable',
+            'other_unsafe_act' => 'required_if:unsafe_act,Other|string|nullable',
         ]);
 
         // Handle file upload
@@ -83,33 +77,31 @@ class ReportController extends Controller
         // Log validated data before creating the report
         \Log::info('Attempting to create report with validated data:', $validated);
 
+        if ($validated['category_type'] === 'unsafe_condition') {
+            $validated['unsafe_act'] = null;
+            $validated['other_unsafe_act'] = null;
+        } elseif ($validated['category_type'] === 'unsafe_act') {
+            $validated['unsafe_condition'] = null;
+            $validated['other_unsafe_condition'] = null;
+        }
+
         // Create the main report record
         $report = Report::create([
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
             'department_id' => Auth::user()->department_id, // Use authenticated user's department_id
             'phone' => $validated['phone'],
-            'non_compliance_type' => $validated['non_compliance_type'],
+            'category' => $validated['category_type'],
+            'unsafe_condition' => $validated['unsafe_condition'],
+            'other_unsafe_condition' => $validated['other_unsafe_condition'],
+            'unsafe_act' => $validated['unsafe_act'],
+            'other_unsafe_act' => $validated['other_unsafe_act'],
             'location' => $validated['location'] === 'Other' ? $validated['other_location'] : $validated['location'],
             'incident_date' => $validated['incident_date'],
             'description' => $validated['description'],
             'attachment' => $attachmentPath,
             'status' => 'pending',
-            'category' => null,
         ]);
-
-        // Create associated detail records based on user input
-        if ($validated['unsafe_condition']) {
-            $report->unsafeConditionDetails()->create([
-                'condition_type' => $validated['unsafe_condition'] === 'Other' ? null : $validated['unsafe_condition'],
-                'other_condition_details' => $validated['other_unsafe_condition'],
-            ]);
-        } elseif ($validated['unsafe_act']) {
-             $report->unsafeActDetails()->create([
-                'act_type' => $validated['unsafe_act'] === 'Other' ? null : $validated['unsafe_act'],
-                'other_act_details' => $validated['other_unsafe_act'],
-            ]);
-        }
 
         return redirect()->route('reports.track')
             ->with('success', 'Your report has been submitted successfully!');
