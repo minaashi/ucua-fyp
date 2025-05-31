@@ -71,9 +71,18 @@
                         <input id="password" type="password" 
                             class="form-control @error('password') is-invalid @enderror" 
                             name="password" placeholder="Password" 
-                            minlength="8" maxlength="12" required>
+                            minlength="12" maxlength="32" required>
                         <label for="password">Password</label>
                         <i class="fas fa-eye password-toggle" aria-hidden="true"></i>
+                        <small class="form-text text-muted">
+                            Password must be 12-32 characters long and include:
+                            <ul class="mb-0">
+                                <li>At least one uppercase letter (A-Z)</li>
+                                <li>At least one lowercase letter (a-z)</li>
+                                <li>At least one number (0-9)</li>
+                                <li>At least one special character (!@#$%^&*)</li>
+                            </ul>
+                        </small>
                         @error('password')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
