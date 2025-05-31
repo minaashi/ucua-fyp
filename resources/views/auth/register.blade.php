@@ -48,13 +48,15 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <select id="department" name="department" 
+                        <select id="department" name="department_id" 
                             class="form-control @error('department') is-invalid @enderror" 
                             required>
                             <option value="">Select Department</option>
-                            <option value="security & safety">Port Security and Safety</option>
-                            <option value="maintenance">Maintenance and Repair</option>
-                            <option value="electrical & service">Electrical and Service</option>
+                            @foreach ($departments as $department)
+                                <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                    {{ $department->name }}
+                                </option>
+                            @endforeach
                         </select>
                         <label for="department">Department</label>
                         @error('department')

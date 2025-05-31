@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use App\Models\Department;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -77,15 +78,20 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $department = Department::where('worker_id_prefix', substr($data['worker_id'], 0, 3))
-                                ->first();
+        // Find the department based on worker_id_identifier (adjust logic as needed)
+        // $department = Department::where(function ($query) use ($data) {
+        //     $query->where('worker_id_identifier', '!=', '') // Ensure identifier is not empty
+        //           ->whereNotNull('worker_id_identifier'); // Ensure identifier is not null
+        // })
+        // ->where(DB::raw('INSTR(? , departments.worker_id_identifier)'), '>', 0, [$data['worker_id']]) // Check if worker_id contains the identifier
+        // ->first();
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'worker_id' => $data['worker_id'],
             'password' => Hash::make($data['password']),
-            'department_id' => $department ? $department->id : null,
+            'department_id' => $data['department_id'],
             'email_verified_at' => null,
         ]);
 
@@ -109,5 +115,11 @@ class RegisterController extends Controller
     protected function registered(Request $request, $user)
     {
         return redirect()->route('verification.notice', ['email' => $user->email])->with('status', 'Please verify your email with the OTP sent to your inbox.');
+    }
+
+    public function showRegistrationForm()
+    {
+        $departments = Department::all();
+        return view('auth.register', compact('departments'));
     }
 }
