@@ -55,7 +55,6 @@ class ReportController extends Controller
     {
         $validated = $request->validate([
             'employee_id' => 'required|string',
-            'department' => 'required|string',
             'phone' => 'required|string',
             'non_compliance_type' => 'required|string',
             'location' => 'required|string',
@@ -81,11 +80,14 @@ class ReportController extends Controller
             $attachmentPath = $request->file('attachment')->store('reports', 'public'); // Store in public/reports directory
         }
 
+        // Log validated data before creating the report
+        \Log::info('Attempting to create report with validated data:', $validated);
+
         // Create the main report record
         $report = Report::create([
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
-            'department' => $validated['department'],
+            'department_id' => Auth::user()->department_id, // Use authenticated user's department_id
             'phone' => $validated['phone'],
             'non_compliance_type' => $validated['non_compliance_type'],
             'location' => $validated['location'] === 'Other' ? $validated['other_location'] : $validated['location'],

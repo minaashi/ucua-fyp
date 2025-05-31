@@ -33,16 +33,10 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="department">
-                                Department*
+                                Department
                             </label>
-                            <select id="department" name="department" 
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required>
-                                <option value="">Select Department</option>
-                                @foreach($departments as $department)
-                                    <option value="{{ $department->name }}">{{ $department->name }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" id="department_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ Auth::user()->department->name ?? 'N/A' }}" readonly>
+                            <input type="hidden" name="department_id" value="{{ Auth::user()->department_id }}">
                         </div>
 
                         <div>

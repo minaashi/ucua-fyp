@@ -7,6 +7,12 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use App\Mail\OtpMail;
+use Illuminate\Http\Request;
+use App\Models\Department;
 
 class RegisterController extends Controller
 {
@@ -51,6 +57,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'worker_id' => ['required', 'string', 'unique:users'],
             'password' => [
                 'required',
                 'string',
@@ -70,10 +77,37 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $department = Department::where('worker_id_prefix', substr($data['worker_id'], 0, 3))
+                                ->first();
+
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'worker_id' => $data['worker_id'],
             'password' => Hash::make($data['password']),
+            'department_id' => $department ? $department->id : null,
+            'email_verified_at' => null,
         ]);
+
+        $otp = Str::random(6);
+        $user->otp = $otp;
+        $user->otp_expires_at = Carbon::now()->addMinutes(1);
+        $user->save();
+
+        Mail::to($user->email)->send(new OtpMail($otp, $user->name));
+
+        return $user;
+    }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function registered(Request $request, $user)
+    {
+        return redirect()->route('verification.notice', ['email' => $user->email])->with('status', 'Please verify your email with the OTP sent to your inbox.');
     }
 }
