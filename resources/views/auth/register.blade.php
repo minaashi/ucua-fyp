@@ -52,15 +52,25 @@
                             class="form-control @error('department') is-invalid @enderror" 
                             required>
                             <option value="">Select Department</option>
-                            <option value="operations">Operations</option>
-                            <option value="maintenance">Maintenance</option>
-                            <option value="security">Security</option>
-                            <option value="safety">Safety</option>
-                            <option value="hr">Human Resources</option>
-                            <option value="it">Information Technology</option>
+                            <option value="security & safety">Port Security and Safety</option>
+                            <option value="maintenance">Maintenance and Repair</option>
+                            <option value="electrical & service">Electrical and Service</option>
                         </select>
                         <label for="department">Department</label>
                         @error('department')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input id="worker_id" type="text" 
+                            class="form-control @error('worker_id') is-invalid @enderror" 
+                            name="worker_id" value="{{ old('worker_id') }}" 
+                            placeholder="Worker ID" required>
+                        <label for="worker_id">Worker ID</label>
+                        @error('worker_id')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
