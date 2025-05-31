@@ -52,10 +52,10 @@
                             <div class="flex flex-col gap-2 md:flex-row md:items-center">
                                 <div class="flex-1">
                                     <label class="block text-xs text-gray-600 mb-1" for="department-{{ $report->id }}">Assign Department</label>
-                                    <select id="department-{{ $report->id }}" name="department" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                                    <select id="department-{{ $report->id }}" name="department_id" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
                                         <option value="">Select Department</option>
                                         @foreach($departments as $department)
-                                            <option value="{{ $department->name }}">{{ $department->name }}</option>
+                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

@@ -6,9 +6,11 @@ use App\Models\Report;
 use App\Models\Department;
 use App\Models\Warning;
 use App\Models\Reminder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\ReportAssignedToDepartmentNotification;
 
 class UCUADashboardController extends Controller
 {
@@ -42,7 +44,7 @@ class UCUADashboardController extends Controller
     {
         $request->validate([
             'report_id' => 'required|exists:reports,id',
-            'department' => 'required|string',
+            'department_id' => 'required|string',
             'deadline' => 'required|date|after:today',
             'initial_remarks' => 'nullable|string|max:1000'
         ]);
@@ -51,13 +53,10 @@ class UCUADashboardController extends Controller
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
-
-            // Update with department name, deadline, and status
-            $report->update([
-                'handling_department' => $request->department,
-                'deadline' => $request->deadline,
-                'status' => 'in_progress'
-            ]);
+            $report->handling_department_id = $request->department_id;
+            $report->deadline = $request->deadline;
+            $report->status = 'investigation';
+            $report->save();
 
             if ($request->initial_remarks) {
                 $report->remarks()->create([
@@ -66,11 +65,27 @@ class UCUADashboardController extends Controller
                 ]);
             }
 
+            // Get the UCUA Officer who assigned the report
+            $ucuaOfficer = Auth::user();
+
+            $department = Department::where('id', $request->department_id)->first();
+
+            // Notify users belonging to the assigned department who have the 'department_head' role
+            $departmentUsers = User::where('department_id', $department->id)
+                                    ->where('name', $department->head_name)
+                                    ->get();
+
+            foreach ($departmentUsers as $user) {
+                $user->notify(new ReportAssignedToDepartmentNotification($report, $ucuaOfficer));
+            }
+
             DB::commit();
 
-            return redirect()->back()->with('success', 'Department assigned successfully.');
+            return redirect()->route('ucua.dashboard')->with('success', 'Report assigned successfully to ' . $department->name . '. Deadline: ' . \Carbon\Carbon::parse($request->deadline)->format('d/m/Y') . '.');
         } catch (\Exception $e) {
             DB::rollBack();
+            // Log the exception for debugging
+            \Log::error('Failed to assign department or send notification: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to assign department. Please try again.');
         }
     }
@@ -161,8 +176,8 @@ class UCUADashboardController extends Controller
 
     public function assignDepartmentsPage()
     {
-        // Fetch reports that are pending assignment (status = 'pending')
-        $reports = Report::where('status', 'pending')->get();
+        // Fetch reports that are in progress after being assigned a department
+        $reports = Report::where('status', 'review')->get();
         $departments = Department::where('is_active', true)->get();
         return view('ucua-officer.assign-departments', compact('reports', 'departments'));
     }
