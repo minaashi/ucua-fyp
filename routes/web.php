@@ -30,7 +30,7 @@ Route::prefix('department')->group(function () {
     Route::post('logout', [DepartmentAuthController::class, 'logout'])->name('department.logout');
 
     // Protected Routes
-    Route::middleware(['auth:department'])->group(function () {
+    Route::middleware(['auth:department', 'department.head'])->group(function () {
         Route::get('dashboard', [DepartmentDashboardController::class, 'index'])->name('department.dashboard');
         Route::get('pending-reports', [DepartmentDashboardController::class, 'pendingReports'])->name('department.pending-reports');
         Route::get('resolved-reports', [DepartmentDashboardController::class, 'resolvedReports'])->name('department.resolved-reports');

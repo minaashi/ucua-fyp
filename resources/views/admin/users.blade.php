@@ -72,7 +72,7 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->department ?? 'Not Assigned' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->department->name ?? 'Not Assigned' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $user->hasRole('admin') ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
@@ -144,7 +144,12 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Department</label>
-              <input type="text" name="department" class="form-control" value="{{ $user->department }}">
+              <select name="department_id" class="form-control">
+                <option value="">Select Department</option>
+                @foreach($departments as $department)
+                  <option value="{{ $department->id }}" {{ $user->department_id == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="mb-3">
               <label class="form-label">Password <small>(leave blank to keep current)</small></label>
@@ -197,7 +202,12 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Department</label>
-              <input type="text" name="department" class="form-control">
+              <select name="department_id" class="form-control">
+                <option value="">Select Department</option>
+                @foreach($departments as $department)
+                  <option value="{{ $department->id }}">{{ $department->name }}</option>
+                @endforeach
+              </select>
             </div>
           </div>
           <div class="modal-footer">

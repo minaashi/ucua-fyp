@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="mb-6 flex justify-between items-center w-full">
-    <h1 class="text-2xl font-bold">{{ $department->name }} Dashboard</h1>
+    <h1 class="text-2xl font-bold">{{ isset($departments) ? 'Departments Dashboard' : $department->name . ' Dashboard' }}</h1>
     <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex items-center" data-toggle="modal" data-target="#addDepartmentModal">
         <i class="fas fa-plus mr-2"></i> Add New Department
     </button>

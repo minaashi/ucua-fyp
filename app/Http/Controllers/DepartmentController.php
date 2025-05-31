@@ -9,14 +9,32 @@ class DepartmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'department.head']);
+        $this->middleware(['auth']);
     }
 
     public function index()
     {
-        $department = auth()->user()->department;
-        $reports = $department->reports()->with('user')->latest()->get();
-        return view('admin.departments.index', compact('department', 'reports'));
+        // Check if the authenticated user is an admin
+        if (auth()->user()->hasRole('admin')) {
+            \Log::info('Admin accessing DepartmentController index.');
+            // Admins see a list of all departments
+            $departments = Department::all();
+            return view('admin.departments.index', compact('departments'));
+        } else {
+            \Log::info('Non-admin accessing DepartmentController index.');
+            // Assuming non-admins are department heads with a department relationship
+            $department = auth()->user()->department;
+
+            // If a department head doesn't have a department assigned, handle it (optional)
+            if (!$department) {
+                 // Redirect or show an error, depending on your application's flow
+                 return redirect()->route('dashboard')->with('error', 'You are not assigned to a department.');
+            }
+
+            // Department heads see reports for their department (this might be redundant if DepartmentDashboardController handles this)
+            $reports = $department->reports()->with('user')->latest()->get();
+            return view('admin.departments.index', compact('department', 'reports'));
+        }
     }
 
     public function show(Department $department)

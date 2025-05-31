@@ -17,7 +17,7 @@ class AdminUserController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with('roles')->latest();
+        $query = User::with(['roles', 'department'])->latest();
 
         // Apply search filter if provided
         if ($request->has('search')) {
@@ -34,6 +34,7 @@ class AdminUserController extends Controller
         }
 
         $users = $query->paginate(10);
+
         $totalUsers = User::count();
         $adminUsers = User::role('admin')->count();
         $portWorkers = User::role('port_worker')->count();
@@ -57,14 +58,16 @@ class AdminUserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
-            'department' => 'nullable|exists:departments,name'
+            'department_id' => 'nullable|exists:departments,id'
         ]);
+
+        $departmentId = $validated['department_id'] ?? null;
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'department' => $validated['department'] ?? null,
+            'department_id' => $departmentId,
         ]);
 
         $user->assignRole($validated['role']);
@@ -78,13 +81,15 @@ class AdminUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|exists:roles,name',
-            'department' => 'nullable|exists:departments,name'
+            'department_id' => 'nullable|exists:departments,id'
         ]);
+
+        $departmentId = $validated['department_id'] ?? null;
 
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'department' => $validated['department'] ?? null,
+            'department_id' => $departmentId,
         ]);
 
         $user->syncRoles([$validated['role']]);
