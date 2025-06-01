@@ -89,7 +89,7 @@ class ReportController extends Controller
         $report = Report::create([
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
-            'department_id' => Auth::user()->department_id, // Use authenticated user's department_id
+            'department' => Auth::user()->department->name, // Use authenticated user's department name
             'phone' => $validated['phone'],
             'category' => $validated['category_type'],
             'unsafe_condition' => $validated['unsafe_condition'],

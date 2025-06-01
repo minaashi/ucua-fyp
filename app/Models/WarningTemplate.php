@@ -85,7 +85,8 @@ class WarningTemplate extends Model
             'warning_level' => 'Warning Level',
             'supervisor_name' => 'Supervisor Name',
             'company_name' => 'Company Name',
-            'report_id' => 'Report ID'
+            'report_id' => 'Report ID',
+            'warning_id' => 'Warning ID (formatted as WL-001)'
         ];
     }
 }

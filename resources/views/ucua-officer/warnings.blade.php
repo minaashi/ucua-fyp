@@ -59,7 +59,7 @@
                         @forelse($warnings as $warning)
                         <tr class="{{ $warning->status === 'pending' ? 'bg-yellow-25' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-900 font-bold">
-                                WL-{{ str_pad($warning->id, 3, '0', STR_PAD_LEFT) }}
+                                {{ $warning->formatted_id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-900">
                                 <a href="{{ route('ucua.report.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">

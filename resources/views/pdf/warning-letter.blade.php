@@ -138,7 +138,7 @@
 
     <div style="text-align: right; margin-bottom: 20px;">
         <strong>Date:</strong> {{ now()->format('F j, Y') }}<br>
-        <strong>Warning ID:</strong> {{ $warning->id }}<br>
+        <strong>Warning ID:</strong> {{ $warning->formatted_id }}<br>
         <strong>Report Reference:</strong> #{{ $report->id }}
     </div>
 
@@ -250,7 +250,7 @@
 
     <div class="footer">
         <p>This document was generated electronically by the {{ config('app.name', 'UCUA') }} Safety Management System</p>
-        <p>Warning ID: {{ $warning->id }} | Generated: {{ now()->format('F j, Y \a\t g:i A') }}</p>
+        <p>Warning ID: {{ $warning->formatted_id }} | Generated: {{ now()->format('F j, Y \a\t g:i A') }}</p>
         @if($warning->approvedBy)
         <p>Approved by: {{ $warning->approvedBy->name }} on {{ $warning->approved_at->format('F j, Y') }}</p>
         @endif

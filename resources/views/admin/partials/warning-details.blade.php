@@ -3,7 +3,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <h6 class="font-weight-bold text-primary">Warning ID</h6>
-            <p class="mb-2">WL-{{ str_pad($warning->id, 4, '0', STR_PAD_LEFT) }}</p>
+            <p class="mb-2">{{ $warning->formatted_id }}</p>
         </div>
         <div class="col-md-6">
             <h6 class="font-weight-bold text-primary">Status</h6>

@@ -92,6 +92,18 @@ class Warning extends Model
         return $this->status === 'approved';
     }
 
+    // Get formatted warning ID (WL-001, WL-002, etc.)
+    public function getFormattedIdAttribute()
+    {
+        return 'WL-' . str_pad($this->id, 3, '0', STR_PAD_LEFT);
+    }
+
+    // Get formatted ID for display
+    public function getDisplayIdAttribute()
+    {
+        return $this->formatted_id;
+    }
+
     // Check if warning has been sent
     public function isSent()
     {

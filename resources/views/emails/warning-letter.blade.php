@@ -187,7 +187,7 @@
         <div class="footer">
             <p><strong>This is an automated message from the {{ $companyName ?? 'UCUA' }} Safety Management System.</strong></p>
             <p>For questions or concerns, please contact your supervisor or the Safety Department.</p>
-            <p>Warning ID: {{ $warning->id }} | Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</p>
+            <p>Warning ID: {{ $warning->formatted_id }} | Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</p>
             
             @if($warning->approvedBy)
             <p>Approved by: {{ $warning->approvedBy->name }} on {{ $warning->approved_at->format('F j, Y') }}</p>

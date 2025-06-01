@@ -43,7 +43,7 @@
                 <tbody class="bg-white divide-y divide-red-100">
                     @forelse($reminders as $reminder)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900 font-bold">#{{ $reminder->id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900 font-bold">{{ $reminder->formatted_id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">
                             @if($reminder->report)
                                 <a href="{{ route('ucua.report.show', $reminder->report->id) }}" class="hover:text-red-700">

@@ -88,7 +88,7 @@
                     @forelse($warnings as $warning)
                         <tr class="{{ $warning->status === 'pending' ? 'bg-yellow-50' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                WL-{{ str_pad($warning->id, 4, '0', STR_PAD_LEFT) }}
+                                {{ $warning->formatted_id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <a href="{{ route('admin.reports.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800">
