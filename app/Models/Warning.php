@@ -14,11 +14,23 @@ class Warning extends Model
         'reason',
         'suggested_action',
         'suggested_by',
-        'report_id'
+        'report_id',
+        'status',
+        'approved_by',
+        'admin_notes',
+        'approved_at',
+        'sent_at',
+        'recipient_id',
+        'warning_message',
+        'template_id',
+        'email_sent_at',
+        'email_delivery_status'
     ];
 
     protected $casts = [
-        'sent_at' => 'datetime'
+        'approved_at' => 'datetime',
+        'sent_at' => 'datetime',
+        'email_sent_at' => 'datetime'
     ];
 
     public function user()
@@ -34,5 +46,55 @@ class Warning extends Model
     public function suggestedBy()
     {
         return $this->belongsTo(User::class, 'suggested_by');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo(WarningTemplate::class, 'template_id');
+    }
+
+    public function escalations()
+    {
+        return $this->belongsToMany(ViolationEscalation::class, 'escalation_warnings');
+    }
+
+    // Scope for pending warnings
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    // Scope for approved warnings
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    // Check if warning is pending approval
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    // Check if warning is approved
+    public function isApproved()
+    {
+        return $this->status === 'approved';
+    }
+
+    // Check if warning has been sent
+    public function isSent()
+    {
+        return $this->status === 'sent';
     }
 } 
