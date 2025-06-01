@@ -34,13 +34,17 @@ class Report extends Model
         'handling_department_id',
         'handling_staff_id',
         'remarks',
+        'assignment_remark',
         'deadline',
-        'attachment'
+        'attachment',
+        'resolution_notes',
+        'resolved_at'
     ];
 
     protected $casts = [
         'incident_date' => 'datetime',
         'deadline' => 'date',
+        'resolved_at' => 'datetime',
         'is_anonymous' => 'boolean'
     ];
 
@@ -83,6 +87,108 @@ class Report extends Model
     public function reminders()
     {
         return $this->hasMany(Reminder::class);
+    }
+
+    public function statusHistory()
+    {
+        return $this->hasMany(ReportStatusHistory::class);
+    }
+
+    /**
+     * Update status with history tracking
+     */
+    public function updateStatus($newStatus, $reason = null, $metadata = [])
+    {
+        $previousStatus = $this->status;
+
+        // Determine who is making the change
+        $changedBy = null;
+        $departmentId = null;
+        $changedByType = 'user';
+
+        if (\Auth::guard('department')->check()) {
+            $department = \Auth::guard('department')->user();
+            $departmentId = $department->id;
+            $changedByType = 'department';
+        } elseif (\Auth::guard('ucua')->check()) {
+            $changedBy = \Auth::guard('ucua')->id();
+            $changedByType = 'ucua_officer';
+        } elseif (\Auth::check()) {
+            $user = \Auth::user();
+            $changedBy = $user->id;
+            $changedByType = $user->hasRole('admin') ? 'admin' : 'user';
+        }
+
+        // Update the status
+        $this->status = $newStatus;
+        $this->save();
+
+        // Record the change in history
+        $this->statusHistory()->create([
+            'previous_status' => $previousStatus,
+            'new_status' => $newStatus,
+            'changed_by' => $changedBy,
+            'department_id' => $departmentId,
+            'changed_by_type' => $changedByType,
+            'reason' => $reason,
+            'metadata' => $metadata
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Get the latest status change
+     */
+    public function getLatestStatusChangeAttribute()
+    {
+        return $this->statusHistory()->latest()->first();
+    }
+
+    /**
+     * Check if report is overdue
+     */
+    public function getIsOverdueAttribute()
+    {
+        return $this->deadline &&
+               $this->deadline < now() &&
+               !in_array($this->status, ['resolved', 'rejected']);
+    }
+
+    /**
+     * Get days until deadline
+     */
+    public function getDaysUntilDeadlineAttribute()
+    {
+        if (!$this->deadline) {
+            return null;
+        }
+
+        return now()->diffInDays($this->deadline, false);
+    }
+
+    /**
+     * Get priority based on deadline and status
+     */
+    public function getPriorityAttribute()
+    {
+        if ($this->is_overdue) {
+            return 'critical';
+        }
+
+        $daysLeft = $this->days_until_deadline;
+
+        if ($daysLeft === null) {
+            return 'normal';
+        }
+
+        if ($daysLeft <= 1) {
+            return 'urgent';
+        } elseif ($daysLeft <= 3) {
+            return 'high';
+        } else {
+            return 'normal';
+        }
     }
 
     public function isOverdue()
