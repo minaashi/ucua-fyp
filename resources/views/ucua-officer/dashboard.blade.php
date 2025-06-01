@@ -88,19 +88,52 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $report->deadline ? $report->deadline->format('Y-m-d') : 'No Deadline' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-900" onclick="assignDepartment({{ $report->id }})">
-                                        <i class="fas fa-building"></i>
-                                    </button>
-                                    <button class="text-green-600 hover:text-green-900" onclick="addRemarks({{ $report->id }})">
-                                        <i class="fas fa-comment"></i>
-                                    </button>
-                                    <button class="text-yellow-600 hover:text-yellow-900" onclick="suggestWarning({{ $report->id }})">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </button>
-                                    <button class="text-red-600 hover:text-red-900" onclick="sendReminder({{ $report->id }})">
-                                        <i class="fas fa-bell"></i>
-                                    </button>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex flex-wrap gap-2">
+                                        <!-- Review Button -->
+                                        <a href="{{ route('ucua.report.show', $report->id) }}"
+                                           class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
+                                           title="Review Report Details">
+                                            <i class="fas fa-eye mr-1"></i>
+                                            Review
+                                        </a>
+
+                                        <!-- Assign Department Button (only if not assigned) -->
+                                        @if(!$report->handlingDepartment)
+                                        <button onclick="assignDepartment({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
+                                                title="Assign to Department">
+                                            <i class="fas fa-building mr-1"></i>
+                                            Assign
+                                        </button>
+                                        @endif
+
+                                        <!-- Add Comment Button -->
+                                        <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
+                                                title="Add Discussion Comment">
+                                            <i class="fas fa-comment mr-1"></i>
+                                            Comment
+                                        </button>
+
+                                        <!-- Suggest Warning Button -->
+                                        <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                                title="Suggest Warning Letter">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                                            Warning
+                                        </button>
+
+                                        <!-- Send Reminder Button (only if assigned and has deadline) -->
+                                        @if($report->handlingDepartment && $report->deadline)
+                                        <button onclick="sendReminder({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full hover:bg-red-200 transition-colors duration-200"
+                                                title="Send Follow-up Reminder">
+                                            <i class="fas fa-bell mr-1"></i>
+                                            Reminder
+                                        </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -153,28 +186,72 @@
 
 @push('scripts')
 <script>
-function assignDepartment(reportId) {
+function assignDepartment(reportId, status, reportCode) {
+    // Populate report information
+    $('#assignReportId').val(reportId);
+    $('#displayReportId').text(reportCode);
+    $('#displayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
     // Show assign department modal
     $('#assignDepartmentModal').modal('show');
-    $('#reportId').val(reportId);
 }
 
-function addRemarks(reportId) {
+function addRemarks(reportId, status, reportCode) {
+    // Populate report information
+    $('#remarksReportId').val(reportId);
+    $('#remarksDisplayReportId').text(reportCode);
+    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#content').val('');
+
     // Show add remarks modal
     $('#addRemarksModal').modal('show');
-    $('#reportId').val(reportId);
 }
 
-function suggestWarning(reportId) {
+function suggestWarning(reportId, status, reportCode) {
+    // Populate report information
+    $('#warningReportId').val(reportId);
+    $('#warningDisplayReportId').text(reportCode);
+    $('#warningDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#warning_type').val('');
+    $('#warning_reason').val('');
+    $('#suggested_action').val('');
+
     // Show suggest warning modal
     $('#suggestWarningModal').modal('show');
-    $('#reportId').val(reportId);
 }
 
-function sendReminder(reportId) {
+function sendReminder(reportId, status, reportCode) {
+    // Populate report information
+    $('#reminderReportId').val(reportId);
+    $('#reminderDisplayReportId').text(reportCode);
+    $('#reminderDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#reminder_type').val('');
+    $('#reminder_message').val('');
+    $('#extend_deadline').prop('checked', false);
+    $('#new_deadline_group').hide();
+    $('#new_deadline').prop('required', false);
+
     // Show send reminder modal
     $('#sendReminderModal').modal('show');
-    $('#reportId').val(reportId);
 }
+
+// Success message auto-hide
+$(document).ready(function() {
+    // Auto-hide success messages after 5 seconds
+    setTimeout(function() {
+        $('.alert-success').fadeOut('slow');
+    }, 5000);
+
+    // Auto-hide error messages after 7 seconds
+    setTimeout(function() {
+        $('.alert-danger').fadeOut('slow');
+    }, 7000);
+});
 </script>
-@endpush 
+@endpush

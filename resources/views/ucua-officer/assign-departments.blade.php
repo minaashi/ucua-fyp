@@ -64,6 +64,10 @@
                                     <input id="deadline-{{ $report->id }}" type="date" name="deadline" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                <label class="block text-xs text-gray-600 mb-1" for="assignment_remark-{{ $report->id }}">Assignment Remark (Optional)</label>
+                                <textarea id="assignment_remark-{{ $report->id }}" name="assignment_remark" rows="2" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Add any notes or comments about this assignment..."></textarea>
+                            </div>
                             <button type="submit" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors shadow">Assign Department</button>
                         </form>
                     </div>
