@@ -69,6 +69,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Admin Routes
 Route::prefix('admin')->group(function () {
+    // Admin logout route (accessible to authenticated users)
+    Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('admin.logout');
+
     // Guest Admin Routes
     Route::middleware('guest')->group(function () {
         Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm'])->name('admin.login');
@@ -119,8 +122,8 @@ Route::prefix('admin')->group(function () {
         // Warning Management Routes
         Route::get('/warnings', [AdminWarningController::class, 'index'])
             ->name('admin.warnings.index');
-        Route::post('/warnings', [AdminWarningController::class, 'store'])
-            ->name('admin.warnings.store');
+        Route::get('/warnings/{warning}/details', [AdminWarningController::class, 'getDetails'])
+            ->name('admin.warnings.details');
         Route::post('/warnings/{warning}/approve', [AdminWarningController::class, 'approve'])
             ->name('admin.warnings.approve');
         Route::post('/warnings/{warning}/reject', [AdminWarningController::class, 'reject'])

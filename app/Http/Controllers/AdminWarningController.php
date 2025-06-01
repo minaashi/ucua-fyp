@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warning;
-use App\Models\Report;
 use App\Models\User;
-use App\Models\WarningTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\WarningLetterNotification;
@@ -20,48 +18,48 @@ class AdminWarningController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $warnings = Warning::with(['report', 'suggestedBy', 'approvedBy', 'recipient'])
-            ->latest()
-            ->paginate(10);
+        $query = Warning::with(['report', 'suggestedBy', 'approvedBy', 'recipient']);
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('report', function($reportQuery) use ($search) {
+                    $reportQuery->where('id', 'like', "%{$search}%");
+                })
+                ->orWhereHas('suggestedBy', function($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('reason', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        $warnings = $query->latest()->paginate(10)->appends($request->query());
 
         $totalWarnings = Warning::count();
         $pendingWarnings = Warning::where('status', 'pending')->count();
         $approvedWarnings = Warning::where('status', 'approved')->count();
         $sentWarnings = Warning::where('status', 'sent')->count();
+        $rejectedWarnings = Warning::where('status', 'rejected')->count();
 
-        return view('admin.warnings', compact('warnings', 'totalWarnings', 'pendingWarnings', 'approvedWarnings', 'sentWarnings'));
+        return view('admin.warnings', compact(
+            'warnings',
+            'totalWarnings',
+            'pendingWarnings',
+            'approvedWarnings',
+            'sentWarnings',
+            'rejectedWarnings'
+        ));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'report_id' => 'required|exists:reports,id',
-            'message' => 'required|string'
-        ]);
-
-        $report = Report::findOrFail($request->report_id);
-        
-        $warning = Warning::create([
-            'user_id' => $report->user_id,
-            'report_id' => $report->id,
-            'message' => $request->message,
-            'status' => 'pending'
-        ]);
-
-        // Send notification
-        $user = $report->user;
-        Notification::send($user, new WarningLetterNotification($report));
-
-        $warning->update([
-            'status' => 'sent',
-            'sent_at' => now()
-        ]);
-
-        return redirect()->route('admin.warnings')
-            ->with('success', 'Warning letter sent successfully.');
-    }
+    // Removed store() method - All warnings must go through UCUA suggestion → Admin approval workflow
 
     public function approve(Request $request, Warning $warning)
     {
@@ -177,14 +175,21 @@ class AdminWarningController extends Controller
             }
 
             // Add safety officer or admin emails
-            $safetyOfficers = User::role('admin')->get();
-            foreach ($safetyOfficers as $officer) {
-                if ($officer->email !== $user->email) {
-                    $ccRecipients[] = [
-                        'email' => $officer->email,
-                        'name' => $officer->name
-                    ];
+            try {
+                $safetyOfficers = User::whereHas('roles', function($query) {
+                    $query->where('name', 'admin');
+                })->get();
+
+                foreach ($safetyOfficers as $officer) {
+                    if ($officer->email !== $user->email) {
+                        $ccRecipients[] = [
+                            'email' => $officer->email,
+                            'name' => $officer->name
+                        ];
+                    }
                 }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to get admin users for CC: ' . $e->getMessage());
             }
 
         } catch (\Exception $e) {
@@ -212,5 +217,34 @@ class AdminWarningController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Get warning details for AJAX requests
+     */
+    public function getDetails(Warning $warning)
+    {
+        try {
+            $warning->load(['report.user', 'suggestedBy', 'approvedBy', 'recipient']);
+
+            $html = view('admin.partials.warning-details', compact('warning'))->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'warning' => [
+                    'id' => $warning->id,
+                    'reason' => $warning->reason,
+                    'suggested_action' => $warning->suggested_action,
+                    'type' => $warning->type,
+                    'status' => $warning->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading warning details'
+            ], 500);
+        }
     }
 }
