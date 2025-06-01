@@ -65,7 +65,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Left</th>
@@ -78,14 +78,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        <div class="max-w-xs truncate" title="{{ $report->description }}">
-                                            {{ Str::limit($report->description, 50) }}
-                                        </div>
-                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php
-                                            $daysLeft = $report->deadline ? now()->diffInDays($report->deadline, false) : null;
+                                            $daysLeft = $report->deadline ? round(now()->diffInDays($report->deadline, false)) : null;
                                             $priority = 'Medium';
                                             $priorityColor = 'bg-blue-100 text-blue-800';
 
@@ -119,7 +114,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         @if($report->deadline)
                                             @php
-                                                $daysLeft = now()->diffInDays($report->deadline, false);
+                                                $daysLeft = round(now()->diffInDays($report->deadline, false));
                                             @endphp
                                             @if($daysLeft < 0)
                                                 <span class="text-red-600 font-semibold">{{ abs($daysLeft) }} days overdue</span>
@@ -164,7 +159,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                         No pending reports found
                                     </td>
                                 </tr>
