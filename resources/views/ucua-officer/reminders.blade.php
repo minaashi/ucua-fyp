@@ -45,7 +45,7 @@
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900 font-bold">#{{ $reminder->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">
-                            <a href="{{ route('reports.show', $reminder->report->id) }}" class="hover:text-red-700">
+                            <a href="{{ route('ucua.report.show', $reminder->report->id) }}" class="hover:text-red-700">
                                 Report #{{ $reminder->report->id }}
                             </a>
                         </td>

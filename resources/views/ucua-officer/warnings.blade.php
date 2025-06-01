@@ -110,7 +110,7 @@
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-900 font-bold">#{{ $warning->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-900">
-                            <a href="{{ route('reports.show', $warning->report->id) }}" class="hover:text-yellow-700">
+                            <a href="{{ route('ucua.report.show', $warning->report->id) }}" class="hover:text-yellow-700">
                                 Report #{{ $warning->report->id }}
                             </a>
                         </td>
