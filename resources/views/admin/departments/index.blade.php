@@ -100,6 +100,11 @@
           <input type="tel" name="head_phone" class="form-control" value="{{ $department->head_phone }}" required>
         </div>
         <div class="mb-3">
+          <label class="form-label">Department Login Password</label>
+          <input type="password" name="password" class="form-control" minlength="8" placeholder="Leave blank to keep current password">
+          <small class="text-muted">Leave blank to keep current password. Enter new password to change it.</small>
+        </div>
+        <div class="mb-3">
           <label class="form-label">Active Status</label>
           <select name="is_active" class="form-control">
             <option value="1" {{ $department->is_active ? 'selected' : '' }}>Active</option>
@@ -150,6 +155,11 @@
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Head of Department Phone</label>
                 <input type="tel" name="head_phone" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Department Login Password</label>
+                <input type="password" name="password" class="mt-1 block w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400" required minlength="8">
+                <small class="text-gray-500">This password will be used for department login access</small>
             </div>
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Active Status</label>

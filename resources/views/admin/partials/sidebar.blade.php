@@ -24,6 +24,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.departments.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.departments.*') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-building w-5 mr-3"></i>
+                    Departments
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
                     <i class="fas fa-envelope w-5 mr-3"></i>
                     Warning Letters

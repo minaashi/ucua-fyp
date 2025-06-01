@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class DepartmentController extends Controller
 {
@@ -64,7 +65,10 @@ class DepartmentController extends Controller
             'head_name' => 'required|string|max:255',
             'head_email' => 'required|email|max:255',
             'head_phone' => 'required|string|max:20',
+            'password' => 'required|string|min:8',
         ]);
+
+        $validated['password'] = Hash::make($validated['password']);
 
         Department::create($validated);
 
@@ -85,8 +89,16 @@ class DepartmentController extends Controller
             'head_name' => 'required|string|max:255',
             'head_email' => 'required|email|max:255',
             'head_phone' => 'required|string|max:20',
+            'password' => 'nullable|string|min:8',
             'is_active' => 'boolean'
         ]);
+
+        // Only update password if provided
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
 
         $department->update($validated);
 
@@ -111,4 +123,4 @@ class DepartmentController extends Controller
         $staff = $department->staff()->get();
         return response()->json($staff);
     }
-} 
+}
