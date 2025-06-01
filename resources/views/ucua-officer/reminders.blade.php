@@ -45,9 +45,13 @@
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900 font-bold">#{{ $reminder->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">
-                            <a href="{{ route('ucua.report.show', $reminder->report->id) }}" class="hover:text-red-700">
-                                Report #{{ $reminder->report->id }}
-                            </a>
+                            @if($reminder->report)
+                                <a href="{{ route('ucua.report.show', $reminder->report->id) }}" class="hover:text-red-700">
+                                    Report #{{ $reminder->report->id }}
+                                </a>
+                            @else
+                                <span class="text-gray-500">No Report</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -57,8 +61,8 @@
                                 {{ ucfirst($reminder->type) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-red-900">{{ Str::limit($reminder->message, 50) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">{{ $reminder->sentBy->name }}</td>
+                        <td class="px-6 py-4 text-sm text-red-900">{{ Str::limit($reminder->message ?? 'No message', 50) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">{{ $reminder->sentBy->name ?? 'Unknown' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">{{ $reminder->created_at->format('Y-m-d') }}</td>
                     </tr>
                     @empty

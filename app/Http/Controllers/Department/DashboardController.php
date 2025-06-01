@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\Remark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -151,4 +152,30 @@ class DashboardController extends Controller
 
         return back()->with('success', 'Department remark added successfully.');
     }
-} 
+
+    public function exportReport(Report $report)
+    {
+        $department = Auth::guard('department')->user();
+
+        // Check if report belongs to this department
+        if ($report->handling_department_id !== $department->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Load report with relationships
+        $report->load(['user', 'handlingDepartment', 'remarks']);
+
+        // Generate PDF
+        $pdf = Pdf::loadView('department.pdf.report-export', compact('report', 'department'))
+                   ->setPaper('a4', 'portrait')
+                   ->setOptions([
+                       'defaultFont' => 'sans-serif',
+                       'isHtml5ParserEnabled' => true,
+                       'isRemoteEnabled' => true
+                   ]);
+
+        $filename = 'report-RPT-' . str_pad($report->id, 3, '0', STR_PAD_LEFT) . '-' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($filename);
+    }
+}

@@ -66,8 +66,9 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Left</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -77,68 +78,93 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $report->title }}
+                                    <td class="px-6 py-4 text-sm text-gray-900">
+                                        <div class="max-w-xs truncate" title="{{ $report->description }}">
+                                            {{ Str::limit($report->description, 50) }}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                               ($report->status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                                                'bg-gray-100 text-gray-800') }}">
-                                            {{ ucfirst($report->status) }}
+                                        @php
+                                            $daysLeft = $report->deadline ? now()->diffInDays($report->deadline, false) : null;
+                                            $priority = 'Medium';
+                                            $priorityColor = 'bg-blue-100 text-blue-800';
+
+                                            if ($daysLeft !== null) {
+                                                if ($daysLeft < 0) {
+                                                    $priority = 'Overdue';
+                                                    $priorityColor = 'bg-red-100 text-red-800';
+                                                } elseif ($daysLeft <= 2) {
+                                                    $priority = 'High';
+                                                    $priorityColor = 'bg-red-100 text-red-800';
+                                                } elseif ($daysLeft <= 5) {
+                                                    $priority = 'Medium';
+                                                    $priorityColor = 'bg-yellow-100 text-yellow-800';
+                                                } else {
+                                                    $priority = 'Low';
+                                                    $priorityColor = 'bg-green-100 text-green-800';
+                                                }
+                                            }
+                                        @endphp
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $priorityColor }}">
+                                            {{ $priority }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $report->deadline ? $report->deadline->format('Y-m-d') : 'No Deadline' }}
+                                        @if($report->deadline)
+                                            {{ $report->deadline->format('M d, Y') }}
+                                        @else
+                                            <span class="text-gray-400">No Deadline</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        @if($report->deadline)
+                                            @php
+                                                $daysLeft = now()->diffInDays($report->deadline, false);
+                                            @endphp
+                                            @if($daysLeft < 0)
+                                                <span class="text-red-600 font-semibold">{{ abs($daysLeft) }} days overdue</span>
+                                            @elseif($daysLeft == 0)
+                                                <span class="text-red-600 font-semibold">Due today</span>
+                                            @elseif($daysLeft <= 3)
+                                                <span class="text-yellow-600 font-semibold">{{ $daysLeft }} days left</span>
+                                            @else
+                                                <span class="text-green-600">{{ $daysLeft }} days left</span>
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="relative inline-block text-left">
-                                            <button type="button" 
-                                                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                                    onclick="toggleActionsMenu({{ $report->id }})">
-                                                Actions
-                                                <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
+                                        <div class="flex flex-wrap gap-2">
+                                            <!-- Review Button -->
+                                            <a href="{{ route('department.report.show', $report->id) }}"
+                                               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
+                                               title="Review Report Details">
+                                                <i class="fas fa-eye mr-1"></i>
+                                                Review
+                                            </a>
+
+                                            <!-- Remark Button -->
+                                            <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
+                                                    title="Add Department Remark">
+                                                <i class="fas fa-comment mr-1"></i>
+                                                Remark
                                             </button>
-                                            <div id="actions-menu-{{ $report->id }}" 
-                                                 class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                                                <div class="py-1" role="menu" aria-orientation="vertical">
-                                                    <button onclick="viewReport({{ $report->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                            role="menuitem">
-                                                        <i class="fas fa-eye mr-2"></i> View Details
-                                                    </button>
-                                                    @if($report->status === 'pending')
-                                                    <button onclick="resolveReport({{ $report->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                            role="menuitem">
-                                                        <i class="fas fa-check mr-2"></i> Resolve Report
-                                                    </button>
-                                                    @endif
-                                                    <button onclick="addRemarks({{ $report->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                            role="menuitem">
-                                                        <i class="fas fa-comment mr-2"></i> Add Remarks
-                                                    </button>
-                                                    <button onclick="requestExtension({{ $report->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                            role="menuitem">
-                                                        <i class="fas fa-clock mr-2"></i> Request Extension
-                                                    </button>
-                                                    <button onclick="assignToTeam({{ $report->id }})"
-                                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                            role="menuitem">
-                                                        <i class="fas fa-users mr-2"></i> Assign to Team
-                                                    </button>
-                                                </div>
-                                            </div>
+
+                                            <!-- Resolve Button -->
+                                            <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
+                                                    title="Mark as Resolved">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Resolve
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                         No pending reports found
                                     </td>
                                 </tr>
@@ -154,7 +180,6 @@
 </div>
 
 <!-- Modals -->
-@include('department.partials.view-report-modal')
 @include('department.partials.resolve-report-modal')
 @include('department.partials.add-remarks-modal')
 
@@ -162,50 +187,30 @@
 
 @push('scripts')
 <script>
-function toggleActionsMenu(reportId) {
-    const menu = document.getElementById(`actions-menu-${reportId}`);
-    menu.classList.toggle('hidden');
-    
-    // Close other open menus
-    document.querySelectorAll('[id^="actions-menu-"]').forEach(otherMenu => {
-        if (otherMenu.id !== `actions-menu-${reportId}`) {
-            otherMenu.classList.add('hidden');
-        }
-    });
-}
+function addRemarks(reportId, status, reportCode) {
+    // Populate report information
+    $('#remarksReportId').val(reportId);
+    $('#remarksDisplayReportId').text(reportCode);
+    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
 
-// Close menus when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.closest('[id^="actions-menu-"]') && !event.target.closest('button')) {
-        document.querySelectorAll('[id^="actions-menu-"]').forEach(menu => {
-            menu.classList.add('hidden');
-        });
-    }
-});
+    // Clear previous content
+    $('#remarks').val('');
 
-function viewReport(reportId) {
-    $('#viewReportModal').modal('show');
-    $('#reportId').val(reportId);
-}
-
-function resolveReport(reportId) {
-    $('#resolveReportModal').modal('show');
-    $('#reportId').val(reportId);
-}
-
-function addRemarks(reportId) {
+    // Show add remarks modal
     $('#addRemarksModal').modal('show');
-    $('#reportId').val(reportId);
 }
 
-function requestExtension(reportId) {
-    // TODO: Implement request extension functionality
-    alert('Request extension functionality to be implemented');
-}
+function markAsResolved(reportId, status, reportCode) {
+    // Populate report information
+    $('#resolveReportId').val(reportId);
+    $('#resolveDisplayReportId').text(reportCode);
+    $('#resolveDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
 
-function assignToTeam(reportId) {
-    // TODO: Implement team assignment functionality
-    alert('Team assignment functionality to be implemented');
+    // Clear previous content
+    $('#resolution_notes').val('');
+
+    // Show resolve report modal
+    $('#resolveReportModal').modal('show');
 }
 </script>
-@endpush 
+@endpush
