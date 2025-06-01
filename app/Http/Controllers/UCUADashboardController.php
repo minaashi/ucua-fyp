@@ -198,7 +198,8 @@ class UCUADashboardController extends Controller
                 'type' => $request->warning_type,
                 'reason' => $request->warning_reason,
                 'suggested_action' => $request->suggested_action,
-                'suggested_by' => Auth::id()
+                'suggested_by' => Auth::id(),
+                'status' => 'pending'
             ]);
 
             return redirect()->back()->with('success', 'Warning suggestion added successfully.');
@@ -276,4 +277,34 @@ class UCUADashboardController extends Controller
 
         return view('ucua-officer.reminders', compact('reminders', 'totalReminders', 'recentReminders'));
     }
-} 
+
+    /**
+     * Get warning details for UCUA officers
+     */
+    public function getWarningDetails(Warning $warning)
+    {
+        try {
+            // Ensure the UCUA officer can only view warnings they suggested
+            if ($warning->suggested_by !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+
+            $warning->load(['report.user', 'suggestedBy', 'approvedBy', 'recipient']);
+
+            $html = view('ucua-officer.partials.warning-details', compact('warning'))->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading warning details'
+            ], 500);
+        }
+    }
+}

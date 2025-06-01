@@ -1,4 +1,9 @@
 <!-- Suggest Warning Modal -->
+<style>
+.text-orange { color: #f97316 !important; }
+.border-orange { border-color: #f97316 !important; }
+.border-left { border-left: 3px solid; }
+</style>
 <div class="modal fade" id="suggestWarningModal" tabindex="-1" role="dialog" aria-labelledby="suggestWarningModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -6,9 +11,7 @@
                 <h5 class="modal-title" id="suggestWarningModalLabel">
                     <i class="fas fa-exclamation-triangle mr-2"></i>Suggest Warning Letter
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('ucua.suggest-warning') }}" method="POST">
                 @csrf
@@ -30,7 +33,52 @@
                             <option value="moderate">Moderate Warning - Repeated or medium-risk violation</option>
                             <option value="severe">Severe Warning - Serious or high-risk violation</option>
                         </select>
-                        <small class="form-text text-muted">Choose the appropriate warning level based on the severity of the safety violation</small>
+
+                        <!-- Warning Type Guidelines -->
+                        <div class="mt-3">
+                            <div class="card">
+                                <div class="card-header bg-light py-2">
+                                    <h6 class="mb-0 text-dark"><i class="fas fa-info-circle mr-2"></i>Warning Type Guidelines</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="border-left border-warning pl-3">
+                                                <h6 class="text-warning mb-2"><i class="fas fa-exclamation-circle mr-1"></i>Minor Warning</h6>
+                                                <ul class="small mb-0">
+                                                    <li>First-time violations</li>
+                                                    <li>Low safety risk</li>
+                                                    <li>Minor PPE issues</li>
+                                                    <li>Procedural oversights</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border-left border-orange pl-3">
+                                                <h6 class="text-orange mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Moderate Warning</h6>
+                                                <ul class="small mb-0">
+                                                    <li>Repeated violations</li>
+                                                    <li>Medium safety risk</li>
+                                                    <li>Ignoring safety protocols</li>
+                                                    <li>Equipment misuse</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border-left border-danger pl-3">
+                                                <h6 class="text-danger mb-2"><i class="fas fa-ban mr-1"></i>Severe Warning</h6>
+                                                <ul class="small mb-0">
+                                                    <li>High safety risk</li>
+                                                    <li>Willful negligence</li>
+                                                    <li>Endangering others</li>
+                                                    <li>Multiple violations</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group mt-3">
@@ -45,6 +93,25 @@
                         <textarea name="suggested_action" id="suggested_action" class="form-control" rows="3" required
                                   placeholder="Recommend specific actions to prevent future violations (e.g., safety training, equipment checks, policy review)..."></textarea>
                         <small class="form-text text-muted">Suggest concrete steps to address the safety issue and prevent recurrence</small>
+
+                        <!-- Examples of Corrective Actions -->
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#correctiveActionExamples">
+                                <i class="fas fa-lightbulb mr-1"></i>View Examples
+                            </button>
+                            <div class="collapse mt-2" id="correctiveActionExamples">
+                                <div class="card card-body bg-light">
+                                    <h6 class="mb-2">Example Corrective Actions:</h6>
+                                    <ul class="small mb-0">
+                                        <li><strong>Training:</strong> "Mandatory PPE training session within 7 days"</li>
+                                        <li><strong>Equipment:</strong> "Daily equipment safety checks before use"</li>
+                                        <li><strong>Supervision:</strong> "Increased supervision for 2 weeks"</li>
+                                        <li><strong>Documentation:</strong> "Review and sign safety procedures"</li>
+                                        <li><strong>Assessment:</strong> "Safety competency re-assessment required"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="alert alert-info mt-3">
@@ -52,7 +119,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </button>
                     <button type="submit" class="btn btn-warning">
