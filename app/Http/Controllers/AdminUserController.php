@@ -75,11 +75,47 @@ class AdminUserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'department_id' => $departmentId,
+            'email_verified_at' => now(), // Auto-verify emails for admin-created users
         ]);
 
-        $user->assignRole($validated['role']);
+        // Assign role with appropriate guard based on role type
+        $guardName = $this->getGuardForRole($validated['role']);
+        $this->assignRoleWithGuard($user, $validated['role'], $guardName);
 
         return redirect()->back()->with('success', 'User created successfully.');
+    }
+
+    /**
+     * Get the appropriate guard name for a given role
+     */
+    private function getGuardForRole($roleName)
+    {
+        $guardMapping = [
+            'admin' => 'web',           // Admin uses web guard but has admin role
+            'ucua_officer' => 'ucua',   // UCUA Officer uses ucua guard
+            'user' => 'web',            // Regular users use web guard
+            'port_worker' => 'web',     // Port workers use web guard
+            'department_head' => 'web', // Department heads use web guard
+        ];
+
+        return $guardMapping[$roleName] ?? 'web'; // Default to web guard
+    }
+
+    /**
+     * Assign role to user with specific guard
+     */
+    private function assignRoleWithGuard($user, $roleName, $guardName)
+    {
+        $role = \Spatie\Permission\Models\Role::where('name', $roleName)
+                    ->where('guard_name', $guardName)
+                    ->first();
+
+        if ($role) {
+            $user->roles()->attach($role->id);
+        } else {
+            // Fallback to default assignment if role with specific guard doesn't exist
+            $user->assignRole($roleName);
+        }
     }
 
     public function update(Request $request, User $user)
