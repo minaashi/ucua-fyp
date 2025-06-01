@@ -93,51 +93,62 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Otherwise, fallback to the view (if needed elsewhere)
-        return view('department.show-report', compact('report', 'department'));
+        // Load report with relationships for the detail view
+        $report->load(['user', 'handlingDepartment', 'remarks.user']);
+
+        // Return the detailed report view
+        return view('department.report-detail', compact('report', 'department'));
     }
 
-    public function resolveReport(Request $request, Report $report)
+    public function resolveReport(Request $request)
     {
         $department = Auth::guard('department')->user();
+
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'resolution_notes' => 'required|string|max:1000',
+            'resolution_date' => 'required|date',
+        ]);
+
+        $report = Report::findOrFail($request->report_id);
 
         // Check if report belongs to this department
         if ($report->handling_department_id !== $department->id) {
             abort(403, 'Unauthorized action.');
         }
 
-        $request->validate([
-            'resolution_notes' => 'required|string|max:1000',
-        ]);
-
         $report->update([
             'status' => 'resolved',
             'resolution_notes' => $request->resolution_notes,
-            'resolved_at' => now(),
+            'resolved_at' => $request->resolution_date,
         ]);
 
         return redirect()->route('department.dashboard')
             ->with('success', 'Report has been resolved successfully.');
     }
 
-    public function addRemarks(Request $request, Report $report)
+    public function addRemarks(Request $request)
     {
         $department = Auth::guard('department')->user();
+
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'remarks' => 'required|string|max:1000',
+        ]);
+
+        $report = Report::findOrFail($request->report_id);
 
         // Check if report belongs to this department
         if ($report->handling_department_id !== $department->id) {
             abort(403, 'Unauthorized action.');
         }
 
-        $request->validate([
-            'remarks' => 'required|string|max:1000',
-        ]);
-
         $report->remarks()->create([
             'content' => $request->remarks,
             'user_id' => $department->id,
+            'user_type' => 'department', // Add this to distinguish department remarks
         ]);
 
-        return back()->with('success', 'Remarks added successfully.');
+        return back()->with('success', 'Department remark added successfully.');
     }
 } 

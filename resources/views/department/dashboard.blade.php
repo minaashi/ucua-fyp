@@ -124,18 +124,34 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $report->deadline ? $report->deadline->format('Y-m-d') : 'No Deadline' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button class="text-blue-600 hover:text-blue-900" onclick="viewReport({{ $report->id }})">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        @if($report->status === 'pending')
-                                        <button class="text-green-600 hover:text-green-900" onclick="resolveReport({{ $report->id }})">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        @endif
-                                        <button class="text-yellow-600 hover:text-yellow-900" onclick="addRemarks({{ $report->id }})">
-                                            <i class="fas fa-comment"></i>
-                                        </button>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex flex-wrap gap-2">
+                                            <!-- Review Button -->
+                                            <a href="{{ route('department.report.show', $report->id) }}"
+                                               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
+                                               title="Review Report Details">
+                                                <i class="fas fa-eye mr-1"></i>
+                                                Review
+                                            </a>
+
+                                            <!-- Remark Button -->
+                                            <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
+                                                    title="Add Department Remark">
+                                                <i class="fas fa-comment mr-1"></i>
+                                                Remark
+                                            </button>
+
+                                            <!-- Mark as Resolved Button (only for non-resolved reports) -->
+                                            @if($report->status !== 'resolved')
+                                            <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
+                                                    title="Mark as Resolved">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Resolve
+                                            </button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
@@ -163,22 +179,27 @@
 
 @push('scripts')
 <script>
-function viewReport(reportId) {
-    // Show view report modal
-    $('#viewReportModal').modal('show');
-    $('#reportId').val(reportId);
-}
+function addRemarks(reportId, status, reportCode) {
+    // Populate report information
+    $('#remarksReportId').val(reportId);
+    $('#remarksDisplayReportId').text(reportCode);
+    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
 
-function resolveReport(reportId) {
-    // Show resolve report modal
-    $('#resolveReportModal').modal('show');
-    $('#reportId').val(reportId);
-}
+    // Clear previous content
+    $('#remarks').val('');
 
-function addRemarks(reportId) {
     // Show add remarks modal
     $('#addRemarksModal').modal('show');
-    $('#reportId').val(reportId);
+}
+
+function markAsResolved(reportId, status, reportCode) {
+    // Populate report information
+    $('#resolveReportId').val(reportId);
+    $('#resolveDisplayReportId').text(reportCode);
+    $('#resolveDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Show resolve report modal
+    $('#resolveReportModal').modal('show');
 }
 </script>
 @endpush 

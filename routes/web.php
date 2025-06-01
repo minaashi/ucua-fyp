@@ -37,7 +37,7 @@ Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
         Route::get('resolved-reports', [DepartmentDashboardController::class, 'resolvedReports'])->name('department.resolved-reports');
         
         // Report Actions
-        Route::get('reports/{report}', [DepartmentDashboardController::class, 'showReport'])->name('department.show-report');
+        Route::get('reports/{report}', [DepartmentDashboardController::class, 'showReport'])->name('department.report.show');
         Route::post('resolve-report', [DepartmentDashboardController::class, 'resolveReport'])->name('department.resolve-report');
         Route::post('add-remarks', [DepartmentDashboardController::class, 'addRemarks'])->name('department.add-remarks');
     });
@@ -142,6 +142,16 @@ Route::middleware(['auth:ucua'])->prefix('ucua')->name('ucua.')->group(function 
     Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
     Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');
     Route::get('/reminders', [UCUADashboardController::class, 'remindersPage'])->name('reminders');
+
+    // Warning Analytics Routes
+    Route::get('/analytics', [App\Http\Controllers\WarningAnalyticsController::class, 'index'])->name('analytics');
+    Route::get('/analytics/data', [App\Http\Controllers\WarningAnalyticsController::class, 'getAnalyticsData'])->name('analytics.data');
+    Route::get('/analytics/trends', [App\Http\Controllers\WarningAnalyticsController::class, 'getTrendsData'])->name('analytics.trends');
+    Route::get('/analytics/repeat-offenders', [App\Http\Controllers\WarningAnalyticsController::class, 'getRepeatOffenders'])->name('analytics.repeat-offenders');
+    Route::get('/analytics/departments', [App\Http\Controllers\WarningAnalyticsController::class, 'getDepartmentStats'])->name('analytics.departments');
+    Route::get('/analytics/escalations', [App\Http\Controllers\WarningAnalyticsController::class, 'getEscalationStats'])->name('analytics.escalations');
+    Route::get('/analytics/export', [App\Http\Controllers\WarningAnalyticsController::class, 'exportReport'])->name('analytics.export');
+    Route::get('/analytics/dashboard-data', [App\Http\Controllers\WarningAnalyticsController::class, 'getDashboardData'])->name('analytics.dashboard-data');
 });
 
 // UCUA Officer Login Routes
