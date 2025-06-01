@@ -243,21 +243,80 @@
             </div>
             @endif
 
-            <!-- Recent Activity -->
-            @if(($report->remarks && $report->remarks->count() > 0) || ($report->warnings && $report->warnings->count() > 0) || ($report->reminders && $report->reminders->count() > 0))
+            <!-- Discussion Comments -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Discussion Comments</h3>
+                    <button type="button"
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                            onclick="document.getElementById('main-comment-form').classList.toggle('hidden')">
+                        <i class="fas fa-plus mr-1"></i>
+                        Add Admin Comment
+                    </button>
+                </div>
+
+                <!-- Main Comment Form -->
+                <div id="main-comment-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <form method="POST" action="{{ route('admin.add-remarks') }}" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="report_id" value="{{ $report->id }}">
+
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Admin Comment</label>
+                            <textarea name="content"
+                                      rows="4"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                                      placeholder="Add your administrative comment..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Attachment (optional)</label>
+                            <input type="file"
+                                   name="attachment"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                                   accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+                            <p class="text-xs text-gray-500 mt-1">
+                                Max 10MB. Allowed: JPG, PNG, PDF, DOC, XLS, TXT
+                            </p>
+                        </div>
+
+                        <div class="flex items-center justify-end space-x-2">
+                            <button type="button"
+                                    class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                                    onclick="document.getElementById('main-comment-form').classList.add('hidden')">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <i class="fas fa-comment mr-1"></i>
+                                Post Comment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Threaded Comments Display -->
+                @if(isset($threadedRemarks) && $threadedRemarks->count() > 0)
+                    <div class="space-y-4">
+                        @foreach($threadedRemarks as $comment)
+                            <x-admin-threaded-comment :comment="$comment" :report="$report" />
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <i class="fas fa-comments text-gray-300 text-4xl mb-3"></i>
+                        <p class="text-gray-500 text-sm">No discussion comments yet.</p>
+                        <p class="text-gray-400 text-xs">Be the first to start the conversation!</p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Recent Activity (Warnings & Reminders) -->
+            @if(($report->warnings && $report->warnings->count() > 0) || ($report->reminders && $report->reminders->count() > 0))
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-bold mb-4 text-gray-800">Recent Activity</h3>
                 <div class="space-y-3 max-h-64 overflow-y-auto">
-                    @if($report->remarks && $report->remarks->count() > 0)
-                        @foreach($report->remarks->take(3) as $remark)
-                        <div class="border-l-4 border-blue-500 pl-3">
-                            <p class="text-sm text-gray-600">Remark by {{ $remark->user ? $remark->user->name : 'Unknown User' }}</p>
-                            <p class="text-sm text-gray-800">{{ Str::limit($remark->content, 100) }}</p>
-                            <p class="text-xs text-gray-500">{{ $remark->created_at->diffForHumans() }}</p>
-                        </div>
-                        @endforeach
-                    @endif
-
                     @if($report->warnings && $report->warnings->count() > 0)
                         @foreach($report->warnings->take(2) as $warning)
                         <div class="border-l-4 border-yellow-500 pl-3">
@@ -284,24 +343,6 @@
     </div>
 
     <!-- Detailed History Sections -->
-    @if($report->remarks && $report->remarks->count() > 0)
-    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Remarks History</h2>
-        <div class="space-y-4">
-            @foreach($report->remarks as $remark)
-            <div class="border border-gray-200 rounded p-4">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <p class="font-semibold text-gray-800">{{ $remark->user ? $remark->user->name : 'Unknown User' }}</p>
-                        <p class="text-sm text-gray-600">{{ $remark->created_at->format('F d, Y \a\t g:i A') }}</p>
-                    </div>
-                </div>
-                <p class="text-gray-900 whitespace-pre-wrap">{{ $remark->content }}</p>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
 
     @if($report->warnings && $report->warnings->count() > 0)
     <div class="mt-6 bg-white rounded-lg shadow-md p-6">
@@ -423,14 +464,5 @@
             </div>
         </div>
     </div>
-
-    @if($report->remarks)
-    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Admin Remarks</h2>
-        <div class="bg-gray-50 p-4 rounded border">
-            <p class="text-gray-900 whitespace-pre-wrap">{{ $report->remarks ?: 'No remarks available' }}</p>
-        </div>
-    </div>
-    @endif
 
 @endsection
