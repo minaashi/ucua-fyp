@@ -116,6 +116,12 @@ Route::prefix('admin')->group(function () {
             ->name('admin.warnings.index');
         Route::post('/warnings', [AdminWarningController::class, 'store'])
             ->name('admin.warnings.store');
+        Route::post('/warnings/{warning}/approve', [AdminWarningController::class, 'approve'])
+            ->name('admin.warnings.approve');
+        Route::post('/warnings/{warning}/reject', [AdminWarningController::class, 'reject'])
+            ->name('admin.warnings.reject');
+        Route::post('/warnings/{warning}/send', [AdminWarningController::class, 'send'])
+            ->name('admin.warnings.send');
         Route::post('/warnings/{warning}/resend', [AdminWarningController::class, 'resend'])
             ->name('admin.warnings.resend');
 
@@ -126,8 +132,9 @@ Route::prefix('admin')->group(function () {
 });
 
 // UCUA Officer Routes
-Route::middleware(['auth:ucua', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
+Route::middleware(['auth:ucua'])->prefix('ucua')->name('ucua.')->group(function () {
     Route::get('/dashboard', [UCUADashboardController::class, 'index'])->name('dashboard');
+    Route::get('/report/{report}', [UCUADashboardController::class, 'showReport'])->name('report.show');
     Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
     Route::post('/assign-department', [UCUADashboardController::class, 'assignDepartment'])->name('assign-department');
     Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');

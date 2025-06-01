@@ -206,27 +206,45 @@
                 </div>
             </div>
 
-            <!-- Report Statistics -->
+            <!-- Assignment Information -->
+            @if($report->handlingDepartment || $report->assignment_remark || $report->deadline)
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold mb-4 text-gray-800">Report Statistics</h3>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Remarks:</span>
-                        <span class="font-semibold">{{ $report->getRemarksCount() }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Warnings:</span>
-                        <span class="font-semibold">{{ $report->getWarningsCount() }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Reminders:</span>
-                        <span class="font-semibold">{{ $report->getRemindersCount() }}</span>
+                <h3 class="text-lg font-bold mb-4 text-gray-800">Assignment Details</h3>
+
+                @if($report->handlingDepartment)
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">Assigned to:</span>
+                    <div class="text-base font-medium text-gray-800">{{ $report->handlingDepartment->name }}</div>
+                </div>
+                @endif
+
+                @if($report->deadline)
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">Deadline:</span>
+                    <div class="text-base font-medium text-gray-800">
+                        {{ $report->deadline->format('M d, Y') }}
+                        @if($report->isOverdue())
+                            <span class="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Overdue</span>
+                        @elseif($report->daysUntilDeadline() !== null && $report->daysUntilDeadline() <= 3)
+                            <span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Due Soon</span>
+                        @endif
                     </div>
                 </div>
+                @endif
+
+                @if($report->assignment_remark)
+                <div>
+                    <span class="text-sm text-gray-500">Assignment Notes:</span>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded mt-2">
+                        <p class="text-sm text-gray-800">{{ $report->assignment_remark }}</p>
+                    </div>
+                </div>
+                @endif
             </div>
+            @endif
 
             <!-- Recent Activity -->
-            @if($report->hasActivity())
+            @if(($report->remarks && $report->remarks->count() > 0) || ($report->warnings && $report->warnings->count() > 0) || ($report->reminders && $report->reminders->count() > 0))
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-bold mb-4 text-gray-800">Recent Activity</h3>
                 <div class="space-y-3 max-h-64 overflow-y-auto">
@@ -246,6 +264,16 @@
                             <p class="text-sm text-gray-600">Warning ({{ ucfirst($warning->type) }}) by {{ $warning->suggestedBy ? $warning->suggestedBy->name : 'Unknown User' }}</p>
                             <p class="text-sm text-gray-800">{{ Str::limit($warning->reason, 100) }}</p>
                             <p class="text-xs text-gray-500">{{ $warning->created_at->diffForHumans() }}</p>
+                        </div>
+                        @endforeach
+                    @endif
+
+                    @if($report->reminders && $report->reminders->count() > 0)
+                        @foreach($report->reminders->take(2) as $reminder)
+                        <div class="border-l-4 border-purple-500 pl-3">
+                            <p class="text-sm text-gray-600">Reminder ({{ ucfirst($reminder->type) }}) by {{ $reminder->sentBy ? $reminder->sentBy->name : 'Unknown User' }}</p>
+                            <p class="text-sm text-gray-800">{{ Str::limit($reminder->message, 100) }}</p>
+                            <p class="text-xs text-gray-500">{{ $reminder->created_at->diffForHumans() }}</p>
                         </div>
                         @endforeach
                     @endif
