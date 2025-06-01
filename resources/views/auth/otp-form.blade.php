@@ -45,10 +45,16 @@
                     <button type="submit" class="btn btn-primary w-100 py-3 mb-4">Verify OTP</button>
                 </form>
 
-                <p class="text-center mb-0">
-                    Didn't receive the OTP? 
-                    <a href="{{ route('verification.notice', ['email' => request()->email]) }}" class="text-primary text-decoration-none fw-bold">Resend OTP</a>
-                </p>
+                <div class="text-center mb-0">
+                    <p class="mb-2">Didn't receive the OTP?</p>
+                    <form method="POST" action="{{ route('otp.resend') }}" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="email" value="{{ request()->email }}">
+                        <button type="submit" class="btn btn-link text-primary text-decoration-none fw-bold p-0">
+                            Resend OTP
+                        </button>
+                    </form>
+                </div>
 
             </div>
         </div>

@@ -26,9 +26,20 @@
                 @endif
 
                 <p class="text-center mb-4">A One-Time Password (OTP) has been sent to your email address. Please check your inbox and enter the OTP below to verify your account.</p>
-                
-                <div class="text-center">
+
+                <div class="text-center mb-3">
                     <a href="{{ route('otp.form', ['email' => request()->email]) }}" class="btn btn-primary">Enter OTP</a>
+                </div>
+
+                <div class="text-center">
+                    <p class="mb-2">Didn't receive the OTP?</p>
+                    <form method="POST" action="{{ route('otp.resend') }}" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="email" value="{{ request()->email }}">
+                        <button type="submit" class="btn btn-link text-primary text-decoration-none fw-bold p-0">
+                            Resend OTP
+                        </button>
+                    </form>
                 </div>
 
             </div>

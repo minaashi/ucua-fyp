@@ -31,7 +31,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your OTP Verification Code',
+            subject: 'UCUA Reporting System - OTP Verification Code',
         );
     }
 

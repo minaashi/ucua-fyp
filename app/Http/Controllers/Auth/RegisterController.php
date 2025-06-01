@@ -8,12 +8,10 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use App\Models\Department;
-use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -59,6 +57,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'worker_id' => ['required', 'string', 'unique:users'],
+            'department_id' => ['required', 'exists:departments,id'],
             'password' => [
                 'required',
                 'string',
@@ -95,7 +94,7 @@ class RegisterController extends Controller
             'email_verified_at' => null,
         ]);
 
-        $otp = Str::random(6);
+        $otp = $this->generateSecureOtp();
         $user->otp = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(1);
         $user->save();
@@ -121,5 +120,68 @@ class RegisterController extends Controller
     {
         $departments = Department::all();
         return view('auth.register', compact('departments'));
+    }
+
+    /**
+     * Generate a secure OTP with mixed case letters, numbers, and special characters.
+     *
+     * @return string
+     */
+    private function generateSecureOtp()
+    {
+        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        $numbers = '0123456789';
+        $specialChars = '!@#$%&*';
+
+        // Ensure at least one character from each category
+        $otp = '';
+        $otp .= $uppercase[random_int(0, strlen($uppercase) - 1)];
+        $otp .= $lowercase[random_int(0, strlen($lowercase) - 1)];
+        $otp .= $numbers[random_int(0, strlen($numbers) - 1)];
+        $otp .= $specialChars[random_int(0, strlen($specialChars) - 1)];
+
+        // Fill remaining positions with random characters from all categories
+        $allChars = $uppercase . $lowercase . $numbers . $specialChars;
+        for ($i = 4; $i < 6; $i++) {
+            $otp .= $allChars[random_int(0, strlen($allChars) - 1)];
+        }
+
+        // Shuffle the OTP to randomize character positions
+        return str_shuffle($otp);
+    }
+
+    /**
+     * Resend OTP to user email.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function resendOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'User not found.']);
+        }
+
+        if ($user->email_verified_at) {
+            return redirect()->route('login')->with('status', 'Email already verified. Please login.');
+        }
+
+        // Generate new OTP
+        $otp = $this->generateSecureOtp();
+        $user->otp = $otp;
+        $user->otp_expires_at = Carbon::now()->addMinutes(1);
+        $user->save();
+
+        // Send new OTP email
+        Mail::to($user->email)->send(new OtpMail($otp, $user->name));
+
+        return back()->with('status', 'A new OTP has been sent to your email address.');
     }
 }

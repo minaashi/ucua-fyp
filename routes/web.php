@@ -17,6 +17,7 @@ use App\Http\Controllers\UCUADashboardController;
 use App\Http\Controllers\Department\AuthController as DepartmentAuthController;
 use App\Http\Controllers\Department\DashboardController as DepartmentDashboardController;
 use App\Http\Controllers\OtpVerificationController;
+use App\Http\Controllers\Auth\RegisterController;
 
 // Home/Hero page route
 Route::get('/', function () {
@@ -40,6 +41,7 @@ Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
         Route::get('reports/{report}', [DepartmentDashboardController::class, 'showReport'])->name('department.report.show');
         Route::post('resolve-report', [DepartmentDashboardController::class, 'resolveReport'])->name('department.resolve-report');
         Route::post('add-remarks', [DepartmentDashboardController::class, 'addRemarks'])->name('department.add-remarks');
+        Route::post('reports/{report}/export', [DepartmentDashboardController::class, 'exportReport'])->name('department.report.export');
     });
 });
 
@@ -173,4 +175,5 @@ Route::get('/email/verify', function () {
 
 Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->middleware('auth')->name('otp.form');
 Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->middleware('auth')->name('otp.verify');
+Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
 
