@@ -202,25 +202,6 @@
                 </div>
                 @endif
 
-                <!-- Activity Summary -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold mb-4 text-gray-800">Activity Summary</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600 text-sm">Discussion Comments:</span>
-                            <span class="font-semibold text-blue-600">{{ $report->remarks ? $report->remarks->count() : 0 }}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600 text-sm">Warning Suggestions:</span>
-                            <span class="font-semibold text-yellow-600">{{ $report->warnings ? $report->warnings->count() : 0 }}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600 text-sm">Follow-up Reminders:</span>
-                            <span class="font-semibold text-purple-600">{{ $report->reminders ? $report->reminders->count() : 0 }}</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Recent Comments -->
                 @if($report->remarks && $report->remarks->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
