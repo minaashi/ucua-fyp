@@ -198,14 +198,17 @@
                 </div>
 
                 <!-- Recent Remarks (Confidential) -->
-                @if($report->remarks && $report->remarks->count() > 0)
+                @if(isset($remarks) && $remarks->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-bold mb-4 text-gray-800">Recent Remarks</h3>
                     <div class="space-y-3 max-h-64 overflow-y-auto">
-                        @foreach($report->remarks->take(5) as $remark)
-                        <div class="border-l-4 {{ $remark->user_type === 'department' ? 'border-green-500' : 'border-blue-500' }} pl-3 py-2">
+                        @foreach($remarks->take(5) as $remark)
+                        <div class="border-l-4 {{ $remark->isDepartmentRemark() ? 'border-green-500' : 'border-blue-500' }} pl-3 py-2">
                             <p class="text-sm text-gray-600">
-                                {{ $remark->user_type === 'department' ? 'Department Remark' : 'System Remark' }}
+                                {{ $remark->author_name }}
+                                @if($remark->isConfidential())
+                                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-2">Confidential</span>
+                                @endif
                             </p>
                             <p class="text-sm text-gray-800">{{ $remark->content }}</p>
                             <p class="text-xs text-gray-500">{{ $remark->created_at->diffForHumans() }}</p>

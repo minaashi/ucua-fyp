@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Department;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Remark;
+use App\Services\RemarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -22,7 +23,7 @@ class DashboardController extends Controller
 
         $totalReports = Report::where('handling_department_id', $department->id)->count();
         $pendingReports = Report::where('handling_department_id', $department->id)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'in_progress'])
             ->count();
         $resolvedReports = Report::where('handling_department_id', $department->id)
             ->where('status', 'resolved')
@@ -46,8 +47,9 @@ class DashboardController extends Controller
     {
         $department = Auth::guard('department')->user();
 
+        // Include both 'pending' and 'in_progress' status for active reports
         $reports = Report::where('handling_department_id', $department->id)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'in_progress'])
             ->latest()
             ->paginate(10);
 
@@ -95,10 +97,14 @@ class DashboardController extends Controller
         }
 
         // Load report with relationships for the detail view
-        $report->load(['user', 'handlingDepartment', 'remarks.user']);
+        $report->load(['user', 'handlingDepartment']);
+
+        // Get remarks using the service for proper filtering
+        $remarkService = new RemarkService();
+        $remarks = $remarkService->getRemarksForUser($report, 'department', $department->id);
 
         // Return the detailed report view
-        return view('department.report-detail', compact('report', 'department'));
+        return view('department.report-detail', compact('report', 'department', 'remarks'));
     }
 
     public function resolveReport(Request $request)
@@ -128,29 +134,22 @@ class DashboardController extends Controller
             ->with('success', 'Report has been resolved successfully.');
     }
 
-    public function addRemarks(Request $request)
+    public function addRemarks(Request $request, RemarkService $remarkService)
     {
-        $department = Auth::guard('department')->user();
-
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'remarks' => 'required|string|max:1000',
         ]);
 
-        $report = Report::findOrFail($request->report_id);
+        try {
+            $report = Report::findOrFail($request->report_id);
+            $remarkService->addDepartmentRemark($report, $request->remarks);
 
-        // Check if report belongs to this department
-        if ($report->handling_department_id !== $department->id) {
-            abort(403, 'Unauthorized action.');
+            return back()->with('success', 'Department remark added successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to add department remark: ' . $e->getMessage());
+            return back()->with('error', 'Failed to add remark. Please try again.');
         }
-
-        $report->remarks()->create([
-            'content' => $request->remarks,
-            'user_id' => $department->id,
-            'user_type' => 'department', // Add this to distinguish department remarks
-        ]);
-
-        return back()->with('success', 'Department remark added successfully.');
     }
 
     public function exportReport(Report $report)
