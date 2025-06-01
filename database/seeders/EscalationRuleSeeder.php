@@ -14,7 +14,10 @@ class EscalationRuleSeeder extends Seeder
     public function run(): void
     {
         // Get the first admin user or create a default one
-        $adminUser = User::role('admin')->first();
+        $adminUser = User::whereHas('roles', function($query) {
+            $query->where('name', 'admin');
+        })->first();
+
         if (!$adminUser) {
             $adminUser = User::where('email', 'admin@gmail.com')->first();
         }
