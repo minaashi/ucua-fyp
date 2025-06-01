@@ -202,6 +202,45 @@
                 </div>
                 @endif
 
+                <!-- Reminders History -->
+                @if($report->reminders && $report->reminders->count() > 0)
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-bell mr-2 text-red-500"></i>Reminders History
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($report->reminders as $reminder)
+                        <div class="border border-red-200 rounded-lg p-4 bg-red-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-2">
+                                        <span class="font-semibold text-gray-800">{{ $reminder->sentBy ? $reminder->sentBy->name : 'Unknown User' }}</span>
+                                        <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full
+                                            {{ $reminder->type === 'gentle' ? 'bg-green-100 text-green-800' :
+                                               ($reminder->type === 'urgent' ? 'bg-orange-100 text-orange-800' :
+                                                'bg-red-100 text-red-800') }}">
+                                            {{ ucfirst($reminder->type) }} Reminder
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">{{ $reminder->created_at->format('F d, Y \a\t g:i A') }}</p>
+                                    @if($reminder->message)
+                                    <div class="bg-white p-3 rounded border border-red-200">
+                                        <p class="text-sm text-gray-800">{{ $reminder->message }}</p>
+                                    </div>
+                                    @else
+                                    <p class="text-sm text-gray-500 italic">No additional message provided</p>
+                                    @endif
+                                </div>
+                                <div class="ml-4">
+                                    <span class="text-xs text-gray-500">{{ $reminder->formatted_id }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Discussion Comments -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
