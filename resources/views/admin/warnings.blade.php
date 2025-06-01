@@ -193,15 +193,13 @@
                     <h5 class="modal-title" id="viewWarningModalLabel">
                         <i class="fas fa-eye mr-2"></i>Warning Letter Details
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" onclick="closeModal('viewWarningModal')"></button>
                 </div>
                 <div class="modal-body" id="warningDetailsContent">
                     <!-- Content will be loaded dynamically -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="closeModal('viewWarningModal')">Close</button>
                 </div>
             </div>
         </div>
@@ -215,9 +213,7 @@
                     <h5 class="modal-title" id="approveWarningModalLabel">
                         <i class="fas fa-check mr-2"></i>Approve Warning Letter
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" onclick="closeModal('approveWarningModal')"></button>
                 </div>
                 <form id="approveWarningForm" method="POST">
                     @csrf
@@ -246,7 +242,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="closeModal('approveWarningModal')">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </button>
                         <button type="submit" class="btn btn-success">
@@ -266,9 +262,7 @@
                     <h5 class="modal-title" id="rejectWarningModalLabel">
                         <i class="fas fa-times mr-2"></i>Reject Warning Letter
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" onclick="closeModal('rejectWarningModal')"></button>
                 </div>
                 <form id="rejectWarningForm" method="POST">
                     @csrf
@@ -290,7 +284,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="closeModal('rejectWarningModal')">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </button>
                         <button type="submit" class="btn btn-danger">
@@ -375,6 +369,27 @@ function rejectWarning(warningId) {
 // Auto-submit search form when status changes
 document.getElementById('status').addEventListener('change', function() {
     this.form.submit();
+});
+
+// Universal close modal function
+function closeModal(modalId) {
+    // Try Bootstrap 5 method first
+    const modal = bootstrap?.Modal?.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
+    } else {
+        // Fallback to Bootstrap 4 method
+        $('#' + modalId).modal('hide');
+    }
+}
+
+// Handle clicking outside modals
+$(document).ready(function() {
+    $('.modal').on('click', function(e) {
+        if (e.target === this) {
+            closeModal(this.id);
+        }
+    });
 });
 </script>
 @endpush

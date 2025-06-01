@@ -132,15 +132,13 @@
                 <h5 class="modal-title" id="warningDetailsModalLabel">
                     <i class="fas fa-exclamation-triangle mr-2"></i>Warning Letter Details
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" onclick="closeWarningModal()"></button>
             </div>
             <div class="modal-body" id="warningDetailsContent">
                 <!-- Content will be loaded dynamically -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="closeWarningModal()">Close</button>
             </div>
         </div>
     </div>
@@ -165,6 +163,27 @@ function viewWarningDetails(warningId) {
             alert('Error loading warning details');
         });
 }
+
+// Close warning modal function
+function closeWarningModal() {
+    // Try Bootstrap 5 method first
+    const modal = bootstrap?.Modal?.getInstance(document.getElementById('warningDetailsModal'));
+    if (modal) {
+        modal.hide();
+    } else {
+        // Fallback to Bootstrap 4 method
+        $('#warningDetailsModal').modal('hide');
+    }
+}
+
+// Also handle clicking outside the modal
+$(document).ready(function() {
+    $('#warningDetailsModal').on('click', function(e) {
+        if (e.target === this) {
+            closeWarningModal();
+        }
+    });
+});
 </script>
 @endpush
 

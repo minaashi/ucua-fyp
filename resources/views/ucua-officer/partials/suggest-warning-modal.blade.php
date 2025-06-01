@@ -96,10 +96,10 @@
 
                         <!-- Examples of Corrective Actions -->
                         <div class="mt-2">
-                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#correctiveActionExamples">
-                                <i class="fas fa-lightbulb mr-1"></i>View Examples
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="toggleExamples()">
+                                <i class="fas fa-lightbulb mr-1"></i><span id="examplesButtonText">View Examples</span>
                             </button>
-                            <div class="collapse mt-2" id="correctiveActionExamples">
+                            <div class="mt-2" id="correctiveActionExamples" style="display: none;">
                                 <div class="card card-body bg-light">
                                     <h6 class="mb-2">Example Corrective Actions:</h6>
                                     <ul class="small mb-0">
@@ -108,6 +108,9 @@
                                         <li><strong>Supervision:</strong> "Increased supervision for 2 weeks"</li>
                                         <li><strong>Documentation:</strong> "Review and sign safety procedures"</li>
                                         <li><strong>Assessment:</strong> "Safety competency re-assessment required"</li>
+                                        <li><strong>Mentoring:</strong> "Pair with experienced worker for guidance"</li>
+                                        <li><strong>Review:</strong> "Weekly safety performance review meetings"</li>
+                                        <li><strong>Certification:</strong> "Complete safety certification course"</li>
                                     </ul>
                                 </div>
                             </div>
@@ -130,3 +133,18 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleExamples() {
+    const examplesDiv = document.getElementById('correctiveActionExamples');
+    const buttonText = document.getElementById('examplesButtonText');
+
+    if (examplesDiv.style.display === 'none') {
+        examplesDiv.style.display = 'block';
+        buttonText.textContent = 'Hide Examples';
+    } else {
+        examplesDiv.style.display = 'none';
+        buttonText.textContent = 'View Examples';
+    }
+}
+</script>

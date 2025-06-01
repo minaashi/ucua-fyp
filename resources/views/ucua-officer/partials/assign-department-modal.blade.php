@@ -6,9 +6,7 @@
                 <h5 class="modal-title" id="assignDepartmentModalLabel">
                     <i class="fas fa-building mr-2"></i>Assign Department to Report
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" onclick="closeModal('assignDepartmentModal')"></button>
             </div>
             <form action="{{ route('ucua.assign-department') }}" method="POST">
                 @csrf
@@ -49,7 +47,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="closeModal('assignDepartmentModal')">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </button>
                     <button type="submit" class="btn btn-primary">

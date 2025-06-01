@@ -241,6 +241,18 @@ function sendReminder(reportId, status, reportCode) {
     $('#sendReminderModal').modal('show');
 }
 
+// Universal close modal function
+function closeModal(modalId) {
+    // Try Bootstrap 5 method first
+    const modal = bootstrap?.Modal?.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
+    } else {
+        // Fallback to Bootstrap 4 method
+        $('#' + modalId).modal('hide');
+    }
+}
+
 // Success message auto-hide
 $(document).ready(function() {
     // Auto-hide success messages after 5 seconds
@@ -252,6 +264,13 @@ $(document).ready(function() {
     setTimeout(function() {
         $('.alert-danger').fadeOut('slow');
     }, 7000);
+
+    // Handle clicking outside modals
+    $('.modal').on('click', function(e) {
+        if (e.target === this) {
+            closeModal(this.id);
+        }
+    });
 });
 </script>
 @endpush
