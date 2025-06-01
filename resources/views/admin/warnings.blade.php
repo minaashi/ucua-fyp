@@ -125,19 +125,22 @@
                                 <div class="flex space-x-2">
                                     <!-- View Details Button -->
                                     <button onclick="viewWarningDetails({{ $warning->id }})"
-                                            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                            class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
+                                            title="View Warning Details">
                                         <i class="fas fa-eye mr-1"></i>View
                                     </button>
 
                                     @if($warning->status === 'pending')
                                         <!-- Approve Button -->
                                         <button onclick="approveWarning({{ $warning->id }})"
-                                                class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">
+                                                class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
+                                                title="Approve Warning">
                                             <i class="fas fa-check mr-1"></i>Approve
                                         </button>
                                         <!-- Reject Button -->
                                         <button onclick="rejectWarning({{ $warning->id }})"
-                                                class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+                                                class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full hover:bg-red-200 transition-colors duration-200"
+                                                title="Reject Warning">
                                             <i class="fas fa-times mr-1"></i>Reject
                                         </button>
                                     @elseif($warning->status === 'approved')
@@ -145,17 +148,18 @@
                                         <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit"
-                                                    class="bg-purple-500 text-white px-3 py-1 rounded text-xs hover:bg-purple-600"
+                                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
+                                                    title="Send Warning Letter"
                                                     onclick="return confirm('Are you sure you want to send this warning letter?')">
                                                 <i class="fas fa-paper-plane mr-1"></i>Send
                                             </button>
                                         </form>
                                     @elseif($warning->status === 'sent')
-                                        <span class="text-green-600 text-xs">
+                                        <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                                             <i class="fas fa-check-circle mr-1"></i>Sent
                                         </span>
                                     @elseif($warning->status === 'rejected')
-                                        <span class="text-red-600 text-xs">
+                                        <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
                                             <i class="fas fa-ban mr-1"></i>Rejected
                                         </span>
                                     @endif

@@ -93,8 +93,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button onclick="viewWarningDetails({{ $warning->id }})"
-                                        class="text-blue-600 hover:text-blue-900 mr-3">
-                                    <i class="fas fa-eye mr-1"></i>View
+                                        class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
+                                        title="View Warning Details">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    View
                                 </button>
                             </td>
                         </tr>
