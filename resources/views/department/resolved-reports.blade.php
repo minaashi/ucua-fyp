@@ -65,7 +65,6 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resolved Date</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resolution Time</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -76,11 +75,6 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        <div class="max-w-xs truncate" title="{{ $report->description }}">
-                                            {{ Str::limit($report->description, 50) }}
-                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         @if($report->resolved_at)
@@ -95,7 +89,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         @if($report->created_at && $report->resolved_at)
                                             @php
-                                                $resolutionTime = $report->created_at->diffInDays($report->resolved_at);
+                                                $resolutionTime = round($report->created_at->diffInDays($report->resolved_at));
                                             @endphp
                                             @if($resolutionTime == 0)
                                                 <span class="text-green-600 font-semibold">Same day</span>
@@ -132,7 +126,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                         No resolved reports found
                                     </td>
                                 </tr>
