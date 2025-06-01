@@ -15,12 +15,32 @@ use Illuminate\Support\Facades\Log;
 
 class UCUADashboardController extends Controller
 {
+    public function __construct()
+    {
+        // Ensure the user is authenticated via ucua guard and has the ucua_officer role
+        $this->middleware(function ($request, $next) {
+            if (!auth()->guard('ucua')->check()) {
+                return redirect()->route('ucua.login');
+            }
+
+            $user = auth()->guard('ucua')->user();
+            if (!$user->hasRole('ucua_officer')) {
+                auth()->guard('ucua')->logout();
+                return redirect()->route('ucua.login')->withErrors([
+                    'email' => 'You do not have permission to access the UCUA Officer portal.',
+                ]);
+            }
+
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         $totalReports = Report::count();
         $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
-        
+
         // Get reports with deadlines within the next 7 days
         $deadlineReports = Report::whereNotNull('deadline')
             ->where('deadline', '<=', now()->addDays(7))
@@ -32,13 +52,42 @@ class UCUADashboardController extends Controller
             ->with(['user', 'handlingDepartment'])
             ->paginate(10);
 
+        // Get departments for assignment modal
+        $departments = Department::where('is_active', true)->get();
+
         return view('ucua-officer.dashboard', compact(
             'totalReports',
             'pendingReports',
             'resolvedReports',
             'deadlineReports',
-            'recentReports'
+            'recentReports',
+            'departments'
         ));
+    }
+
+    public function showReport(Report $report)
+    {
+        // Load the report with basic related data
+        $report->load([
+            'user',
+            'handlingDepartment',
+            'handlingStaff',
+            'warnings' => function($query) {
+                $query->with('suggestedBy')->orderBy('created_at', 'desc');
+            },
+            'reminders' => function($query) {
+                $query->with('sentBy')->orderBy('created_at', 'desc');
+            }
+        ]);
+
+        // Get threaded remarks using enhanced service
+        $remarkService = new \App\Services\EnhancedRemarkService();
+        $threadedRemarks = $remarkService->getThreadedRemarksForUser($report);
+
+        // Get departments for potential assignment
+        $departments = Department::where('is_active', true)->get();
+
+        return view('ucua-officer.report-detail', compact('report', 'departments', 'threadedRemarks'));
     }
 
     public function assignDepartment(Request $request)
@@ -47,7 +96,8 @@ class UCUADashboardController extends Controller
             'report_id' => 'required|exists:reports,id',
             'department_id' => 'required|string',
             'deadline' => 'required|date|after:today',
-            'initial_remarks' => 'nullable|string|max:1000'
+            'initial_remarks' => 'nullable|string|max:1000',
+            'assignment_remark' => 'nullable|string|max:1000'
         ]);
 
         try {
@@ -56,7 +106,13 @@ class UCUADashboardController extends Controller
             $report = Report::findOrFail($request->report_id);
             $report->handling_department_id = $request->department_id;
             $report->deadline = $request->deadline;
-            $report->status = 'investigation';
+            $report->status = 'in_progress';
+
+            // Save assignment remark if provided
+            if ($request->assignment_remark) {
+                $report->assignment_remark = $request->assignment_remark;
+            }
+
             $report->save();
 
             Log::info('Report ' . $report->id . ' updated with department ' . $request->department_id . ' and deadline ' . $request->deadline . '. New status: ' . $report->status);
@@ -98,20 +154,31 @@ class UCUADashboardController extends Controller
     {
         $request->validate([
             'report_id' => 'required|exists:reports,id',
-            'remarks' => 'required|string|max:1000'
+            'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:remarks,id',
+            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
         ]);
 
         try {
             $report = Report::findOrFail($request->report_id);
-            
-            $report->remarks()->create([
-                'content' => $request->remarks,
-                'user_id' => Auth::id()
-            ]);
+            $remarkService = new \App\Services\EnhancedRemarkService();
 
-            return redirect()->back()->with('success', 'Remarks added successfully.');
+            $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
+            $parentId = $request->input('parent_id');
+
+            $remarkService->addUCUARemark(
+                $report,
+                $request->content,
+                null,
+                $attachment,
+                $parentId
+            );
+
+            $message = $parentId ? 'Reply added successfully.' : 'Discussion comment added successfully.';
+            return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to add remarks. Please try again.');
+            \Log::error('Failed to add UCUA remark: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add comment. Please try again.');
         }
     }
 

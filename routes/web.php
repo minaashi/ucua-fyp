@@ -94,6 +94,9 @@ Route::prefix('admin')->group(function () {
         Route::post('/reports/{report}/accept', [AdminReportController::class, 'acceptReport'])->name('admin.reports.accept');
         Route::post('/reports/{report}/reject', [AdminReportController::class, 'rejectReport'])->name('admin.reports.reject');
 
+        // Enhanced comment system
+        Route::post('/add-remarks', [AdminReportController::class, 'addRemarks'])->name('admin.add-remarks');
+
         // User Management Routes
         Route::get('/users', [AdminUserController::class, 'index'])
             ->name('admin.users.index');

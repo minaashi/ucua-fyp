@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Department;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Remark;
-use App\Services\RemarkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -99,12 +98,12 @@ class DashboardController extends Controller
         // Load report with relationships for the detail view
         $report->load(['user', 'handlingDepartment']);
 
-        // Get remarks using the service for proper filtering
-        $remarkService = new RemarkService();
-        $remarks = $remarkService->getRemarksForUser($report, 'department', $department->id);
+        // Get threaded remarks using enhanced service
+        $remarkService = new \App\Services\EnhancedRemarkService();
+        $threadedRemarks = $remarkService->getThreadedRemarksForUser($report);
 
         // Return the detailed report view
-        return view('department.report-detail', compact('report', 'department', 'remarks'));
+        return view('department.report-detail', compact('report', 'department', 'threadedRemarks'));
     }
 
     public function resolveReport(Request $request)
@@ -134,18 +133,32 @@ class DashboardController extends Controller
             ->with('success', 'Report has been resolved successfully.');
     }
 
-    public function addRemarks(Request $request, RemarkService $remarkService)
+    public function addRemarks(Request $request)
     {
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'remarks' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:remarks,id',
+            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
         ]);
 
         try {
             $report = Report::findOrFail($request->report_id);
-            $remarkService->addDepartmentRemark($report, $request->remarks);
+            $remarkService = new \App\Services\EnhancedRemarkService();
 
-            return back()->with('success', 'Department remark added successfully.');
+            $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
+            $parentId = $request->input('parent_id');
+
+            $remarkService->addDepartmentRemark(
+                $report,
+                $request->remarks,
+                null,
+                $attachment,
+                $parentId
+            );
+
+            $message = $parentId ? 'Reply added successfully.' : 'Department remark added successfully.';
+            return back()->with('success', $message);
         } catch (\Exception $e) {
             \Log::error('Failed to add department remark: ' . $e->getMessage());
             return back()->with('error', 'Failed to add remark. Please try again.');

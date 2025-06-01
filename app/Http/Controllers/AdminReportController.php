@@ -85,14 +85,11 @@ class AdminReportController extends Controller
 
     public function show(Report $report)
     {
-        // Load the report with all related data, ensuring relationships are always loaded
+        // Load the report with basic related data
         $report->load([
             'user',
             'handlingDepartment',
             'handlingStaff',
-            'remarks' => function($query) {
-                $query->with('user')->orderBy('created_at', 'desc');
-            },
             'warnings' => function($query) {
                 $query->with('suggestedBy')->orderBy('created_at', 'desc');
             },
@@ -101,10 +98,11 @@ class AdminReportController extends Controller
             }
         ]);
 
+        // Get threaded remarks using enhanced service
+        $remarkService = new \App\Services\EnhancedRemarkService();
+        $threadedRemarks = $remarkService->getThreadedRemarksForUser($report);
+
         // Ensure relationships are collections, not null
-        if (!$report->relationLoaded('remarks')) {
-            $report->setRelation('remarks', collect());
-        }
         if (!$report->relationLoaded('warnings')) {
             $report->setRelation('warnings', collect());
         }
@@ -112,7 +110,7 @@ class AdminReportController extends Controller
             $report->setRelation('reminders', collect());
         }
 
-        return view('admin.reports.show', compact('report'));
+        return view('admin.reports.show', compact('report', 'threadedRemarks'));
     }
 
     public function edit(Report $report)
@@ -146,6 +144,38 @@ class AdminReportController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Report status updated successfully.');
+    }
+
+    public function addRemarks(Request $request)
+    {
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:remarks,id',
+            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
+        ]);
+
+        try {
+            $report = Report::findOrFail($request->report_id);
+            $remarkService = new \App\Services\EnhancedRemarkService();
+
+            $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
+            $parentId = $request->input('parent_id');
+
+            $remarkService->addAdminRemark(
+                $report,
+                $request->content,
+                null,
+                $attachment,
+                $parentId
+            );
+
+            $message = $parentId ? 'Reply added successfully.' : 'Admin comment added successfully.';
+            return redirect()->back()->with('success', $message);
+        } catch (\Exception $e) {
+            \Log::error('Failed to add admin remark: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add comment. Please try again.');
+        }
     }
 
     public function destroy(Report $report)

@@ -202,26 +202,74 @@
                 </div>
                 @endif
 
-                <!-- Recent Comments -->
-                @if($report->remarks && $report->remarks->count() > 0)
+                <!-- Discussion Comments -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold mb-4 text-gray-800">Recent Discussion Comments</h3>
-                    <div class="space-y-3 max-h-64 overflow-y-auto">
-                        @foreach($report->remarks->take(5) as $remark)
-                        <div class="border-l-4 border-blue-500 pl-3 py-2">
-                            <p class="text-sm text-gray-600">{{ $remark->user ? $remark->user->name : 'Unknown User' }}</p>
-                            <p class="text-sm text-gray-800">{{ $remark->content }}</p>
-                            <p class="text-xs text-gray-500">{{ $remark->created_at->diffForHumans() }}</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Discussion Comments</h3>
+                        <button type="button"
+                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                onclick="document.getElementById('main-comment-form').classList.toggle('hidden')">
+                            <i class="fas fa-plus mr-1"></i>
+                            Add Comment
+                        </button>
+                    </div>
+
+                    <!-- Main Comment Form -->
+                    <div id="main-comment-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border">
+                        <form method="POST" action="{{ route('ucua.add-remarks') }}" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="report_id" value="{{ $report->id }}">
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Comment</label>
+                                <textarea name="content"
+                                          rows="4"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                          placeholder="Add your discussion comment..."
+                                          required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Attachment (optional)</label>
+                                <input type="file"
+                                       name="attachment"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                       accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Max 10MB. Allowed: JPG, PNG, PDF, DOC, XLS, TXT
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-end space-x-2">
+                                <button type="button"
+                                        class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                                        onclick="document.getElementById('main-comment-form').classList.add('hidden')">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i class="fas fa-comment mr-1"></i>
+                                    Post Comment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Threaded Comments Display -->
+                    @if(isset($threadedRemarks) && $threadedRemarks->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($threadedRemarks as $comment)
+                                <x-threaded-comment :comment="$comment" :report="$report" />
+                            @endforeach
                         </div>
-                        @endforeach
-                    </div>
-                    @if($report->remarks->count() > 5)
-                    <div class="mt-3 text-center">
-                        <span class="text-sm text-gray-500">Showing latest 5 of {{ $report->remarks->count() }} comments</span>
-                    </div>
+                    @else
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No discussion comments yet.</p>
+                            <p class="text-gray-400 text-xs">Be the first to start the conversation!</p>
+                        </div>
                     @endif
                 </div>
-                @endif
 
                 <!-- Timeline -->
                 <div class="bg-white rounded-lg shadow-md p-6">
