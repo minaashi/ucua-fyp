@@ -123,7 +123,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <div class="logo">UCUA Port Safety System</div>
+        <div class="logo">UCUA  Reporting System </div>
         <div class="title">Safety Report Export</div>
         <div class="subtitle">Report ID: RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</div>
     </div>
