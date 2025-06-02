@@ -82,13 +82,20 @@
             <div class="flex items-center space-x-4">
                 <!-- Reply Button -->
                 @if($currentDepth < $maxDepth)
-                    <button type="button" 
+                    <button type="button"
                             class="text-sm text-blue-600 hover:text-blue-800 font-medium reply-btn"
                             data-comment-id="{{ $comment->id }}"
-                            data-author-name="{{ $comment->authorName }}">
+                            data-author-name="{{ $comment->authorName }}"
+                            onclick="console.log('Reply button clicked directly for comment {{ $comment->id }}')">
                         <i class="fas fa-reply mr-1"></i>
                         Reply
                     </button>
+                @else
+                    <!-- Debug: Show why reply button is hidden -->
+                    <span class="text-xs text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Max depth reached ({{ $currentDepth }}/{{ $maxDepth }})
+                    </span>
                 @endif
                 
                 <!-- Reply Count -->
@@ -108,8 +115,12 @@
     </div>
 
     <!-- Reply Form (Hidden by default) -->
-    <div class="reply-form mt-3 hidden" id="reply-form-{{ $comment->id }}">
+    <div class="reply-form mt-3 hidden" id="reply-form-{{ $comment->id }}" data-debug="Reply form for comment {{ $comment->id }}">
         <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="text-xs text-gray-500 mb-2">
+                <i class="fas fa-bug mr-1"></i>
+                Debug: Reply form for comment ID {{ $comment->id }}
+            </div>
             <form method="POST" action="{{ route('ucua.add-remarks') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="report_id" value="{{ $report->id }}">
@@ -168,44 +179,83 @@
     @endif
 </div>
 
+@once
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle reply button clicks
-    document.querySelectorAll('.reply-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const replyForm = document.getElementById(`reply-form-${commentId}`);
-            
-            // Hide all other reply forms
-            document.querySelectorAll('.reply-form').forEach(form => {
-                if (form.id !== `reply-form-${commentId}`) {
-                    form.classList.add('hidden');
+// Global comment reply functionality
+window.CommentReplyHandler = window.CommentReplyHandler || {
+    initialized: false,
+
+    init: function() {
+        if (this.initialized) return;
+
+        console.log('Initializing Comment Reply Handler');
+
+        // Use event delegation for better performance and dynamic content
+        document.addEventListener('click', function(event) {
+            // Handle reply button clicks
+            if (event.target.closest('.reply-btn')) {
+                event.preventDefault();
+                const button = event.target.closest('.reply-btn');
+                const commentId = button.dataset.commentId;
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+
+                console.log('Reply button clicked for comment:', commentId);
+
+                if (!replyForm) {
+                    console.error('Reply form not found for comment:', commentId);
+                    return;
                 }
-            });
-            
-            // Toggle current reply form
-            replyForm.classList.toggle('hidden');
-            
-            // Focus on textarea if showing
-            if (!replyForm.classList.contains('hidden')) {
-                const textarea = replyForm.querySelector('textarea[name="content"]');
-                textarea.focus();
+
+                // Hide all other reply forms
+                document.querySelectorAll('.reply-form').forEach(form => {
+                    if (form.id !== `reply-form-${commentId}`) {
+                        form.classList.add('hidden');
+                    }
+                });
+
+                // Toggle current reply form
+                replyForm.classList.toggle('hidden');
+
+                // Focus on textarea if showing
+                if (!replyForm.classList.contains('hidden')) {
+                    const textarea = replyForm.querySelector('textarea[name="content"], textarea[name="remarks"]');
+                    if (textarea) {
+                        setTimeout(() => textarea.focus(), 100);
+                    }
+                }
+            }
+
+            // Handle cancel reply button clicks
+            if (event.target.closest('.cancel-reply-btn')) {
+                event.preventDefault();
+                const button = event.target.closest('.cancel-reply-btn');
+                const replyForm = button.closest('.reply-form');
+
+                if (replyForm) {
+                    replyForm.classList.add('hidden');
+
+                    // Clear form
+                    const form = replyForm.querySelector('form');
+                    if (form) {
+                        form.reset();
+                    }
+                }
             }
         });
+
+        this.initialized = true;
+    }
+};
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        window.CommentReplyHandler.init();
     });
-    
-    // Handle cancel reply button clicks
-    document.querySelectorAll('.cancel-reply-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const replyForm = this.closest('.reply-form');
-            replyForm.classList.add('hidden');
-            
-            // Clear form
-            const form = replyForm.querySelector('form');
-            form.reset();
-        });
-    });
-});
+} else {
+    window.CommentReplyHandler.init();
+}
 </script>
 @endpush
+@endonce

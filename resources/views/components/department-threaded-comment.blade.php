@@ -168,44 +168,4 @@
     @endif
 </div>
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle reply button clicks
-    document.querySelectorAll('.reply-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const replyForm = document.getElementById(`reply-form-${commentId}`);
-            
-            // Hide all other reply forms
-            document.querySelectorAll('.reply-form').forEach(form => {
-                if (form.id !== `reply-form-${commentId}`) {
-                    form.classList.add('hidden');
-                }
-            });
-            
-            // Toggle current reply form
-            replyForm.classList.toggle('hidden');
-            
-            // Focus on textarea if showing
-            if (!replyForm.classList.contains('hidden')) {
-                const textarea = replyForm.querySelector('textarea[name="remarks"]');
-                textarea.focus();
-            }
-        });
-    });
-    
-    // Handle cancel reply button clicks
-    document.querySelectorAll('.cancel-reply-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const replyForm = this.closest('.reply-form');
-            replyForm.classList.add('hidden');
-            
-            // Clear form
-            const form = replyForm.querySelector('form');
-            form.reset();
-        });
-    });
-});
-</script>
-@endpush
+{{-- Script is handled globally by threaded-comment.blade.php --}}
