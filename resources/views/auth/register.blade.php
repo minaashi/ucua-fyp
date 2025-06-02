@@ -1,22 +1,20 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="auth-wrapper">
+<div class="auth-wrapper register-auth">
     <div class="split-container">
         <!-- Left Panel -->
         <div class="left-panel">
-            <div class="brand-header">
-                <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
-                <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Reporting System</h4>
-            </div>
-            <div class="image-container">
-                <img src="{{ asset('images/auth-image.jpg') }}" alt="Welcome" class="welcome-image">
-            </div>
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
+                <div class="brand-header">
+                    <div class="logo-container">
+                        <img src="{{ asset('images/logo.png') }}" alt="UCUA Logo" height="40">
+                    </div>
+                </div>
                 <h3 class="text-center fw-bold mb-4">Create Account</h3>
                 <form method="POST" action="{{ route('register') }}">
                     @csrf

@@ -2,24 +2,34 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="auth-wrapper">
+<div class="auth-wrapper admin-auth">
     <div class="split-container">
         <!-- Left Panel -->
         <div class="left-panel">
-            <div class="brand-header">
-                <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
-                <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Admin Portal</h4>
-            </div>
-            <div class="image-container">
-                <img src="{{ asset('images/admin-auth.jpg') }}" alt="Admin Portal" class="welcome-image">
-            </div>
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
+                <div class="brand-header">
+                    <div class="logo-container">
+                        <img src="{{ asset('images/logo.png') }}" alt="UCUA Logo" height="40">
+                    </div>
+                </div>
                 <h3 class="text-center fw-bold mb-4">Administrator Login</h3>
                 <p class="text-center text-muted mb-4">Access the admin dashboard</p>
+
+                @if(Auth::check())
+                    <div class="alert alert-info">
+                        <p class="mb-2">You are currently logged in as: <strong>{{ Auth::user()->email }}</strong></p>
+                        <form method="POST" action="{{ route('admin.logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout First
+                            </button>
+                        </form>
+                    </div>
+                @endif
 
                 @if(session('error'))
                     <div class="alert alert-danger">
@@ -76,7 +86,7 @@
                         <div class="border-t border-gray-200 my-3"></div>
                     
                         <a href="{{ route('ucua.login') }}" class="btn btn-outline-primary mt-2">
-                            <i class="fas fa-user-shield me-1"></i> UCUA Officer Login
+                            <i class="fas fa-user-shield me-1"></i> PIC Login
                         </a>
                     </div>
                 </form>

@@ -30,11 +30,36 @@
 
         .left-panel {
             flex: 1.2;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            padding: 2rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 0;
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        /* Default background for admin pages */
+        .admin-auth .left-panel {
+            background-image: url('/images/admin-auth.jpg');
+        }
+
+        /* Background for user login page */
+        .user-auth .left-panel {
+            background-image: url('/images/auth-image.jpg');
+        }
+
+        /* Background for registration page - adjusted sizing for taller form */
+        .register-auth .left-panel {
+            background-image: url('/images/auth-image.jpg');
+            background-size: contain;
+            background-position: center;
+        }
+
+        /* Background for UCUA pages */
+        .ucua-auth .left-panel {
+            background-image: url('/images/admin-auth.jpg');
         }
 
         .right-panel {
@@ -54,30 +79,25 @@
             margin-bottom: 2rem;
         }
 
-        .image-container {
-            width: 100%;
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0rem;
+        .logo-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .welcome-image {
-            max-width: 90%;
-            max-height: 60vh;
-            object-fit: cover;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+
 
         .auth-card {
             width: 100%;
-            max-width: 450px;
+            max-width: 550px;
             background: white;
-            padding: 2.5rem;
+            padding: 3rem;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 600px;
         }
 
         .auth-footer {

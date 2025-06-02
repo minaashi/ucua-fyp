@@ -1,22 +1,20 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="auth-wrapper">
+<div class="auth-wrapper ucua-auth">
     <div class="split-container">
         <!-- Left Panel -->
         <div class="left-panel">
-            <div class="brand-header">
-                <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" height="45">
-                <h4 class="ms-2 mb-0 text-white fw-bold">UCUA Officer Portal</h4>
-            </div>
-            <div class="image-container">
-                <img src="{{ asset('images/admin-auth.jpg') }}" alt="UCUA Officer Portal" class="welcome-image">
-            </div>
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="auth-card">
+                <div class="brand-header">
+                    <div class="logo-container">
+                        <img src="{{ asset('images/logo.png') }}" alt="UCUA Logo" height="40">
+                    </div>
+                </div>
                 <h3 class="text-center fw-bold mb-4">UCUA Officer Login</h3>
                 <p class="text-center text-muted mb-4">Access the UCUA Officer dashboard</p>
 
