@@ -162,10 +162,7 @@
                             <h3 class="font-semibold text-red-800">Report #{{ $report->id }}</h3>
                             <p class="text-sm text-red-600">Deadline: {{ $report->deadline->format('Y-m-d') }}</p>
                         </div>
-                        <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                                onclick="sendReminder({{ $report->id }})">
-                            Send Reminder
-                        </button>
+                        
                     </div>
                     @empty
                     <p class="text-center text-gray-500">No reports nearing deadline</p>
