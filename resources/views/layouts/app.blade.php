@@ -30,7 +30,7 @@
     @vite(['resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen flex">
+    <div id="app" class="min-h-screen flex">
         @if(auth()->guard('web')->check())
             @include('partials.sidebar')
         @elseif(auth()->guard('ucua')->check())

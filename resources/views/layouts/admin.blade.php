@@ -15,7 +15,7 @@
     <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="bg-gray-100">
-<div class="min-h-screen flex">
+<div id="app" class="min-h-screen flex">
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 

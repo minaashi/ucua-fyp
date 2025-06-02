@@ -37,4 +37,15 @@ app.component('example-component', ExampleComponent);
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
 
-app.mount('#app');
+// Mount Vue app with error handling
+try {
+    const appElement = document.getElementById('app');
+    if (appElement) {
+        app.mount('#app');
+        console.log('Vue app mounted successfully');
+    } else {
+        console.warn('Vue app mount target #app not found - Vue components will not be available');
+    }
+} catch (error) {
+    console.error('Failed to mount Vue app:', error);
+}
