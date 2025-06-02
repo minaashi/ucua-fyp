@@ -1,47 +1,99 @@
-@extends('layouts.guest')
+@extends('layouts.auth')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <div class="text-center">
-            <img src="{{ asset('images/ucua-logo.png') }}" alt="UCUA Logo" class="h-16 mx-auto">
-            <h2 class="mt-6 text-3xl font-bold text-gray-900">Department Login</h2>
-            <p class="mt-2 text-sm text-gray-600">Sign in to manage your department's reports</p>
+<div class="auth-wrapper department-auth">
+    <div class="split-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
         </div>
 
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
-        @endif
-
-        <form class="mt-8 space-y-6" action="{{ route('department.login') }}" method="POST">
-            @csrf
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div>
-                    <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                           placeholder="Department Email">
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="auth-card">
+                <div class="brand-header">
+                    <div class="logo-container">
+                        <img src="{{ asset('images/logo.png') }}" alt="UCUA Logo" height="40">
+                    </div>
                 </div>
-                <div>
-                    <label for="password" class="sr-only">Password</label>
-                    <input id="password" name="password" type="password" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                           placeholder="Password">
-                </div>
-            </div>
+                <h3 class="text-center fw-bold mb-4">Department Login</h3>
+                <p class="text-center text-muted mb-4">Sign in to manage your department's reports</p>
 
-            <div>
-                <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </span>
-                    Sign in
-                </button>
+                @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('department.login') }}" class="needs-validation" novalidate>
+                    @csrf
+
+                    <!-- Email -->
+                    <div class="form-floating mb-3">
+                        <input type="email"
+                               class="form-control @error('email') is-invalid @enderror"
+                               id="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="name@example.com"
+                               required>
+                        <label for="email">Department Email</label>
+                        @error('email')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-floating mb-4 position-relative">
+                        <input type="password"
+                               class="form-control @error('password') is-invalid @enderror"
+                               id="password"
+                               name="password"
+                               placeholder="Password"
+                               required>
+                        <label for="password">Password</label>
+                        <i class="fas fa-eye password-toggle"></i>
+                        @error('password')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 mb-4">
+                        Sign In to Department
+                    </button>
+
+                    <div class="text-center">
+                        <a href="{{ route('login') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i> Back to User Login
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
+
+    <footer class="auth-footer">
+        <p class="mb-0">&copy; {{ date('Y') }} Copyright: Nursyahmina Mosdy, Dr Cik Feresa Mohd Foozy</p>
+    </footer>
 </div>
-@endsection 
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    });
+});
+</script>
+@endpush
+@endsection

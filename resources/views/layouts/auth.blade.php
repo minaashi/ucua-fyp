@@ -62,6 +62,11 @@
             background-image: url('/images/admin-auth.jpg');
         }
 
+        /* Background for department pages */
+        .department-auth .left-panel {
+            background-image: url('/images/register.png');
+        }
+
         .right-panel {
             flex: 0.8;
             display: flex;
