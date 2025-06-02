@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminWarningController;
+use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\UCUAOfficerController;
 use App\Http\Controllers\Auth\UCUALoginController;
@@ -133,9 +134,9 @@ Route::prefix('admin')->group(function () {
         Route::post('/warnings/{warning}/resend', [AdminWarningController::class, 'resend'])
             ->name('admin.warnings.resend');
 
-        Route::get('/settings', function() {
-            return view('admin.settings');
-        })->name('admin.settings');
+        Route::get('/settings', [AdminSettingsController::class, 'index'])->name('admin.settings');
+        Route::post('/settings/profile', [AdminSettingsController::class, 'updateProfile'])->name('admin.settings.profile');
+        Route::post('/settings/system', [AdminSettingsController::class, 'updateSystemSettings'])->name('admin.settings.system');
     });
 });
 
