@@ -16,11 +16,14 @@
 </head>
 <body class="bg-gray-100">
 <div class="min-h-screen flex">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-blue-600 text-white flex flex-col min-h-screen">
-        <div class="p-6 flex flex-col items-center border-b border-blue-700">
-            <img src="{{ asset('images/ucua-logo.png') }}" alt="JohorPort Logo" class="h-12 mb-2">
-            <span class="font-bold text-lg">Admin Panel</span>
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-blue-600 text-white flex flex-col min-h-screen transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div class="p-4 lg:p-6 flex flex-col items-center border-b border-blue-700">
+            <img src="{{ asset('images/ucua-logo.png') }}" alt="JohorPort Logo" class="h-10 lg:h-12 mb-2">
+            <span class="font-bold text-base lg:text-lg">Admin Panel</span>
         </div>
         <nav class="flex-1 mt-6">
             <ul class="space-y-2">
@@ -66,16 +69,53 @@
             </ul>
         </nav>
     </aside>
+
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-h-screen">
-        @yield('content')
+    <div class="flex-1 flex flex-col min-h-screen lg:ml-0">
+        <main class="flex-1 p-4 lg:p-6">
+            @yield('content')
+        </main>
         <footer class="bg-blue-800 text-white p-4 mt-auto">
-            <p class="text-center text-sm">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
+            <p class="text-center text-xs sm:text-sm">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
         </footer>
     </div>
 </div>
+
 <!-- jQuery and Bootstrap 4 JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<!-- Responsive Sidebar Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+
+    // Toggle sidebar on mobile
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        });
+    }
+
+    // Close sidebar when clicking overlay
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.add('-translate-x-full');
+        sidebarOverlay.classList.add('hidden');
+    });
+
+    // Close sidebar on window resize if large screen
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
+    });
+});
+</script>
+
+@stack('scripts')
 </body>
 </html> 
