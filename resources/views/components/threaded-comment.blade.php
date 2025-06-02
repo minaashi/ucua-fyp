@@ -86,7 +86,7 @@
                             class="text-sm text-blue-600 hover:text-blue-800 font-medium reply-btn"
                             data-comment-id="{{ $comment->id }}"
                             data-author-name="{{ $comment->authorName }}"
-                            onclick="console.log('Reply button clicked directly for comment {{ $comment->id }}')">
+                            onclick="console.log('UCUA Reply button clicked for comment {{ $comment->id }}'); toggleUCUAReplyForm({{ $comment->id }});">
                         <i class="fas fa-reply mr-1"></i>
                         Reply
                     </button>
@@ -182,6 +182,36 @@
 @once
 @push('scripts')
 <script>
+// UCUA comment reply functionality
+function toggleUCUAReplyForm(commentId) {
+    console.log('toggleUCUAReplyForm called for comment:', commentId);
+
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+
+    if (!replyForm) {
+        console.error('Reply form not found for comment:', commentId);
+        return;
+    }
+
+    // Hide all other reply forms
+    document.querySelectorAll('.reply-form').forEach(form => {
+        if (form.id !== `reply-form-${commentId}`) {
+            form.classList.add('hidden');
+        }
+    });
+
+    // Toggle current reply form
+    replyForm.classList.toggle('hidden');
+
+    // Focus on textarea if showing
+    if (!replyForm.classList.contains('hidden')) {
+        const textarea = replyForm.querySelector('textarea[name="content"]');
+        if (textarea) {
+            setTimeout(() => textarea.focus(), 100);
+        }
+    }
+}
+
 // Global comment reply functionality
 window.CommentReplyHandler = window.CommentReplyHandler || {
     initialized: false,

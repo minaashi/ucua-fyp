@@ -82,10 +82,11 @@
             <div class="flex items-center space-x-4">
                 <!-- Reply Button -->
                 @if($currentDepth < $maxDepth)
-                    <button type="button" 
+                    <button type="button"
                             class="text-sm text-green-600 hover:text-green-800 font-medium reply-btn"
                             data-comment-id="{{ $comment->id }}"
-                            data-author-name="{{ $comment->authorName }}">
+                            data-author-name="{{ $comment->authorName }}"
+                            onclick="console.log('Department reply button clicked for comment {{ $comment->id }}'); toggleDepartmentReplyForm({{ $comment->id }});">
                         <i class="fas fa-reply mr-1"></i>
                         Reply
                     </button>
@@ -168,4 +169,59 @@
     @endif
 </div>
 
-{{-- Script is handled globally by threaded-comment.blade.php --}}
+@once
+@push('scripts')
+<script>
+// Department comment reply functionality
+function toggleDepartmentReplyForm(commentId) {
+    console.log('toggleDepartmentReplyForm called for comment:', commentId);
+
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+
+    if (!replyForm) {
+        console.error('Reply form not found for comment:', commentId);
+        return;
+    }
+
+    // Hide all other reply forms
+    document.querySelectorAll('.reply-form').forEach(form => {
+        if (form.id !== `reply-form-${commentId}`) {
+            form.classList.add('hidden');
+        }
+    });
+
+    // Toggle current reply form
+    replyForm.classList.toggle('hidden');
+
+    // Focus on textarea if showing
+    if (!replyForm.classList.contains('hidden')) {
+        const textarea = replyForm.querySelector('textarea[name="remarks"]');
+        if (textarea) {
+            setTimeout(() => textarea.focus(), 100);
+        }
+    }
+}
+
+// Handle cancel reply button clicks for department
+document.addEventListener('click', function(event) {
+    if (event.target.closest('.cancel-reply-btn')) {
+        event.preventDefault();
+        const button = event.target.closest('.cancel-reply-btn');
+        const replyForm = button.closest('.reply-form');
+
+        if (replyForm) {
+            replyForm.classList.add('hidden');
+
+            // Clear form
+            const form = replyForm.querySelector('form');
+            if (form) {
+                form.reset();
+            }
+        }
+    }
+});
+
+console.log('Department comment reply functionality loaded');
+</script>
+@endpush
+@endonce
