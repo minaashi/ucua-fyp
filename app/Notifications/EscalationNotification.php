@@ -82,7 +82,7 @@ class EscalationNotification extends Notification implements ShouldQueue
             ->greeting('Dear Department Head')
             ->line('This is an automated notification regarding a safety violation escalation.')
             ->line("**Employee:** {$user->name} (ID: {$user->worker_id})")
-            ->line("**Department:** {$user->department->name ?? 'N/A'}")
+            ->line("**Department:** " . ($user->department ? $user->department->name : 'N/A'))
             ->line("**Warning Count:** {$this->escalation->warning_count} warnings in {$rule->time_period_months} months")
             ->line("**Escalation Triggered:** {$this->escalation->escalation_triggered_at->format('Y-m-d H:i:s')}")
             ->line('**Required Actions:**')
