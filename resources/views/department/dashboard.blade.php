@@ -177,29 +177,3 @@
 
 @endsection
 
-@push('scripts')
-<script>
-function addRemarks(reportId, status, reportCode) {
-    // Populate report information
-    $('#remarksReportId').val(reportId);
-    $('#remarksDisplayReportId').text(reportCode);
-    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-
-    // Clear previous content
-    $('#remarks').val('');
-
-    // Show add remarks modal
-    $('#addRemarksModal').modal('show');
-}
-
-function markAsResolved(reportId, status, reportCode) {
-    // Populate report information
-    $('#resolveReportId').val(reportId);
-    $('#resolveDisplayReportId').text(reportCode);
-    $('#resolveDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-
-    // Show resolve report modal
-    $('#resolveReportModal').modal('show');
-}
-</script>
-@endpush 

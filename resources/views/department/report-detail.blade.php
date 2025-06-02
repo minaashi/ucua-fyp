@@ -297,27 +297,11 @@
 
 @push('scripts')
 <script>
-function addRemarks(reportId, status, reportCode) {
-    $('#remarksReportId').val(reportId);
-    $('#remarksDisplayReportId').text(reportCode);
-    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-    $('#remarks').val('');
-    $('#addRemarksModal').modal('show');
-}
-
-function markAsResolved(reportId, status, reportCode) {
-    $('#resolveReportId').val(reportId);
-    $('#resolveDisplayReportId').text(reportCode);
-    $('#resolveDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-    $('#resolution_notes').val('');
-    $('#resolveReportModal').modal('show');
-}
-
 $(document).ready(function() {
     setTimeout(function() {
         $('.alert-success').fadeOut('slow');
     }, 5000);
-    
+
     setTimeout(function() {
         $('.alert-danger').fadeOut('slow');
     }, 7000);

@@ -57,9 +57,17 @@
 
 @push('scripts')
 <script>
-function resolveReport(reportId) {
+function markAsResolved(reportId, status, reportCode) {
+    // Populate report information
     $('#resolveReportId').val(reportId);
+    $('#resolveDisplayReportId').text(reportCode);
+    $('#resolveDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#resolution_notes').val('');
+
+    // Show resolve report modal
     $('#resolveReportModal').modal('show');
 }
 </script>
-@endpush 
+@endpush

@@ -50,9 +50,17 @@
 
 @push('scripts')
 <script>
-function addRemarks(reportId) {
+function addRemarks(reportId, status, reportCode) {
+    // Populate report information
     $('#remarksReportId').val(reportId);
+    $('#remarksDisplayReportId').text(reportCode);
+    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#remarks').val('');
+
+    // Show add remarks modal
     $('#addRemarksModal').modal('show');
 }
 </script>
-@endpush 
+@endpush
