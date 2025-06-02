@@ -69,7 +69,7 @@ class UCUALoginController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::guard('ucua')->logout();
+        Auth::logout(); // Use default web guard since UCUA officers use web guard
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');

@@ -1,0 +1,42 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\User;
+use App\Models\Department;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Report>
+ */
+class ReportFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+            'employee_id' => fake()->unique()->regexify('[A-Z]{3}[0-9]{3}'),
+            'department' => fake()->randomElement(['Operations', 'Safety', 'Maintenance', 'Security']),
+            'phone' => fake()->phoneNumber(),
+            'unsafe_condition' => fake()->randomElement(['Slippery Surface', 'Poor Lighting', 'Blocked Exit', 'Damaged Equipment']),
+            'unsafe_act' => fake()->randomElement(['Not Wearing PPE', 'Improper Lifting', 'Running in Workplace', 'Ignoring Safety Procedures']),
+            'location' => fake()->randomElement(['Dock A', 'Dock B', 'Warehouse 1', 'Warehouse 2', 'Office Building']),
+            'incident_date' => fake()->dateTimeBetween('-1 month', 'now'),
+            'description' => fake()->paragraph(),
+            'status' => fake()->randomElement(['pending', 'review', 'investigation', 'resolved']),
+            'category' => fake()->randomElement(['unsafe_act', 'unsafe_condition']),
+            'is_anonymous' => fake()->boolean(20), // 20% chance of being anonymous
+            'handling_department_id' => null,
+            'handling_staff_id' => null,
+            'remarks' => null,
+            'assignment_remark' => null,
+            'deadline' => null,
+            'attachment' => null,
+        ];
+    }
+}

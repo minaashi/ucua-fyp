@@ -35,16 +35,15 @@ class RedirectIfAuthenticated
 
                 if ($guard === 'department') {
                     return redirect()->route('department.dashboard');
-                } elseif ($guard === 'admin') {
-                    return redirect()->route('admin.dashboard');
-                } elseif ($guard === 'ucua') {
-                    return redirect()->route('ucua.dashboard');
-                } elseif ($guard === 'web' || $guard === null) {
-                    // For web guard, check user roles
+                } elseif ($guard === 'web' || $guard === null || $guard === 'admin' || $guard === 'ucua') {
+                    // All user types (admin, ucua_officer, regular users) use web guard
                     if ($user && $user->hasRole('admin')) {
                         return redirect()->route('admin.dashboard');
                     } elseif ($user && $user->hasRole('ucua_officer')) {
                         return redirect()->route('ucua.dashboard');
+                    } else {
+                        // Regular users go to user dashboard
+                        return redirect()->route('dashboard');
                     }
                 }
                 return redirect(RouteServiceProvider::HOME);

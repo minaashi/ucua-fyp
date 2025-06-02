@@ -50,17 +50,17 @@ Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
 Auth::routes();
 
 // User-Specific Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'email.verified'])->group(function () {
     // User Dashboard
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    
+
     // Report Routes
     Route::get('/submit-report', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports/store', [ReportController::class, 'store'])->name('reports.store');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/track-report', [ReportController::class, 'trackStatus'])->name('reports.track');
     Route::get('/report-history', [DashboardController::class, 'reportHistory'])->name('reports.history');
-    
+
     // User Profile Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
@@ -176,14 +176,16 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
-// OTP Verification Routes (Registration)
-Route::get('/email/verify', function () {
-    return view('auth.verify-otp-notice'); // Create this view next
-})->middleware('auth')->name('verification.notice');
+// OTP Verification Routes (Registration) - No email verification required
+Route::middleware(['auth'])->group(function () {
+    Route::get('/email/verify', function () {
+        return view('auth.verify-otp-notice');
+    })->name('verification.notice');
 
-Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->middleware('auth')->name('otp.form');
-Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->middleware('auth')->name('otp.verify');
-Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+    Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->name('otp.form');
+    Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->name('otp.verify');
+    Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+});
 
 // Login OTP Verification Routes
 Route::get('/login/otp', [App\Http\Controllers\Auth\LoginOtpController::class, 'showOtpForm'])->name('login.otp.form');

@@ -20,6 +20,8 @@ class Department extends Authenticatable
         'head_email',
         'head_phone',
         'is_active',
+        'otp',
+        'otp_expires_at',
     ];
 
     protected $hidden = [

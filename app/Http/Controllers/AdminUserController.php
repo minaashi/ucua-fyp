@@ -92,7 +92,7 @@ class AdminUserController extends Controller
     {
         $guardMapping = [
             'admin' => 'web',           // Admin uses web guard but has admin role
-            'ucua_officer' => 'ucua',   // UCUA Officer uses ucua guard
+            'ucua_officer' => 'web',    // UCUA Officer uses web guard (FIXED)
             'user' => 'web',            // Regular users use web guard
             'port_worker' => 'web',     // Port workers use web guard
             'department_head' => 'web', // Department heads use web guard

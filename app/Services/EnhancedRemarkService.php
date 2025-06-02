@@ -35,8 +35,9 @@ class EnhancedRemarkService
      */
     public function addUCUARemark(Report $report, string $content, User $user = null, ?UploadedFile $attachment = null, ?int $parentId = null): Remark
     {
-        $user = $user ?? Auth::guard('ucua')->user();
-        
+        // UCUA officers use the web guard, not a separate ucua guard
+        $user = $user ?? Auth::user();
+
         return $this->createRemark($report, $content, [
             'user_id' => $user->id,
             'user_type' => 'ucua_officer',
@@ -193,12 +194,19 @@ class EnhancedRemarkService
     {
         if (Auth::guard('department')->check()) {
             return ['type' => 'department', 'id' => Auth::guard('department')->id()];
-        } elseif (Auth::guard('ucua')->check()) {
-            return ['type' => 'ucua_officer', 'id' => Auth::guard('ucua')->id()];
-        } elseif (Auth::guard('admin')->check() || (Auth::check() && Auth::user()->hasRole('admin'))) {
-            return ['type' => 'admin', 'id' => Auth::id()];
+        } elseif (Auth::check()) {
+            $user = Auth::user();
+
+            // Check user roles to determine type
+            if ($user->hasRole('admin')) {
+                return ['type' => 'admin', 'id' => $user->id];
+            } elseif ($user->hasRole('ucua_officer')) {
+                return ['type' => 'ucua_officer', 'id' => $user->id];
+            } else {
+                return ['type' => 'user', 'id' => $user->id];
+            }
         } else {
-            return ['type' => 'user', 'id' => Auth::id()];
+            return ['type' => 'guest', 'id' => null];
         }
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Mail\OtpMail;
 use Illuminate\Http\Request;
@@ -113,7 +114,12 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-        return redirect()->route('verification.notice', ['email' => $user->email])->with('status', 'Please verify your email with the OTP sent to your inbox.');
+        // Log the user in after registration
+        Auth::login($user);
+
+        return redirect()->route('verification.notice')
+            ->with('email', $user->email)
+            ->with('status', 'Registration successful! Please verify your email with the OTP sent to your inbox.');
     }
 
     public function showRegistrationForm()

@@ -17,7 +17,9 @@ class OtpVerificationController extends Controller
      */
     public function showOtpForm(Request $request)
     {
-        return view('auth.otp-form', ['email' => $request->email]);
+        // Get email from authenticated user
+        $email = Auth::user()->email;
+        return view('auth.otp-form', ['email' => $email]);
     }
 
     /**
@@ -33,7 +35,13 @@ class OtpVerificationController extends Controller
             'otp' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Verify the email matches the authenticated user
+        if ($user->email !== $request->email) {
+            return back()->withErrors(['email' => 'Email mismatch.']);
+        }
 
         if (! $user || $user->otp !== $request->otp) {
             return back()->withErrors(['otp' => 'Invalid OTP.']);
@@ -48,9 +56,6 @@ class OtpVerificationController extends Controller
         $user->otp = null;
         $user->otp_expires_at = null;
         $user->save();
-
-        // Log the user in
-        Auth::login($user);
 
         // Redirect to the intended page or dashboard
         return redirect()->intended('/dashboard')->with('status', 'Email verified successfully!');

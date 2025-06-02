@@ -28,7 +28,7 @@
                 <form method="POST" action="{{ route('otp.verify') }}">
                     @csrf
 
-                    <input type="hidden" name="email" value="{{ request()->email }}">
+                    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
 
                     <div class="form-floating mb-3">
                         <input id="otp" type="text" 
@@ -49,7 +49,7 @@
                     <p class="mb-2">Didn't receive the OTP?</p>
                     <form method="POST" action="{{ route('otp.resend') }}" class="d-inline">
                         @csrf
-                        <input type="hidden" name="email" value="{{ request()->email }}">
+                        <input type="hidden" name="email" value="{{ auth()->user()->email }}">
                         <button type="submit" class="btn btn-link text-primary text-decoration-none fw-bold p-0">
                             Resend OTP
                         </button>
