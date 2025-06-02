@@ -17,22 +17,8 @@ class UCUADashboardController extends Controller
 {
     public function __construct()
     {
-        // Ensure the user is authenticated via ucua guard and has the ucua_officer role
-        $this->middleware(function ($request, $next) {
-            if (!auth()->guard('ucua')->check()) {
-                return redirect()->route('ucua.login');
-            }
-
-            $user = auth()->guard('ucua')->user();
-            if (!$user->hasRole('ucua_officer')) {
-                auth()->guard('ucua')->logout();
-                return redirect()->route('ucua.login')->withErrors([
-                    'email' => 'You do not have permission to access the UCUA Officer portal.',
-                ]);
-            }
-
-            return $next($request);
-        });
+        // Ensure the user is authenticated and has the ucua_officer role
+        $this->middleware(['auth', 'role:ucua_officer']);
     }
 
     public function index()

@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Department;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\OtpService;
 
 class AuthController extends Controller
 {
-    public function __construct()
+    protected $otpService;
+
+    public function __construct(OtpService $otpService)
     {
         $this->middleware('guest:department')->except('logout');
+        $this->otpService = $otpService;
     }
 
     public function showLoginForm()
@@ -28,9 +32,26 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::guard('department')->attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('department.dashboard'));
+        // Validate credentials without logging in
+        if (Auth::guard('department')->validate($credentials)) {
+            $department = \App\Models\Department::where('email', $request->email)->first();
+
+            // Generate and send OTP
+            $otpSent = $this->otpService->generateAndSendDepartmentOtp($department);
+
+            if ($otpSent) {
+                // Redirect to OTP verification with department user type
+                return redirect()->route('login.otp.form', [
+                    'email' => $request->email,
+                    'user_type' => 'department'
+                ])->with('status', 'OTP has been sent to your email address.');
+            } else {
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors([
+                        'email' => 'Failed to send OTP. Please try again.',
+                    ]);
+            }
         }
 
         return back()

@@ -24,6 +24,11 @@ class RedirectIfAuthenticated
             Auth::guard('web')->logout();
         }
 
+        // Special handling for admin login - allow access even if authenticated
+        if ($request->is('admin/login')) {
+            return $next($request);
+        }
+
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();

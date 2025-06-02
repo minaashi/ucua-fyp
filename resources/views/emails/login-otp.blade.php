@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>OTP Verification - UCUA Reporting System</title>
+    <title>Login OTP Verification - UCUA Reporting System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,13 +56,13 @@
 </head>
 <body>
     <div class="header">
-        <h1 style="color:rgb(207, 221, 223);">Dear {{ $userName }},</h1>
+        <h1 style="color: #28a745;">Dear {{ $userName }},</h1>
     </div>
 
-    <p>Your One-Time Password (OTP) for account registration is:</p>
+    <p>Your One-Time Password (OTP) for login verification is:</p>
 
     <div class="otp-container">
-        <p style="margin: 0; font-size: 18px; color: #28a745; font-weight: bold;">Your OTP Code:</p>
+        <p style="margin: 0; font-size: 18px; color: #28a745; font-weight: bold;">Your Login OTP Code:</p>
         <div class="otp-code">{{ $otp }}</div>
     </div>
 
@@ -70,7 +70,9 @@
         <strong>⚠️ Important:</strong> This code will expire in 5 minutes for security purposes.
     </div>
 
-    <p>Please enter this OTP in the verification form to complete your registration process. Do not share this code with anyone.</p>
+    <p>Please enter this OTP in the verification form to complete your login process. Do not share this code with anyone.</p>
+
+    <p><strong>Security Notice:</strong> If you did not attempt to log in, please ignore this email and consider changing your password.</p>
 
     <div class="footer">
         <p>Regards,<br>

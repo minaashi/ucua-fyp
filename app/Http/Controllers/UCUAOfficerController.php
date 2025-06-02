@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\Department;
-use App\Models\Warning;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -52,22 +51,7 @@ class UCUAOfficerController extends Controller
         ));
     }
 
-    public function suggestWarning(Request $request, Report $report)
-    {
-        $request->validate([
-            'message' => 'required|string|max:500'
-        ]);
-
-        Warning::create([
-            'report_id' => $report->id,
-            'user_id' => $report->user_id,
-            'message' => $request->message,
-            'status' => 'pending',
-            'suggested_by' => auth()->id()
-        ]);
-
-        return redirect()->back()->with('success', 'Warning letter suggestion submitted for admin approval.');
-    }
+    // This method is deprecated - use UCUADashboardController::suggestWarning instead
 
     public function sendReminder(Request $request, Report $report)
     {

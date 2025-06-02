@@ -96,7 +96,7 @@ class RegisterController extends Controller
 
         $otp = $this->generateSecureOtp();
         $user->otp = $otp;
-        $user->otp_expires_at = Carbon::now()->addMinutes(1);
+        $user->otp_expires_at = Carbon::now()->addMinutes(5);
         $user->save();
 
         Mail::to($user->email)->send(new OtpMail($otp, $user->name));
@@ -176,7 +176,7 @@ class RegisterController extends Controller
         // Generate new OTP
         $otp = $this->generateSecureOtp();
         $user->otp = $otp;
-        $user->otp_expires_at = Carbon::now()->addMinutes(1);
+        $user->otp_expires_at = Carbon::now()->addMinutes(5);
         $user->save();
 
         // Send new OTP email

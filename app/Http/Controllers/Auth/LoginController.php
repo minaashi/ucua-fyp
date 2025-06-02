@@ -9,16 +9,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Services\OtpService;
 
 class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
     protected $redirectTo = RouteServiceProvider::HOME;
+    protected $otpService;
 
-    public function __construct()
+    public function __construct(OtpService $otpService)
     {
         $this->middleware('guest')->except('logout');
+        $this->otpService = $otpService;
     }
 
     /**
@@ -38,30 +41,31 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        // Attempt to log in using the default 'web' guard
-        if (Auth::attempt($this->credentials($request), $request->filled('remember'))) {
-            $user = Auth::user();
+        // Validate credentials without logging in
+        if (Auth::validate($this->credentials($request))) {
+            $user = \App\Models\User::where('email', $request->email)->first();
 
             // Check if the user's email is verified
             if ($user->email_verified_at === null) {
-                Auth::logout();
                 return $this->sendFailedLoginResponse($request, 'Your email is not verified. Please verify your email first.');
             }
 
-            $request->session()->regenerate();
+            // Generate and send OTP
+            $otpSent = $this->otpService->generateAndSendLoginOtp($user);
 
-            // Clear the login attempts for this user
-            if (method_exists($this, 'clearLoginAttempts')) {
-                $this->clearLoginAttempts($request);
-            }
+            if ($otpSent) {
+                // Clear the login attempts for this user
+                if (method_exists($this, 'clearLoginAttempts')) {
+                    $this->clearLoginAttempts($request);
+                }
 
-            // Role-based redirection
-            if ($user->hasRole('admin')) {
-                return redirect()->intended(route('admin.dashboard'));
-            } elseif ($user->hasRole('ucua_officer')) {
-                return redirect()->intended(route('ucua.dashboard'));
+                // Redirect to OTP verification with user type
+                return redirect()->route('login.otp.form', [
+                    'email' => $request->email,
+                    'user_type' => 'user'
+                ])->with('status', 'OTP has been sent to your email address.');
             } else {
-                return redirect()->intended(route('dashboard'));
+                return $this->sendFailedLoginResponse($request, 'Failed to send OTP. Please try again.');
             }
         }
 
@@ -98,27 +102,46 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
+        // Validate credentials without logging in
+        if (Auth::validate(['email' => $request->email, 'password' => $request->password])) {
+            $user = \App\Models\User::where('email', $request->email)->first();
 
             // Check if the user has admin role first
-            if ($user->hasRole('admin')) {
-                // For admin users, skip email verification check since they are manually created
-                $request->session()->regenerate();
-                return redirect()->intended(route('admin.dashboard'));
-            } else {
-                // For non-admin users trying to access admin panel, check email verification
-                if ($user->email_verified_at === null) {
-                    Auth::logout();
-                    return back()->withErrors(['email' => 'Your email is not verified. Please verify your email first.']);
-                }
-
-                Auth::logout();
+            if (!$user->hasRole('admin')) {
                 return back()->withErrors(['email' => 'You do not have permission to access the admin panel.']);
+            }
+
+            // Generate and send OTP
+            $otpSent = $this->otpService->generateAndSendLoginOtp($user);
+
+            if ($otpSent) {
+                // Redirect to OTP verification with admin user type
+                return redirect()->route('login.otp.form', [
+                    'email' => $request->email,
+                    'user_type' => 'admin'
+                ])->with('status', 'OTP has been sent to your email address.');
+            } else {
+                return back()->withErrors(['email' => 'Failed to send OTP. Please try again.']);
             }
         }
 
         return back()->withErrors(['email' => 'These credentials do not match our records.']);
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login')->with('success', 'You have been logged out successfully.');
     }
 
     // Remove authenticated method as redirection is handled in login method

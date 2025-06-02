@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold">Admin Dashboard</h1>
             <div class="flex items-center space-x-4">
                 <span>Welcome, {{ auth()->user()->name }}</span>
-                <img src="{{ asset('images/profile.png') }}" alt="Profile" class="h-8 w-8 rounded-full">
+    
             </div>
         </div>
     </header>

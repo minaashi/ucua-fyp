@@ -141,7 +141,7 @@ Route::prefix('admin')->group(function () {
 });
 
 // UCUA Officer Routes
-Route::middleware(['auth:ucua'])->prefix('ucua')->name('ucua.')->group(function () {
+Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
     Route::get('/dashboard', [UCUADashboardController::class, 'index'])->name('dashboard');
     Route::get('/report/{report}', [UCUADashboardController::class, 'showReport'])->name('report.show');
     Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
@@ -165,7 +165,7 @@ Route::middleware(['auth:ucua'])->prefix('ucua')->name('ucua.')->group(function 
 });
 
 // UCUA Officer Login Routes
-Route::middleware(['guest:ucua'])->group(function () {
+Route::middleware(['guest'])->group(function () {
     Route::get('/ucua/login', [UCUALoginController::class, 'showLoginForm'])->name('ucua.login');
     Route::post('/ucua/login', [UCUALoginController::class, 'login']);
 });
@@ -176,7 +176,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
-// OTP Verification Routes
+// OTP Verification Routes (Registration)
 Route::get('/email/verify', function () {
     return view('auth.verify-otp-notice'); // Create this view next
 })->middleware('auth')->name('verification.notice');
@@ -184,4 +184,9 @@ Route::get('/email/verify', function () {
 Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->middleware('auth')->name('otp.form');
 Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->middleware('auth')->name('otp.verify');
 Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+
+// Login OTP Verification Routes
+Route::get('/login/otp', [App\Http\Controllers\Auth\LoginOtpController::class, 'showOtpForm'])->name('login.otp.form');
+Route::post('/login/otp/verify', [App\Http\Controllers\Auth\LoginOtpController::class, 'verifyOtp'])->name('login.otp.verify');
+Route::post('/login/otp/resend', [App\Http\Controllers\Auth\LoginOtpController::class, 'resendOtp'])->name('login.otp.resend');
 
