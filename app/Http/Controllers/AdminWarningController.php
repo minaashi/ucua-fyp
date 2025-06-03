@@ -241,9 +241,29 @@ class AdminWarningController extends Controller
     public function getDetails(Warning $warning)
     {
         try {
-            $warning->load(['report.user', 'suggestedBy', 'approvedBy', 'recipient']);
+            $warning->load([
+                'report.user.department',
+                'report.handlingDepartment',
+                'suggestedBy',
+                'approvedBy',
+                'recipient'
+            ]);
 
-            $html = view('admin.partials.warning-details', compact('warning'))->render();
+            // Get violator information for admin review
+            $violator = $warning->report->getViolatorForWarning();
+
+            // Get investigation context (department remarks that identified the violator)
+            $investigationRemarks = null;
+            if ($warning->report->hasViolatorIdentified()) {
+                $investigationRemarks = $warning->report->remarks()
+                    ->where('user_type', 'department')
+                    ->where('department_id', $warning->report->handling_department_id)
+                    ->whereNotNull('created_at')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+            }
+
+            $html = view('admin.partials.warning-details', compact('warning', 'violator', 'investigationRemarks'))->render();
 
             return response()->json([
                 'success' => true,
@@ -254,7 +274,13 @@ class AdminWarningController extends Controller
                     'suggested_action' => $warning->suggested_action,
                     'type' => $warning->type,
                     'status' => $warning->status
-                ]
+                ],
+                'violator' => $violator ? [
+                    'name' => $violator->name,
+                    'employee_id' => $violator->worker_id ?? $warning->report->violator_employee_id,
+                    'department' => $warning->report->violator_department,
+                    'is_system_user' => $violator->id ? true : false
+                ] : null
             ]);
         } catch (\Exception $e) {
             return response()->json([

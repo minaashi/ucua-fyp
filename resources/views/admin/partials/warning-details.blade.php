@@ -34,6 +34,98 @@
         </div>
     </div>
 
+    <!-- Violator Information - CRITICAL FOR ADMIN REVIEW -->
+    @if(isset($violator))
+        <div class="card mb-3 border-{{ $violator->id ? 'success' : 'warning' }}">
+            <div class="card-header bg-{{ $violator->id ? 'success' : 'warning' }} text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-user-times mr-2"></i>
+                    Identified Violator - Warning Recipient
+                    @if($violator->id)
+                        <span class="badge badge-light text-success ml-2">
+                            <i class="fas fa-check-circle mr-1"></i>System User
+                        </span>
+                    @else
+                        <span class="badge badge-light text-warning ml-2">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>External Person
+                        </span>
+                    @endif
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Employee ID:</strong><br>
+                        <span class="text-primary font-weight-bold">{{ $violator->worker_id ?? $warning->report->violator_employee_id ?? 'N/A' }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Full Name:</strong><br>
+                        <span class="text-primary font-weight-bold">{{ $violator->name ?? $warning->report->violator_name ?? 'N/A' }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Department:</strong><br>
+                        <span class="text-primary font-weight-bold">{{ $warning->report->violator_department ?? 'N/A' }}</span>
+                    </div>
+                </div>
+
+                @if($violator->id)
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>System User:</strong> This person has an account in the system and will receive the warning letter via email automatically.
+                    </div>
+                @else
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>External Person:</strong> This person does not have a system account. Warning letter will need to be delivered manually or via alternative means.
+                    </div>
+                @endif
+            </div>
+        </div>
+    @else
+        <div class="card mb-3 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Violator Not Identified - Cannot Approve Warning
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger mb-0">
+                    <i class="fas fa-times-circle mr-2"></i>
+                    <strong>Investigation Required:</strong> The violator has not been identified yet. The handling department must complete their investigation and identify the person responsible before this warning can be approved.
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Investigation Context -->
+    @if(isset($investigationRemarks) && $investigationRemarks)
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-search mr-2"></i>
+                    Investigation Context
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <strong>Investigated By:</strong> {{ $warning->report->handlingDepartment->name ?? 'Unknown Department' }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Investigation Date:</strong> {{ $investigationRemarks->created_at->format('M d, Y H:i') }}
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <strong>Investigation Findings:</strong>
+                    <div class="mt-2 p-3 bg-light rounded">
+                        {{ $investigationRemarks->content }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Warning Details -->
     <div class="card mb-3">
         <div class="card-header bg-light">
@@ -51,14 +143,14 @@
                     <strong>Suggested By:</strong> {{ $warning->suggestedBy->name ?? 'Unknown' }}
                 </div>
             </div>
-            
+
             <div class="mb-3">
                 <strong>Reason for Warning:</strong>
                 <div class="mt-2 p-3 bg-light rounded">
                     {{ $warning->reason }}
                 </div>
             </div>
-            
+
             <div class="mb-3">
                 <strong>Suggested Corrective Action:</strong>
                 <div class="mt-2 p-3 bg-light rounded">

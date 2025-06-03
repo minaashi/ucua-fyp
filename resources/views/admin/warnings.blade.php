@@ -448,6 +448,9 @@ function viewWarningDetails(warningId) {
 
 // Approve warning
 function approveWarning(warningId) {
+    // Reset modal state first
+    resetApprovalModal();
+
     fetch(`/admin/warnings/${warningId}/details`)
         .then(response => response.json())
         .then(data => {
@@ -455,9 +458,37 @@ function approveWarning(warningId) {
                 // Populate the approve modal with warning details
                 document.getElementById('approveWarningContent').innerHTML = data.html;
 
-                // Pre-fill the warning message with the suggested content
-                const suggestedMessage = data.warning.reason + '\n\nSuggested Action: ' + data.warning.suggested_action;
-                document.getElementById('warning_message').value = suggestedMessage;
+                // Check if violator is identified
+                if (data.violator) {
+                    // Pre-fill the warning message with the suggested content and violator info
+                    const violatorInfo = `Warning Letter for: ${data.violator.name} (${data.violator.employee_id})\nDepartment: ${data.violator.department || 'N/A'}\n\n`;
+                    const suggestedMessage = violatorInfo + data.warning.reason + '\n\nSuggested Action: ' + data.warning.suggested_action;
+                    document.getElementById('warning_message').value = suggestedMessage;
+
+                    // Enable the approve button
+                    const approveBtn = document.querySelector('#approveWarningModal .btn-success');
+                    if (approveBtn) {
+                        approveBtn.disabled = false;
+                        approveBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Approve & Send Warning';
+                    }
+                } else {
+                    // Violator not identified - disable approval
+                    document.getElementById('warning_message').value = 'Cannot approve: Violator has not been identified yet. Investigation is required.';
+                    document.getElementById('warning_message').disabled = true;
+
+                    // Disable the approve button
+                    const approveBtn = document.querySelector('#approveWarningModal .btn-success');
+                    if (approveBtn) {
+                        approveBtn.disabled = true;
+                        approveBtn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Cannot Approve - Investigation Required';
+                    }
+
+                    // Show alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger mt-3';
+                    alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i><strong>Cannot Approve:</strong> The violator must be identified before this warning can be approved. Please contact the handling department to complete their investigation.';
+                    document.getElementById('approveWarningContent').appendChild(alertDiv);
+                }
 
                 // Set the form action
                 document.getElementById('approveWarningForm').action = `/admin/warnings/${warningId}/approve`;
@@ -482,6 +513,9 @@ function rejectWarning(warningId) {
                 // Populate the reject modal with warning details
                 document.getElementById('rejectWarningContent').innerHTML = data.html;
 
+                // Clear previous rejection reason
+                document.getElementById('reject_admin_notes').value = '';
+
                 // Set the form action
                 document.getElementById('rejectWarningForm').action = `/admin/warnings/${warningId}/reject`;
 
@@ -494,6 +528,29 @@ function rejectWarning(warningId) {
             console.error('Error:', error);
             alert('Error loading warning details');
         });
+}
+
+// Reset modal states when opening
+function resetApprovalModal() {
+    // Reset warning message field
+    const warningMessageField = document.getElementById('warning_message');
+    if (warningMessageField) {
+        warningMessageField.disabled = false;
+        warningMessageField.value = '';
+    }
+
+    // Reset approve button
+    const approveBtn = document.querySelector('#approveWarningModal .btn-success');
+    if (approveBtn) {
+        approveBtn.disabled = false;
+        approveBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Approve Warning';
+    }
+
+    // Clear admin notes
+    const adminNotesField = document.getElementById('admin_notes');
+    if (adminNotesField) {
+        adminNotesField.value = '';
+    }
 }
 
 // Auto-submit search form when status changes
