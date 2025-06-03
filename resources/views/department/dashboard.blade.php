@@ -34,6 +34,13 @@
                         <span>Resolved Reports</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('help.department') }}"
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-question-circle w-5"></i>
+                        <span>Help</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>

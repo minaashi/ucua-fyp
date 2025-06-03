@@ -19,6 +19,7 @@ use App\Http\Controllers\Department\AuthController as DepartmentAuthController;
 use App\Http\Controllers\Department\DashboardController as DepartmentDashboardController;
 use App\Http\Controllers\OtpVerificationController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\HelpController;
 
 // Home/Hero page route
 Route::get('/', function () {
@@ -185,6 +186,31 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->name('otp.form');
     Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->name('otp.verify');
     Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+});
+
+// Help System Routes
+Route::middleware(['auth', 'email.verified'])->group(function () {
+    // Regular User Help
+    Route::get('/help', [HelpController::class, 'userHelp'])->name('help.user');
+    Route::get('/help/search', [HelpController::class, 'search'])->name('help.search');
+});
+
+// Admin Help Routes
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/help', [HelpController::class, 'adminHelp'])->name('help.admin');
+    Route::get('/admin/help/search', [HelpController::class, 'adminSearch'])->name('help.admin.search');
+});
+
+// UCUA Officer Help Routes
+Route::middleware(['auth', 'role:ucua_officer'])->group(function () {
+    Route::get('/ucua/help', [HelpController::class, 'ucuaHelp'])->name('help.ucua');
+    Route::get('/ucua/help/search', [HelpController::class, 'ucuaSearch'])->name('help.ucua.search');
+});
+
+// Department Help Routes
+Route::middleware(['auth:department'])->group(function () {
+    Route::get('/department/help', [HelpController::class, 'departmentHelp'])->name('help.department');
+    Route::get('/department/help/search', [HelpController::class, 'departmentSearch'])->name('help.department.search');
 });
 
 // Login OTP Verification Routes

@@ -27,10 +27,17 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('profile.show') }}" 
+                <a href="{{ route('profile.show') }}"
                    class="flex items-center px-4 py-2 {{ Request::routeIs('profile.show') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
                     <i class="fas fa-cog w-5"></i>
                     <span>Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('help.user') }}"
+                   class="flex items-center px-4 py-2 {{ Request::routeIs('help.user') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-question-circle w-5"></i>
+                    <span>Help</span>
                 </a>
             </li>
             <!-- Logout Button -->

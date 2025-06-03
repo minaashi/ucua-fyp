@@ -41,6 +41,12 @@
                     Admin Settings
                 </a>
             </li>
+            <li>
+                <a href="{{ route('help.admin') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('help.admin') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-question-circle w-5 mr-3"></i>
+                    Help
+                </a>
+            </li>
             <li class="mt-4">
                 <form method="POST" action="{{ route('logout') }}" class="px-6">
                     @csrf

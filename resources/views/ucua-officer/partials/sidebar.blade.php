@@ -29,13 +29,20 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('ucua.reminders') }}" 
+                <a href="{{ route('ucua.reminders') }}"
                    class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
                     <i class="fas fa-bell w-5 animate-bounce text-red-500"></i>
                     <span class="ml-2 font-semibold">Reminders</span>
                     <span class="ml-2 bg-red-200 text-red-700 text-xs px-2 py-1 rounded-full">ALERTS</span>
                 </a>
             </li>
+            <li>
+                <a href="{{ route('help.ucua') }}"
+                   class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-question-circle w-5"></i>
+                    <span class="ml-2">Help</span>
+                </a>
+            </li>
         </ul>
     </nav>
-</aside> 
+</aside>
