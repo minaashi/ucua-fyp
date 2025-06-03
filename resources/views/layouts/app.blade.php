@@ -61,8 +61,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <!-- UCUA Utilities -->
     <script src="{{ asset('js/ucua-utilities.js') }}"></script>
-    <!-- Diagnostic Script (for debugging) -->
-    <script src="{{ asset('js/diagnostic.js') }}"></script>
 
     <!-- Global JavaScript Utilities -->
     <script>

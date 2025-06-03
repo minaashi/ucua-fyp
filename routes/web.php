@@ -26,11 +26,6 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Button Test Route (for debugging)
-Route::get('/test-buttons', function () {
-    return view('test-buttons');
-})->name('test.buttons');
-
 // Department Routes
 Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
     // Public routes (no auth required)

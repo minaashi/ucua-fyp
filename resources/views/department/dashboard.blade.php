@@ -184,3 +184,33 @@
 
 @endsection
 
+@push('scripts')
+<script>
+// Department-specific modal handling
+$(document).ready(function() {
+    // Ensure all modal cancel buttons work
+    $('.modal').on('click', '[data-dismiss="modal"]', function(e) {
+        e.stopPropagation();
+        const modalId = $(this).closest('.modal').attr('id');
+        $('#' + modalId).modal('hide');
+    });
+
+    // Handle modal close buttons specifically
+    $('.modal .close, .modal .btn-secondary').on('click', function(e) {
+        e.stopPropagation();
+        const modalId = $(this).closest('.modal').attr('id');
+        $('#' + modalId).modal('hide');
+    });
+
+    // Auto-hide success/error messages
+    setTimeout(function() {
+        $('.alert-success').fadeOut('slow');
+    }, 5000);
+
+    setTimeout(function() {
+        $('.alert-danger').fadeOut('slow');
+    }, 7000);
+});
+</script>
+@endpush
+

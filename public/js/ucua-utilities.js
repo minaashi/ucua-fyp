@@ -287,13 +287,37 @@
             UCUA.Button.handleFormSubmit(this, options);
         });
 
-        // Auto-initialize buttons with data-ucua-confirm attribute
+        // Ensure Bootstrap modal dismiss buttons work properly
+        $(document).on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"]', function(e) {
+            // Let Bootstrap handle these naturally - don't interfere
+            const modalId = $(this).closest('.modal').attr('id');
+            if (modalId) {
+                // Use a small delay to ensure Bootstrap processes first
+                setTimeout(() => {
+                    $('#' + modalId).modal('hide');
+                }, 10);
+            }
+        });
+
+        // Auto-initialize buttons with data-ucua-confirm attribute (exclude cancel buttons)
         $(document).on('click', '[data-ucua-confirm]', function(e) {
+            // Skip if this is a modal dismiss button
+            if ($(this).attr('data-dismiss') === 'modal' || $(this).attr('data-bs-dismiss') === 'modal') {
+                return true;
+            }
+
+            // Skip if this is a cancel/close button
+            if ($(this).hasClass('btn-secondary') || $(this).hasClass('btn-cancel') ||
+                $(this).text().toLowerCase().includes('cancel') ||
+                $(this).text().toLowerCase().includes('close')) {
+                return true;
+            }
+
             e.preventDefault();
             const message = $(this).data('ucua-confirm');
             const href = $(this).attr('href');
             const form = $(this).closest('form');
-            
+
             UCUA.Modal.confirm(message, function() {
                 if (href) {
                     window.location.href = href;
@@ -303,14 +327,28 @@
             });
         });
 
-        // Global error handling for buttons
-        $(document).on('click', 'button[type="submit"]', function() {
+        // Global error handling for submit buttons only (not cancel buttons)
+        $(document).on('click', 'button[type="submit"]', function(e) {
             const $btn = $(this);
+
+            // Skip if this is a modal dismiss button
+            if ($btn.attr('data-dismiss') === 'modal' || $btn.attr('data-bs-dismiss') === 'modal') {
+                return true;
+            }
+
+            // Skip if this is a cancel/close button
+            if ($btn.hasClass('btn-secondary') || $btn.hasClass('btn-cancel') ||
+                $btn.text().toLowerCase().includes('cancel') ||
+                $btn.text().toLowerCase().includes('close')) {
+                return true;
+            }
+
             const $form = $btn.closest('form');
-            
+
             // Validate form if not already handled
             if (!$form.data('ucua-form') && !$form.data('ajax')) {
                 if (!UCUA.Form.validate($form)) {
+                    e.preventDefault();
                     return false;
                 }
             }

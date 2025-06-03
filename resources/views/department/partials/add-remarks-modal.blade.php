@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-gray-50 border-t border-gray-200">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#addRemarksModal').modal('hide')">
                         <i class="fas fa-times mr-1"></i>
                         Cancel
                     </button>
