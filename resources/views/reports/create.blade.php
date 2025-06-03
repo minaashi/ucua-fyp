@@ -187,9 +187,13 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="incident_date">
                                 Date and Time of Event*
                             </label>
-                            <input type="datetime-local" id="incident_date" name="incident_date" 
+                            <input type="datetime-local" id="incident_date" name="incident_date"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                    required>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                You can only select dates and times up to the current moment
+                            </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="description">
@@ -258,5 +262,47 @@ function toggleOtherField() {
     document.getElementById('otherUnsafeActDiv').style.display = (unsafeAct && unsafeAct.value === 'Other') ? '' : 'none';
     document.getElementById('otherLocationDiv').style.display = (location === 'Other') ? '' : 'none';
 }
+
+// Function to set maximum date/time to current moment
+function setMaxDateTime() {
+    const now = new Date();
+    // Format to YYYY-MM-DDTHH:MM (required for datetime-local input)
+    const maxDateTime = now.getFullYear() + '-' +
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(now.getDate()).padStart(2, '0') + 'T' +
+                       String(now.getHours()).padStart(2, '0') + ':' +
+                       String(now.getMinutes()).padStart(2, '0');
+
+    const incidentDateInput = document.getElementById('incident_date');
+    if (incidentDateInput) {
+        incidentDateInput.setAttribute('max', maxDateTime);
+    }
+}
+
+// Set initial max date/time when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setMaxDateTime();
+
+    // Update max date/time every minute to handle edge cases
+    setInterval(setMaxDateTime, 60000);
+
+    // Add validation on form submission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const incidentDate = document.getElementById('incident_date').value;
+            if (incidentDate) {
+                const selectedDate = new Date(incidentDate);
+                const now = new Date();
+
+                if (selectedDate > now) {
+                    e.preventDefault();
+                    alert('The incident date and time cannot be in the future. Please select a date and time that has already occurred.');
+                    return false;
+                }
+            }
+        });
+    }
+});
 </script>
 @endsection

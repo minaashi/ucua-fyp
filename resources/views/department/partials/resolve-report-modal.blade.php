@@ -36,7 +36,11 @@
                             </label>
                             <input type="date" name="resolution_date" id="resolution_date"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                                   value="{{ date('Y-m-d') }}" required>
+                                   value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" required>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Resolution date cannot be in the future
+                            </p>
                         </div>
                     </div>
                 </div>

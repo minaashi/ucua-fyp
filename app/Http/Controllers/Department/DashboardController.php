@@ -113,7 +113,7 @@ class DashboardController extends Controller
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'resolution_notes' => 'required|string|max:1000',
-            'resolution_date' => 'required|date',
+            'resolution_date' => 'required|date|before_or_equal:today',
         ]);
 
         $report = Report::findOrFail($request->report_id);

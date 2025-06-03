@@ -62,7 +62,7 @@ class AdminReportController extends Controller
             'phone' => 'required|string',
             'non_compliance_type' => 'required|string',
             'location' => 'required|string',
-            'incident_date' => 'required|date',
+            'incident_date' => 'required|date|before_or_equal:now',
         ]);
 
         $report = Report::create([

@@ -61,7 +61,7 @@ class ReportController extends Controller
             'violator_department' => 'nullable|string',
             'location' => 'required|string',
             'other_location' => 'nullable|string',
-            'incident_date' => 'required|date',
+            'incident_date' => 'required|date|before_or_equal:now',
             'description' => 'required|string',
             'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:5120', // 5MB max
             'category_type' => 'required|string|in:unsafe_condition,unsafe_act',
