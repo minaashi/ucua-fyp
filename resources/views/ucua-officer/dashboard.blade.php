@@ -240,16 +240,9 @@ function sendReminder(reportId, status, reportCode) {
     $('#sendReminderModal').modal('show');
 }
 
-// Universal close modal function
+// Universal close modal function - Bootstrap 4 compatible
 function closeModal(modalId) {
-    // Try Bootstrap 5 method first
-    const modal = bootstrap?.Modal?.getInstance(document.getElementById(modalId));
-    if (modal) {
-        modal.hide();
-    } else {
-        // Fallback to Bootstrap 4 method
-        $('#' + modalId).modal('hide');
-    }
+    $('#' + modalId).modal('hide');
 }
 
 // Success message auto-hide

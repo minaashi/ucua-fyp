@@ -164,16 +164,9 @@ function viewWarningDetails(warningId) {
         });
 }
 
-// Close warning modal function
+// Close warning modal function - Bootstrap 4 compatible
 function closeWarningModal() {
-    // Try Bootstrap 5 method first
-    const modal = bootstrap?.Modal?.getInstance(document.getElementById('warningDetailsModal'));
-    if (modal) {
-        modal.hide();
-    } else {
-        // Fallback to Bootstrap 4 method
-        $('#warningDetailsModal').modal('hide');
-    }
+    $('#warningDetailsModal').modal('hide');
 }
 
 // Also handle clicking outside the modal

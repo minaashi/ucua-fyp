@@ -26,7 +26,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login.otp.verify') }}">
+                <form method="POST" action="{{ route('login.otp.verify') }}" data-ucua-form data-ucua-options='{"loadingText": "Verifying OTP..."}'>
                     @csrf
 
                     <input type="hidden" name="email" value="{{ $email }}">

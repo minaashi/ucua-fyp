@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
                     </div>
                 </div>
                 <h3 class="text-center fw-bold mb-4">Sign In</h3>
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('login') }}" data-ucua-form data-ucua-options='{"loadingText": "Signing In..."}'>
                     @csrf
 
                     <div class="form-floating mb-3">

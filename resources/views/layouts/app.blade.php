@@ -11,9 +11,17 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Global JavaScript Variables -->
+    <script>
+        window.Laravel = {
+            csrfToken: '{{ csrf_token() }}',
+            baseUrl: '{{ url('/') }}'
+        };
+    </script>
 
     <!-- Tailwind-like utility classes (for the sidebar design) -->
     <style>
@@ -51,6 +59,64 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- UCUA Utilities -->
+    <script src="{{ asset('js/ucua-utilities.js') }}"></script>
+    <!-- Diagnostic Script (for debugging) -->
+    <script src="{{ asset('js/diagnostic.js') }}"></script>
+
+    <!-- Global JavaScript Utilities -->
+    <script>
+    // Ensure jQuery is available globally
+    window.$ = window.jQuery = $;
+
+    // Global CSRF setup for all AJAX requests
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Global error handler for AJAX requests
+    $(document).ajaxError(function(event, xhr, settings, thrownError) {
+        console.error('AJAX Error:', {
+            url: settings.url,
+            status: xhr.status,
+            error: thrownError,
+            response: xhr.responseText
+        });
+
+        if (xhr.status === 419) {
+            alert('Your session has expired. Please refresh the page and try again.');
+            location.reload();
+        }
+    });
+
+    // Universal modal functions for Bootstrap 4
+    window.showModal = function(modalId) {
+        $('#' + modalId).modal('show');
+    };
+
+    window.hideModal = function(modalId) {
+        $('#' + modalId).modal('hide');
+    };
+
+    // Global button click handler with loading state
+    window.handleButtonClick = function(button, callback) {
+        if (button.disabled) return false;
+
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        Promise.resolve(callback()).finally(() => {
+            setTimeout(() => {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }, 1000);
+        });
+    };
+    </script>
+
     @stack('scripts')
 </body>
 </html>

@@ -501,41 +501,13 @@ document.getElementById('status').addEventListener('change', function() {
     this.form.submit();
 });
 
-// Universal modal functions
+// Universal modal functions - Bootstrap 4 compatible
 function showModal(modalId) {
-    const modalElement = document.getElementById(modalId);
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        // Bootstrap 5
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-    } else if (typeof $ !== 'undefined' && $.fn.modal) {
-        // Bootstrap 4 with jQuery
-        $('#' + modalId).modal('show');
-    } else {
-        // Fallback - show modal manually
-        modalElement.style.display = 'block';
-        modalElement.classList.add('show');
-        document.body.classList.add('modal-open');
-    }
+    $('#' + modalId).modal('show');
 }
 
 function closeModal(modalId) {
-    const modalElement = document.getElementById(modalId);
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        // Bootstrap 5
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) {
-            modal.hide();
-        }
-    } else if (typeof $ !== 'undefined' && $.fn.modal) {
-        // Bootstrap 4 with jQuery
-        $('#' + modalId).modal('hide');
-    } else {
-        // Fallback - hide modal manually
-        modalElement.style.display = 'none';
-        modalElement.classList.remove('show');
-        document.body.classList.remove('modal-open');
-    }
+    $('#' + modalId).modal('hide');
 }
 
 // Handle clicking outside modals

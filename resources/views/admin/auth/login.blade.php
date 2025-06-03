@@ -37,7 +37,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.login.submit') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ route('admin.login.submit') }}" class="needs-validation" novalidate data-ucua-form data-ucua-options='{"loadingText": "Signing In..."}'>
                     @csrf
 
                     <!-- Email -->

@@ -12,6 +12,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     @vite('resources/js/app.js')
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <!-- Global JavaScript Variables -->
+    <script>
+        window.Laravel = {
+            csrfToken: '{{ csrf_token() }}',
+            baseUrl: '{{ url('/') }}'
+        };
+    </script>
     <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="bg-gray-100">
@@ -84,6 +92,36 @@
 <!-- jQuery and Bootstrap 4 JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<!-- UCUA Utilities -->
+<script src="{{ asset('js/ucua-utilities.js') }}"></script>
+
+<!-- Global JavaScript Utilities -->
+<script>
+// Ensure jQuery is available globally
+window.$ = window.jQuery = $;
+
+// Global CSRF setup for all AJAX requests
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
+// Global error handler for AJAX requests
+$(document).ajaxError(function(event, xhr, settings, thrownError) {
+    console.error('AJAX Error:', {
+        url: settings.url,
+        status: xhr.status,
+        error: thrownError,
+        response: xhr.responseText
+    });
+
+    if (xhr.status === 419) {
+        alert('Your session has expired. Please refresh the page and try again.');
+        location.reload();
+    }
+});
+</script>
 
 <!-- Responsive Sidebar Script -->
 <script>
