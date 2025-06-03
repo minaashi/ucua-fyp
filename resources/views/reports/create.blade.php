@@ -38,9 +38,10 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="employee_id">
                                 Employee ID*
                             </label>
-                            <input type="text" id="employee_id" name="employee_id" 
-                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   required>
+                            <input type="text" id="employee_id" name="employee_id"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
+                                   value="{{ Auth::user()->worker_id ?? '' }}" readonly required>
+                            <p class="text-xs text-gray-500 mt-1">Auto-populated from your registration</p>
                         </div>
 
                         <div>
