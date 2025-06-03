@@ -147,7 +147,7 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
     Route::get('/report/{report}', [UCUADashboardController::class, 'showReport'])->name('report.show');
     Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
     Route::post('/assign-department', [UCUADashboardController::class, 'assignDepartment'])->name('assign-department');
-    Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');
+
     Route::post('/suggest-warning', [UCUADashboardController::class, 'suggestWarning'])->name('suggest-warning');
     Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
     Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');

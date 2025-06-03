@@ -136,37 +136,7 @@ class UCUADashboardController extends Controller
         }
     }
 
-    public function addRemarks(Request $request)
-    {
-        $request->validate([
-            'report_id' => 'required|exists:reports,id',
-            'content' => 'required|string|max:1000',
-            'parent_id' => 'nullable|exists:remarks,id',
-            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
-        ]);
 
-        try {
-            $report = Report::findOrFail($request->report_id);
-            $remarkService = new \App\Services\EnhancedRemarkService();
-
-            $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
-            $parentId = $request->input('parent_id');
-
-            $remarkService->addUCUARemark(
-                $report,
-                $request->content,
-                null,
-                $attachment,
-                $parentId
-            );
-
-            $message = $parentId ? 'Reply added successfully.' : 'Discussion comment added successfully.';
-            return redirect()->back()->with('success', $message);
-        } catch (\Exception $e) {
-            \Log::error('Failed to add UCUA remark: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to add comment. Please try again.');
-        }
-    }
 
     public function suggestWarning(Request $request)
     {

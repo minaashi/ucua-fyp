@@ -79,16 +79,5 @@ class UCUAOfficerController extends Controller
         return redirect()->back()->with('success', 'Department assigned successfully.');
     }
 
-    public function addRemarks(Request $request, Report $report)
-    {
-        $request->validate([
-            'remarks' => 'required|string|max:1000'
-        ]);
 
-        $report->update([
-            'remarks' => $request->remarks
-        ]);
-
-        return redirect()->back()->with('success', 'Remarks added successfully.');
-    }
 } 

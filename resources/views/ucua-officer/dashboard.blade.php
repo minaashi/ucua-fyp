@@ -63,6 +63,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Violator Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -75,12 +76,31 @@
                                     RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                           ($report->status === 'resolved' ? 'bg-green-100 text-green-800' : 
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                        {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                           ($report->status === 'resolved' ? 'bg-green-100 text-green-800' :
                                             'bg-gray-100 text-gray-800') }}">
                                         {{ ucfirst($report->status) }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($report->hasViolatorIdentified())
+                                        <span class="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            IDENTIFIED
+                                        </span>
+                                        <div class="text-xs text-gray-600 mt-1">
+                                            {{ $report->violator_name }}
+                                        </div>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800">
+                                            <i class="fas fa-search mr-1"></i>
+                                            INVESTIGATION
+                                        </span>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            Pending
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $report->handlingDepartment->name ?? 'Not Assigned' }}
@@ -108,13 +128,7 @@
                                         </button>
                                         @endif
 
-                                        <!-- Add Comment Button -->
-                                        <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
-                                                class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
-                                                title="Add Discussion Comment">
-                                            <i class="fas fa-comment mr-1"></i>
-                                            Comment
-                                        </button>
+
 
                                         <!-- Suggest Warning Button -->
                                         <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
@@ -175,7 +189,6 @@
 
 <!-- Modals for actions -->
 @include('ucua-officer.partials.assign-department-modal')
-@include('ucua-officer.partials.add-remarks-modal')
 @include('ucua-officer.partials.suggest-warning-modal')
 @include('ucua-officer.partials.send-reminder-modal')
 
@@ -193,18 +206,7 @@ function assignDepartment(reportId, status, reportCode) {
     $('#assignDepartmentModal').modal('show');
 }
 
-function addRemarks(reportId, status, reportCode) {
-    // Populate report information
-    $('#remarksReportId').val(reportId);
-    $('#remarksDisplayReportId').text(reportCode);
-    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
 
-    // Clear previous content
-    $('#content').val('');
-
-    // Show add remarks modal
-    $('#addRemarksModal').modal('show');
-}
 
 function suggestWarning(reportId, status, reportCode) {
     // Populate report information

@@ -71,6 +71,83 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
                             <p class="text-gray-900">{{ $report->department }}</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- VIOLATOR IDENTIFICATION STATUS - PROMINENT SECTION -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 {{ $report->hasViolatorIdentified() ? 'border-green-500' : 'border-red-500' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-user-check mr-2"></i>
+                            Violator Identification Status
+                        </h2>
+                        @if($report->hasViolatorIdentified())
+                            <span class="px-3 py-1 text-sm font-bold rounded-full bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                IDENTIFIED
+                            </span>
+                        @else
+                            <span class="px-3 py-1 text-sm font-bold rounded-full bg-red-100 text-red-800">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                INVESTIGATION NEEDED
+                            </span>
+                        @endif
+                    </div>
+
+                    @if($report->hasViolatorIdentified())
+                        <!-- Violator Details -->
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-3">
+                                <i class="fas fa-user-times mr-1"></i>
+                                Identified Violator
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-green-700 mb-1">Employee ID</label>
+                                    <p class="text-green-900 font-bold">{{ $report->violator_employee_id ?: 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-green-700 mb-1">Full Name</label>
+                                    <p class="text-green-900 font-bold">{{ $report->violator_name ?: 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-green-700 mb-1">Department</label>
+                                    <p class="text-green-900 font-bold">{{ $report->violator_department ?: 'N/A' }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 p-3 bg-green-100 border border-green-300 rounded">
+                                <p class="text-sm text-green-800">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <strong>Ready for Warning:</strong> You can now suggest warning letters for this violator. The system will send warnings to the correct person.
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Investigation Needed -->
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <h3 class="font-semibold text-red-800 mb-3">
+                                <i class="fas fa-search mr-1"></i>
+                                Investigation Required
+                            </h3>
+                            <p class="text-red-700 mb-3">
+                                The violator for this safety incident has not been identified yet. The handling department needs to complete their investigation.
+                            </p>
+                            <div class="p-3 bg-red-100 border border-red-300 rounded">
+                                <p class="text-sm text-red-800">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    <strong>Cannot Issue Warning:</strong> Warning letters cannot be suggested until the violator is identified through department investigation.
+                                </p>
+                            </div>
+                            @if($report->handlingDepartment)
+                                <div class="mt-3">
+                                    <p class="text-sm text-red-700">
+                                        <i class="fas fa-building mr-1"></i>
+                                        <strong>Assigned to:</strong> {{ $report->handlingDepartment->name }} for investigation
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                             <p class="text-gray-900">{{ $report->phone }}</p>
@@ -140,11 +217,7 @@
                         </button>
                         @endif
 
-                        <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')" 
-                                class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors duration-200">
-                            <i class="fas fa-comment mr-2"></i>
-                            Add Discussion Comment
-                        </button>
+
 
                         <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')" 
                                 class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors duration-200">
@@ -241,71 +314,46 @@
                 </div>
                 @endif
 
-                <!-- Discussion Comments -->
+                <!-- Department Remarks Display -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Discussion Comments</h3>
-                        <button type="button"
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                onclick="document.getElementById('main-comment-form').classList.toggle('hidden')">
-                            <i class="fas fa-plus mr-1"></i>
-                            Add Comment
-                        </button>
-                    </div>
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">
+                        <i class="fas fa-building mr-2 text-blue-600"></i>
+                        Department Investigation Updates
+                    </h3>
 
-                    <!-- Main Comment Form -->
-                    <div id="main-comment-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border">
-                        <form method="POST" action="{{ route('ucua.add-remarks') }}" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="report_id" value="{{ $report->id }}">
-
-                            <div class="mb-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-                                <textarea name="content"
-                                          rows="4"
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                          placeholder="Add your discussion comment..."
-                                          required></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Attachment (optional)</label>
-                                <input type="file"
-                                       name="attachment"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                       accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt">
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Max 10MB. Allowed: JPG, PNG, PDF, DOC, XLS, TXT
-                                </p>
-                            </div>
-
-                            <div class="flex items-center justify-end space-x-2">
-                                <button type="button"
-                                        class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                                        onclick="document.getElementById('main-comment-form').classList.add('hidden')">
-                                    Cancel
-                                </button>
-                                <button type="submit"
-                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <i class="fas fa-comment mr-1"></i>
-                                    Post Comment
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Threaded Comments Display -->
-                    @if(isset($threadedRemarks) && $threadedRemarks->count() > 0)
+                    <!-- Department Remarks Display -->
+                    @if(isset($threadedRemarks) && $threadedRemarks->where('user_type', 'department')->count() > 0)
                         <div class="space-y-4">
-                            @foreach($threadedRemarks as $comment)
-                                <x-threaded-comment :comment="$comment" :report="$report" />
+                            @foreach($threadedRemarks->where('user_type', 'department') as $remark)
+                                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-building text-blue-600 mr-2"></i>
+                                            <span class="font-medium text-blue-800">
+                                                {{ $remark->department ? $remark->department->name : 'Department' }}
+                                            </span>
+                                        </div>
+                                        <span class="text-xs text-blue-600">
+                                            {{ $remark->created_at->format('M d, Y g:i A') }}
+                                        </span>
+                                    </div>
+                                    <div class="text-gray-700">
+                                        {{ $remark->content }}
+                                    </div>
+                                    @if(str_contains($remark->content, '[INVESTIGATION UPDATE]'))
+                                        <div class="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                                            <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                                            <span class="text-sm font-medium text-green-800">Investigation Complete - Violator Identified</span>
+                                        </div>
+                                    @endif
+                                </div>
                             @endforeach
                         </div>
                     @else
                         <div class="text-center py-8">
-                            <i class="fas fa-comments text-gray-300 text-4xl mb-3"></i>
-                            <p class="text-gray-500 text-sm">No discussion comments yet.</p>
-                            <p class="text-gray-400 text-xs">Be the first to start the conversation!</p>
+                            <i class="fas fa-search text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No department investigation updates yet.</p>
+                            <p class="text-gray-400 text-xs">Waiting for department to provide investigation results.</p>
                         </div>
                     @endif
                 </div>
@@ -339,7 +387,6 @@
 
 <!-- Include Modals -->
 @include('ucua-officer.partials.assign-department-modal')
-@include('ucua-officer.partials.add-remarks-modal')
 @include('ucua-officer.partials.suggest-warning-modal')
 @include('ucua-officer.partials.send-reminder-modal')
 
@@ -354,13 +401,7 @@ function assignDepartment(reportId, status, reportCode) {
     $('#assignDepartmentModal').modal('show');
 }
 
-function addRemarks(reportId, status, reportCode) {
-    $('#remarksReportId').val(reportId);
-    $('#remarksDisplayReportId').text(reportCode);
-    $('#remarksDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-    $('#content').val('');
-    $('#addRemarksModal').modal('show');
-}
+
 
 function suggestWarning(reportId, status, reportCode) {
     $('#warningReportId').val(reportId);
