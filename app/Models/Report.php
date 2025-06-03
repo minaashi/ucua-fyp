@@ -125,8 +125,8 @@ class Report extends Model
             return $virtualUser;
         }
 
-        // Fallback to report author (current behavior)
-        return $this->user;
+        // No violator identified - return null (investigation needed)
+        return null;
     }
 
     public function statusHistory()

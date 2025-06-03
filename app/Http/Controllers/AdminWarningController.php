@@ -71,6 +71,11 @@ class AdminWarningController extends Controller
         // Get the violator for this warning
         $violator = $warning->report->getViolatorForWarning();
 
+        // Check if violator has been identified
+        if (!$violator) {
+            return redirect()->back()->with('error', 'Cannot approve warning: Violator has not been identified yet. Investigation is required to identify the person involved.');
+        }
+
         $warning->update([
             'status' => 'approved',
             'approved_by' => auth()->id(),

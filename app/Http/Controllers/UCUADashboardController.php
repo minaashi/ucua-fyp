@@ -179,7 +179,13 @@ class UCUADashboardController extends Controller
 
         try {
             $report = Report::findOrFail($request->report_id);
-            
+
+            // Check if violator has been identified
+            $violator = $report->getViolatorForWarning();
+            if (!$violator) {
+                return redirect()->back()->with('error', 'Cannot suggest warning: Violator has not been identified yet. Please wait for investigation to identify the person involved, or contact the handling department for updates.');
+            }
+
             $report->warnings()->create([
                 'type' => $request->warning_type,
                 'reason' => $request->warning_reason,
@@ -188,7 +194,7 @@ class UCUADashboardController extends Controller
                 'status' => 'pending'
             ]);
 
-            return redirect()->back()->with('success', 'Warning suggestion added successfully.');
+            return redirect()->back()->with('success', 'Warning suggestion added successfully for ' . $violator->name . '.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to suggest warning. Please try again.');
         }
