@@ -51,10 +51,46 @@
             </div>
         </div>
 
+        <!-- Assignment Status Info -->
+        @php
+            $unassignedReports = $recentReports->where('handlingDepartment', null);
+            $assignedReports = $recentReports->where('handlingDepartment', '!=', null);
+        @endphp
+
+        @if($unassignedReports->count() > 0)
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>{{ $unassignedReports->count() }} report(s)</strong> need department assignment.
+                        <a href="{{ route('ucua.assign-departments-page') }}" class="font-medium underline hover:text-yellow-800">
+                            Assign departments now
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Recent Reports Table -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">Recent Reports</h2>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Recent Reports</h2>
+                    <div class="text-sm text-gray-600">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-2">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            {{ $unassignedReports->count() }} Unassigned
+                        </span>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            {{ $assignedReports->count() }} Assigned
+                        </span>
+                    </div>
+                </div>
             </div>
             <div class="p-4">
                 <div class="overflow-x-auto">
@@ -103,7 +139,17 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $report->handlingDepartment->name ?? 'Not Assigned' }}
+                                    @if($report->handlingDepartment)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            {{ $report->handlingDepartment->name }}
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>
+                                            Not Assigned
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $report->deadline ? $report->deadline->format('Y-m-d') : 'No Deadline' }}
@@ -126,6 +172,12 @@
                                             <i class="fas fa-building mr-1"></i>
                                             Assign
                                         </button>
+                                        @else
+                                        <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+                                              title="Already assigned to {{ $report->handlingDepartment->name }}">
+                                            <i class="fas fa-check mr-1"></i>
+                                            Assigned
+                                        </span>
                                         @endif
 
 

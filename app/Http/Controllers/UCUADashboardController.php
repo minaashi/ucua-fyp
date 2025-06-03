@@ -33,10 +33,10 @@ class UCUADashboardController extends Controller
             ->where('deadline', '>=', now())
             ->get();
 
-        // Get recent reports with pagination
+        // Get recent reports with pagination - show more to see assignment status
         $recentReports = Report::latest()
             ->with(['user', 'handlingDepartment'])
-            ->paginate(10);
+            ->paginate(15);
 
         // Get departments for assignment modal
         $departments = Department::where('is_active', true)->get();
@@ -210,10 +210,31 @@ class UCUADashboardController extends Controller
 
     public function assignDepartmentsPage()
     {
-        // Fetch reports that are pending and need department assignment
-        $reports = Report::where('status', 'pending')->get();
+        // Fetch reports that need department assignment (no handling department assigned yet)
+        // Include both 'pending' and 'review' status reports that haven't been assigned to departments
+        $reports = Report::whereNull('handling_department_id')
+            ->whereIn('status', ['pending', 'review'])
+            ->with(['user'])
+            ->latest()
+            ->get();
+
         $departments = Department::where('is_active', true)->get();
-        return view('ucua-officer.assign-departments', compact('reports', 'departments'));
+
+        // Debug information - get all reports to understand the current state
+        $allReports = Report::with(['user', 'handlingDepartment'])
+            ->latest()
+            ->get()
+            ->map(function($report) {
+                return [
+                    'id' => $report->id,
+                    'status' => $report->status,
+                    'has_handling_department' => $report->handlingDepartment ? true : false,
+                    'handling_department_name' => $report->handlingDepartment ? $report->handlingDepartment->name : null,
+                    'employee_id' => $report->employee_id,
+                ];
+            });
+
+        return view('ucua-officer.assign-departments', compact('reports', 'departments', 'allReports'));
     }
 
     public function warningsPage()
