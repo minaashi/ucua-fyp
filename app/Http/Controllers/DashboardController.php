@@ -23,8 +23,11 @@ class DashboardController extends Controller
             'pendingReports' => Report::where('user_id', $user->id)
                                     ->where('status', 'pending')
                                     ->count(),
-            'solvedReports' => Report::where('user_id', $user->id)
-                                   ->where('status', 'solved')
+            'resolvedReports' => Report::where('user_id', $user->id)
+                                   ->where('status', 'resolved')
+                                   ->count(),
+            'inProgressReports' => Report::where('user_id', $user->id)
+                                   ->where('status', 'in_progress')
                                    ->count()
         ];
 

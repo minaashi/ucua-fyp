@@ -28,9 +28,11 @@ class AdminReportController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('non_compliance_type', 'like', "%{$search}%")
+                $q->where('unsafe_act', 'like', "%{$search}%")
+                  ->orWhere('unsafe_condition', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('employee_id', 'like', "%{$search}%");
             });
         }
 
@@ -55,24 +57,24 @@ class AdminReportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
             'description' => 'required|string',
             'employee_id' => 'required|string',
             'department' => 'required|string',
             'phone' => 'required|string',
-            'non_compliance_type' => 'required|string',
+            'unsafe_act' => 'nullable|string',
+            'unsafe_condition' => 'nullable|string',
             'location' => 'required|string',
             'incident_date' => 'required|date|before_or_equal:now',
         ]);
 
         $report = Report::create([
             'user_id' => auth()->id(),
-            'title' => $validated['title'],
             'description' => $validated['description'],
             'employee_id' => $validated['employee_id'],
             'department' => $validated['department'],
             'phone' => $validated['phone'],
-            'non_compliance_type' => $validated['non_compliance_type'],
+            'unsafe_act' => $validated['unsafe_act'] ?? null,
+            'unsafe_condition' => $validated['unsafe_condition'] ?? null,
             'location' => $validated['location'],
             'incident_date' => $validated['incident_date'],
             'status' => 'pending',

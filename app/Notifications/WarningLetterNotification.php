@@ -29,9 +29,10 @@ class WarningLetterNotification extends Notification
 
         // Loop through the reports to generate the content for each report
         foreach ($this->reports as $report) {
-            $mail->line('Report Title: ' . $report->title)
+            $mail->line('Report ID: RPT-' . str_pad($report->id, 3, '0', STR_PAD_LEFT))
                 ->line('Report Description: ' . $report->description)
-                ->line('Issued because it was categorized as: ' . $report->category)
+                ->line('Location: ' . $report->location)
+                ->line('Incident Date: ' . $report->incident_date->format('Y-m-d'))
                 ->action('View Report', url('/reports/' . $report->id))
                 ->line('Please ensure to address this unsafe act or condition accordingly.');
         }
@@ -42,5 +43,30 @@ class WarningLetterNotification extends Notification
         return $mail;
     }
 
-    // Additional methods if you want to implement other notification channels (like database or SMS)
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via($notifiable)
+    {
+        return ['mail', 'database'];
+    }
+
+    /**
+     * Get the array representation of the notification.
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            'reports' => $this->reports->map(function($report) {
+                return [
+                    'id' => $report->id,
+                    'description' => $report->description,
+                    'location' => $report->location,
+                    'incident_date' => $report->incident_date->format('Y-m-d')
+                ];
+            }),
+            'type' => 'warning_letter',
+            'message' => 'Warning letter issued for safety violation(s)'
+        ];
+    }
 }

@@ -80,7 +80,7 @@ class UCUADashboardController extends Controller
     {
         $request->validate([
             'report_id' => 'required|exists:reports,id',
-            'department_id' => 'required|string',
+            'department_id' => 'required|exists:departments,id',
             'deadline' => 'required|date|after:today',
             'initial_remarks' => 'nullable|string|max:1000',
             'assignment_remark' => 'nullable|string|max:1000'
@@ -104,10 +104,14 @@ class UCUADashboardController extends Controller
             Log::info('Report ' . $report->id . ' updated with department ' . $request->department_id . ' and deadline ' . $request->deadline . '. New status: ' . $report->status);
 
             if ($request->initial_remarks) {
-                $report->remarks()->create([
-                    'content' => $request->initial_remarks,
-                    'user_id' => Auth::id()
-                ]);
+                $remarkService = new \App\Services\EnhancedRemarkService();
+                $remarkService->addUCUARemark(
+                    $report,
+                    $request->initial_remarks,
+                    null,
+                    null,
+                    null
+                );
             }
 
             // Get the UCUA Officer who assigned the report

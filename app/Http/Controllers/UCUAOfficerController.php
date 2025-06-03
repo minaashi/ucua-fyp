@@ -51,20 +51,6 @@ class UCUAOfficerController extends Controller
         ));
     }
 
-    // This method is deprecated - use UCUADashboardController::suggestWarning instead
-
-    public function sendReminder(Request $request, Report $report)
-    {
-        $request->validate([
-            'message' => 'required|string|max:500'
-        ]);
-
-        // Send reminder notification
-        $report->user->notify(new \App\Notifications\PenaltyReminder($report, $request->message));
-
-        return redirect()->back()->with('success', 'Reminder sent successfully.');
-    }
-
     public function assignDepartment(Request $request, Report $report)
     {
         $request->validate([
