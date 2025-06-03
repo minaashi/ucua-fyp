@@ -57,6 +57,43 @@
         </div>
     </div>
 
+    <!-- Important Notice about Violator Identification -->
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-orange-600 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-semibold text-orange-900 mb-2">
+                    Important: Violator Identification Guidelines
+                </h3>
+                <div class="text-orange-800 space-y-2">
+                    <p class="font-medium">Violator identification is ONLY required for <strong>Unsafe Acts</strong>, not Unsafe Conditions.</p>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <h4 class="font-semibold text-red-800 mb-2">🚨 Unsafe Acts (Requires Violator ID)</h4>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                <li>• Not wearing required PPE</li>
+                                <li>• Improper lifting techniques</li>
+                                <li>• Ignoring safety procedures</li>
+                                <li>• Running in workplace areas</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <h4 class="font-semibold text-blue-800 mb-2">⚠️ Unsafe Conditions (Fix the Issue)</h4>
+                            <ul class="text-sm text-blue-700 space-y-1">
+                                <li>• Slippery surfaces</li>
+                                <li>• Poor lighting conditions</li>
+                                <li>• Damaged equipment</li>
+                                <li>• Blocked emergency exits</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Help Sections -->
     @foreach($helpSections as $key => $section)
         <div id="{{ $key }}" class="help-section bg-white rounded-lg shadow-sm border p-6 mb-8">
@@ -64,13 +101,13 @@
                 <i class="{{ $section['icon'] }} text-indigo-600 mr-3"></i>
                 {{ $section['title'] }}
             </h3>
-            
+
             <div class="space-y-6">
                 @foreach($section['items'] as $item)
                     <div class="help-item bg-gray-50 rounded-lg p-6 border border-gray-200">
                         <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ $item['title'] }}</h4>
                         <p class="text-gray-700 mb-4">{{ $item['content'] }}</p>
-                        
+
                         @if(isset($item['steps']) && count($item['steps']) > 0)
                             <div class="space-y-3">
                                 <h5 class="font-medium text-gray-900 mb-3">Step-by-step instructions:</h5>
@@ -247,7 +284,7 @@
             </div>
 
             <div class="border border-gray-200 rounded-lg">
-                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50" 
+                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
                         onclick="toggleAccordion('dept-faq3')">
                     <div class="flex justify-between items-center">
                         <span>Not receiving report assignment notifications</span>
@@ -262,6 +299,48 @@
                             <li>Verify email address is correct in system</li>
                             <li>Check spam/junk folders for notifications</li>
                             <li>Contact admin to update notification settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                        onclick="toggleAccordion('dept-faq4')">
+                    <div class="flex justify-between items-center">
+                        <span>When should I identify violators?</span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="dept-faq4-icon"></i>
+                    </div>
+                </button>
+                <div id="dept-faq4" class="hidden px-4 pb-3">
+                    <div class="text-gray-700 space-y-2">
+                        <p><strong>Important:</strong> Violator identification is only required for <strong>Unsafe Acts</strong>, not Unsafe Conditions.</p>
+                        <ul class="list-disc list-inside space-y-1 ml-4">
+                            <li><strong>Unsafe Acts:</strong> Human behaviors that violate safety procedures (requires violator identification)</li>
+                            <li><strong>Unsafe Conditions:</strong> Environmental hazards or equipment issues (focus on fixing the issue, not identifying people)</li>
+                            <li>Only use the violator identification fields when investigating unsafe acts</li>
+                            <li>For unsafe conditions, concentrate on corrective actions and preventive measures</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                        onclick="toggleAccordion('dept-faq5')">
+                    <div class="flex justify-between items-center">
+                        <span>Cannot find violator identification fields</span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="dept-faq5-icon"></i>
+                    </div>
+                </button>
+                <div id="dept-faq5" class="hidden px-4 pb-3">
+                    <div class="text-gray-700 space-y-2">
+                        <p><strong>Solutions:</strong></p>
+                        <ul class="list-disc list-inside space-y-1 ml-4">
+                            <li>Ensure the report is categorized as "Unsafe Act" (violator fields only appear for unsafe acts)</li>
+                            <li>Toggle the "Investigation Update" checkbox in the remarks section</li>
+                            <li>Violator identification fields will appear below the toggle</li>
+                            <li>If still not visible, refresh the page and try again</li>
                         </ul>
                     </div>
                 </div>

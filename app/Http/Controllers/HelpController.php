@@ -352,6 +352,16 @@ class HelpController extends Controller
                         ]
                     ],
                     [
+                        'title' => 'Understanding Report Types',
+                        'content' => 'Learn the difference between unsafe acts and unsafe conditions.',
+                        'steps' => [
+                            'Unsafe Acts: Human behaviors that violate safety procedures (e.g., not wearing PPE, improper lifting)',
+                            'Unsafe Conditions: Environmental hazards or equipment issues (e.g., slippery surfaces, damaged equipment)',
+                            'Unsafe Acts require violator identification for potential warning letters',
+                            'Unsafe Conditions focus on fixing environmental/equipment issues'
+                        ]
+                    ],
+                    [
                         'title' => 'Adding Department Remarks',
                         'content' => 'How to respond to reports and add remarks.',
                         'steps' => [
@@ -360,6 +370,45 @@ class HelpController extends Controller
                             'Add your department\'s response and actions taken',
                             'Update report status (in progress, resolved)',
                             'Submit remarks for UCUA review'
+                        ]
+                    ]
+                ]
+            ],
+            'violator_identification' => [
+                'title' => 'Violator Identification (Unsafe Acts Only)',
+                'icon' => 'fas fa-user-check',
+                'items' => [
+                    [
+                        'title' => 'When to Identify Violators',
+                        'content' => 'Violator identification is only required for unsafe act violations, not unsafe conditions.',
+                        'steps' => [
+                            'Check if the report is categorized as "Unsafe Act"',
+                            'If it\'s an "Unsafe Condition", focus on fixing the environmental issue',
+                            'For "Unsafe Acts", investigate to identify the person who violated safety procedures',
+                            'Only proceed with violator identification if human behavior caused the safety issue'
+                        ]
+                    ],
+                    [
+                        'title' => 'How to Identify Violators',
+                        'content' => 'Step-by-step process for identifying violators in unsafe act cases.',
+                        'steps' => [
+                            'Conduct thorough investigation of the unsafe act incident',
+                            'Interview witnesses and review security footage if available',
+                            'Gather employee ID and name of the person who committed the unsafe act',
+                            'Use the "Investigation Update" toggle in your remarks',
+                            'Fill in violator employee ID and name fields',
+                            'Submit your findings for UCUA review and potential warning letter processing'
+                        ]
+                    ],
+                    [
+                        'title' => 'Investigation Best Practices',
+                        'content' => 'Guidelines for conducting effective violator identification investigations.',
+                        'steps' => [
+                            'Remain objective and focus on facts, not blame',
+                            'Document all evidence and witness statements',
+                            'Verify employee information before submitting',
+                            'Consider if the violation was intentional or due to lack of training',
+                            'Recommend appropriate corrective actions alongside identification'
                         ]
                     ]
                 ]
