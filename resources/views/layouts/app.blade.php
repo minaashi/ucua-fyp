@@ -37,7 +37,7 @@
     <!-- Styles -->
     @vite(['resources/js/app.js'])
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased @if(auth()->guard('web')->check()) has-sidebar @endif">
     <div id="app" class="min-h-screen flex">
         @if(auth()->guard('web')->check())
             @if(auth()->user()->hasRole('admin'))
@@ -50,11 +50,13 @@
         @elseif(auth()->guard('department')->check())
             {{-- Department users have their own sidebar in their dashboard views --}}
         @endif
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1">
             @yield('content')
-            @include('partials.footer')
         </div>
     </div>
+
+    <!-- Fixed Footer -->
+    @include('partials.footer')
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

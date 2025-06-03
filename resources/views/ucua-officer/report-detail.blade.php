@@ -41,14 +41,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Main Report Information -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Report Details Card -->
+                <!-- Report Overview -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex justify-between items-start mb-4">
-                        <h2 class="text-xl font-bold text-gray-800">Report Information</h2>
-                        <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                            {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                               ($report->status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                                ($report->status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
+                        <h2 class="text-xl font-bold text-gray-800">Report Overview</h2>
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full
+                            {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                               ($report->status === 'resolved' ? 'bg-green-100 text-green-800' :
+                                ($report->status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
                                  'bg-gray-100 text-gray-800')) }}">
                             {{ ucfirst(str_replace('_', ' ', $report->status)) }}
                         </span>
@@ -60,18 +60,98 @@
                             <p class="text-gray-900">RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
-                            <p class="text-gray-900">{{ $report->employee_id }}</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Submission Date</label>
+                            <p class="text-gray-900">{{ $report->created_at->format('M d, Y g:i A') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reporter Information -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-user mr-2 text-blue-600"></i>
+                        Reporter Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Reporter Name</label>
+                            <p class="text-gray-900">{{ $report->is_anonymous ? 'Anonymous Report' : $report->user->name }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Reporter</label>
-                            <p class="text-gray-900">{{ $report->is_anonymous ? 'Anonymous' : $report->user->name }}</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                            <p class="text-gray-900">{{ $report->employee_id }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
                             <p class="text-gray-900">{{ $report->department }}</p>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <p class="text-gray-900">{{ $report->phone }}</p>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Incident Details -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-exclamation-triangle mr-2 text-orange-600"></i>
+                        Incident Details
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <p class="text-gray-900">{{ $report->category ? ucfirst(str_replace('_', ' ', $report->category)) : 'Not categorized' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <p class="text-gray-900">{{ $report->location }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Incident Date & Time</label>
+                            <p class="text-gray-900">{{ $report->incident_date->format('M d, Y g:i A') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <div class="bg-gray-50 p-3 rounded border">
+                            <p class="text-gray-900 whitespace-pre-wrap">{{ $report->description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Safety Details -->
+                    @if($report->unsafe_condition || $report->unsafe_act)
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Safety Issue Details</label>
+                        @if($report->unsafe_condition)
+                        <div class="mb-2">
+                            <span class="text-sm font-medium text-red-600">Unsafe Condition:</span>
+                            <span class="text-gray-900">{{ $report->unsafe_condition }}</span>
+                        </div>
+                        @endif
+                        @if($report->unsafe_act)
+                        <div>
+                            <span class="text-sm font-medium text-orange-600">Unsafe Act:</span>
+                            <span class="text-gray-900">{{ $report->unsafe_act }}</span>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
+                    @if($report->attachment)
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Attachment</label>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-paperclip text-gray-500"></i>
+                            <a href="{{ asset('storage/' . $report->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                View Attachment
+                            </a>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <!-- VIOLATOR IDENTIFICATION STATUS - PROMINENT SECTION -->
@@ -148,91 +228,33 @@
                             @endif
                         </div>
                     @endif
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <p class="text-gray-900">{{ $report->phone }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                            <p class="text-gray-900">{{ $report->category ? ucfirst(str_replace('_', ' ', $report->category)) : 'Not categorized' }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                            <p class="text-gray-900">{{ $report->location }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Incident Date</label>
-                            <p class="text-gray-900">{{ $report->incident_date->format('M d, Y g:i A') }}</p>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <div class="bg-gray-50 p-3 rounded border">
-                            <p class="text-gray-900 whitespace-pre-wrap">{{ $report->description }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Safety Details -->
-                    @if($report->unsafe_condition || $report->unsafe_act)
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Safety Issue Details</label>
-                        @if($report->unsafe_condition)
-                        <div class="mb-2">
-                            <span class="text-sm font-medium text-red-600">Unsafe Condition:</span>
-                            <span class="text-gray-900">{{ $report->unsafe_condition }}</span>
-                        </div>
-                        @endif
-                        @if($report->unsafe_act)
-                        <div>
-                            <span class="text-sm font-medium text-orange-600">Unsafe Act:</span>
-                            <span class="text-gray-900">{{ $report->unsafe_act }}</span>
-                        </div>
-                        @endif
-                    </div>
-                    @endif
-
-                    @if($report->attachment)
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Attachment</label>
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-paperclip text-gray-500"></i>
-                            <a href="{{ asset('storage/' . $report->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
-                                View Attachment
-                            </a>
-                        </div>
-                    </div>
-                    @endif
                 </div>
 
-                <!-- Quick Actions -->
+                <!-- Discussion Comments -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold mb-4 text-gray-800">Quick Actions</h3>
-                    <div class="flex flex-wrap gap-3">
-                        @if(!$report->handlingDepartment)
-                        <button onclick="assignDepartment({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')" 
-                                class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200">
-                            <i class="fas fa-building mr-2"></i>
-                            Assign to Department
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Discussion Comments</h3>
+                        <button onclick="addUCUAComment({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Comment
                         </button>
-                        @endif
-
-
-
-                        <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')" 
-                                class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors duration-200">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>
-                            Suggest Warning
-                        </button>
-
-                        @if($report->handlingDepartment && $report->deadline)
-                        <button onclick="sendReminder({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')" 
-                                class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
-                            <i class="fas fa-bell mr-2"></i>
-                            Send Reminder
-                        </button>
-                        @endif
                     </div>
+
+                    <!-- Threaded Comments Display -->
+                    @if(isset($threadedRemarks) && $threadedRemarks->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($threadedRemarks as $comment)
+                                <x-threaded-comment :comment="$comment" :report="$report" />
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-gray-500 text-sm">No discussion comments yet.</p>
+                            <p class="text-gray-400 text-xs">Start the conversation by adding the first comment!</p>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -358,25 +380,30 @@
                     @endif
                 </div>
 
-                <!-- Timeline -->
+                <!-- Quick Actions -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold mb-4 text-gray-800">Report Timeline</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center text-sm">
-                            <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                            <div>
-                                <div class="font-medium">Report Created</div>
-                                <div class="text-gray-500">{{ $report->created_at->format('M d, Y g:i A') }}</div>
-                            </div>
-                        </div>
-                        @if($report->handlingDepartment)
-                        <div class="flex items-center text-sm">
-                            <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                            <div>
-                                <div class="font-medium">Assigned to {{ $report->handlingDepartment->name }}</div>
-                                <div class="text-gray-500">{{ $report->updated_at->format('M d, Y g:i A') }}</div>
-                            </div>
-                        </div>
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">Quick Actions</h3>
+                    <div class="flex flex-wrap gap-3">
+                        @if(!$report->handlingDepartment)
+                        <button onclick="assignDepartment({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200">
+                            <i class="fas fa-building mr-2"></i>
+                            Assign to Department
+                        </button>
+                        @endif
+
+                        <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors duration-200">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Suggest Warning
+                        </button>
+
+                        @if($report->handlingDepartment && $report->deadline)
+                        <button onclick="sendReminder({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
+                            <i class="fas fa-bell mr-2"></i>
+                            Send Reminder
+                        </button>
                         @endif
                     </div>
                 </div>
@@ -389,6 +416,7 @@
 @include('ucua-officer.partials.assign-department-modal')
 @include('ucua-officer.partials.suggest-warning-modal')
 @include('ucua-officer.partials.send-reminder-modal')
+@include('ucua-officer.partials.add-comment-modal')
 
 @endsection
 
@@ -425,11 +453,25 @@ function sendReminder(reportId, status, reportCode) {
     $('#sendReminderModal').modal('show');
 }
 
+function addUCUAComment(reportId, status, reportCode) {
+    // Populate report information
+    $('#commentReportId').val(reportId);
+    $('#commentDisplayReportId').text(reportCode);
+    $('#commentDisplayReportStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+
+    // Clear previous content
+    $('#content').val('');
+    $('#attachment').val('');
+
+    // Show add comment modal
+    $('#addCommentModal').modal('show');
+}
+
 $(document).ready(function() {
     setTimeout(function() {
         $('.alert-success').fadeOut('slow');
     }, 5000);
-    
+
     setTimeout(function() {
         $('.alert-danger').fadeOut('slow');
     }, 7000);

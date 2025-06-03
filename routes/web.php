@@ -150,6 +150,7 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
 
     Route::post('/suggest-warning', [UCUADashboardController::class, 'suggestWarning'])->name('suggest-warning');
     Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
+    Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');
     Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');
     Route::get('/warnings/{warning}/details', [UCUADashboardController::class, 'getWarningDetails'])->name('warnings.details');
     Route::get('/reminders', [UCUADashboardController::class, 'remindersPage'])->name('reminders');
