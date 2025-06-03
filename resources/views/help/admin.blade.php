@@ -261,7 +261,7 @@
             </div>
             <div class="flex items-center text-purple-700">
                 <i class="fas fa-phone mr-2"></i>
-                <span>+60 7-123-4567 ext. 100</span>
+                <span>+60 7-253 5888ext. 100</span>
             </div>
         </div>
     </div>
