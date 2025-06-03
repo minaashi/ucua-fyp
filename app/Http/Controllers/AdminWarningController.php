@@ -68,13 +68,16 @@ class AdminWarningController extends Controller
             'warning_message' => 'required|string|max:1000'
         ]);
 
+        // Get the violator for this warning
+        $violator = $warning->report->getViolatorForWarning();
+
         $warning->update([
             'status' => 'approved',
             'approved_by' => auth()->id(),
             'approved_at' => now(),
             'admin_notes' => $request->admin_notes,
             'warning_message' => $request->warning_message,
-            'recipient_id' => $warning->report->user_id
+            'recipient_id' => $violator->id ?? null // Use violator ID if they're a system user
         ]);
 
         return redirect()->back()->with('success', 'Warning suggestion approved successfully.');
@@ -103,30 +106,38 @@ class AdminWarningController extends Controller
         }
 
         try {
-            $user = $warning->recipient;
-            if (!$user) {
-                return redirect()->back()->with('error', 'No recipient found for this warning.');
+            // Get the violator for this warning
+            $violator = $warning->report->getViolatorForWarning();
+
+            if (!$violator) {
+                return redirect()->back()->with('error', 'No violator identified for this warning.');
+            }
+
+            // Check if violator has an email address
+            if (!$violator->email) {
+                return redirect()->back()->with('error', 'Violator does not have an email address. Please update their contact information.');
             }
 
             // Prepare CC recipients (department supervisor, etc.)
-            $ccRecipients = $this->getCCRecipients($user);
+            $ccRecipients = $this->getCCRecipients($violator);
 
             // Send enhanced email with PDF attachment
-            Mail::to($user->email)->send(new WarningLetterMail($warning, $user, $ccRecipients));
+            Mail::to($violator->email)->send(new WarningLetterMail($warning, $violator, $ccRecipients));
 
             // Update warning status
             $warning->update([
                 'status' => 'sent',
                 'sent_at' => now(),
                 'email_sent_at' => now(),
-                'email_delivery_status' => 'sent'
+                'email_delivery_status' => 'sent',
+                'recipient_id' => $violator->id ?? null
             ]);
 
             // Check for escalation after sending warning
             $escalationService = new ViolationEscalationService();
             $escalationService->checkAndProcessEscalation($warning);
 
-            return redirect()->back()->with('success', 'Warning letter sent successfully with PDF attachment.');
+            return redirect()->back()->with('success', 'Warning letter sent successfully to violator with PDF attachment.');
 
         } catch (\Exception $e) {
             \Log::error('Failed to send warning letter: ' . $e->getMessage());

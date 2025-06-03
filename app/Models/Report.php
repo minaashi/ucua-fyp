@@ -18,6 +18,9 @@ class Report extends Model
     protected $fillable = [
         'user_id',
         'employee_id',
+        'violator_employee_id',
+        'violator_name',
+        'violator_department',
         'department',
         'phone',
         'unsafe_condition',
@@ -87,6 +90,43 @@ class Report extends Model
     public function reminders()
     {
         return $this->hasMany(Reminder::class);
+    }
+
+    /**
+     * Get the violator user if they exist in the system
+     */
+    public function violator()
+    {
+        if ($this->violator_employee_id) {
+            return $this->belongsTo(User::class, 'violator_employee_id', 'worker_id');
+        }
+        return null;
+    }
+
+    /**
+     * Get the violator for warning letters - returns User object or creates a virtual one
+     */
+    public function getViolatorForWarning()
+    {
+        // First try to find user by employee ID
+        if ($this->violator_employee_id) {
+            $violatorUser = User::where('worker_id', $this->violator_employee_id)->first();
+            if ($violatorUser) {
+                return $violatorUser;
+            }
+        }
+
+        // If no system user found, create a virtual user object for email purposes
+        if ($this->violator_name && $this->violator_employee_id) {
+            $virtualUser = new User();
+            $virtualUser->name = $this->violator_name;
+            $virtualUser->worker_id = $this->violator_employee_id;
+            $virtualUser->email = null; // Will need to be handled separately
+            return $virtualUser;
+        }
+
+        // Fallback to report author (current behavior)
+        return $this->user;
     }
 
     public function statusHistory()
@@ -236,5 +276,29 @@ class Report extends Model
         return $this->getRemarksCount() > 0 ||
                $this->getWarningsCount() > 0 ||
                $this->getRemindersCount() > 0;
+    }
+
+    /**
+     * Check if violator has been identified
+     */
+    public function hasViolatorIdentified()
+    {
+        return !empty($this->violator_employee_id) || !empty($this->violator_name);
+    }
+
+    /**
+     * Get violator display name
+     */
+    public function getViolatorDisplayName()
+    {
+        if ($this->violator_name) {
+            return $this->violator_name . ($this->violator_employee_id ? " ({$this->violator_employee_id})" : '');
+        }
+
+        if ($this->violator_employee_id) {
+            return "Employee ID: {$this->violator_employee_id}";
+        }
+
+        return 'Not identified';
     }
 }

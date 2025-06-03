@@ -64,6 +64,44 @@
                     </div>
                 </div>
 
+                <!-- Violator Information Section -->
+                <div class="mb-8">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Violator Information</h2>
+                    <p class="text-sm text-gray-600 mb-4">Please provide information about the person who committed the safety violation (if different from reporter).</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="violator_employee_id">
+                                Violator Employee ID
+                            </label>
+                            <input type="text" id="violator_employee_id" name="violator_employee_id"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                   placeholder="Enter violator's employee ID">
+                            <p class="text-xs text-gray-500 mt-1">Leave blank if you are reporting your own violation</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="violator_name">
+                                Violator Name
+                            </label>
+                            <input type="text" id="violator_name" name="violator_name"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                   placeholder="Enter violator's full name">
+                            <p class="text-xs text-gray-500 mt-1">Required for contractors, visitors, or unknown employees</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="violator_department">
+                                Violator Department
+                            </label>
+                            <input type="text" id="violator_department" name="violator_department"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                   placeholder="Enter violator's department">
+                            <p class="text-xs text-gray-500 mt-1">Department where the violator works</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Incident Information Section -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-700 mb-4">Incident Information</h2>

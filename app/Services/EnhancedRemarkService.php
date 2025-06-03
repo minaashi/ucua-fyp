@@ -69,13 +69,52 @@ class EnhancedRemarkService
     public function addDepartmentRemark(Report $report, string $content, Department $department = null, ?UploadedFile $attachment = null, ?int $parentId = null): Remark
     {
         $department = $department ?? Auth::guard('department')->user();
-        
+
         // Verify department has access to this report
         if ($report->handling_department_id !== $department->id) {
             throw new \Exception('Department does not have access to this report.');
         }
-        
+
         return $this->createRemark($report, $content, [
+            'user_id' => null,
+            'user_type' => 'department',
+            'department_id' => $department->id,
+            'parent_id' => $parentId,
+            'thread_level' => $parentId ? $this->calculateThreadLevel($parentId) : 0
+        ], $attachment);
+    }
+
+    /**
+     * Add a department remark with violator identification update
+     */
+    public function addDepartmentRemarkWithViolator(
+        Report $report,
+        string $content,
+        string $violatorEmployeeId,
+        string $violatorName,
+        string $violatorDepartment = null,
+        Department $department = null,
+        ?UploadedFile $attachment = null,
+        ?int $parentId = null
+    ): Remark {
+        $department = $department ?? Auth::guard('department')->user();
+
+        // Verify department has access to this report
+        if ($report->handling_department_id !== $department->id) {
+            throw new \Exception('Department does not have access to this report.');
+        }
+
+        // Update the report with violator information
+        $report->update([
+            'violator_employee_id' => $violatorEmployeeId,
+            'violator_name' => $violatorName,
+            'violator_department' => $violatorDepartment ?? $department->name
+        ]);
+
+        // Create the remark with special metadata
+        $enhancedContent = $content . "\n\n[INVESTIGATION UPDATE] Violator identified: {$violatorName} (ID: {$violatorEmployeeId})";
+
+        return $this->createRemark($report, $enhancedContent, [
             'user_id' => null,
             'user_type' => 'department',
             'department_id' => $department->id,

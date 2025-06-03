@@ -139,7 +139,10 @@ class DashboardController extends Controller
             'report_id' => 'required|exists:reports,id',
             'remarks' => 'required|string|max:1000',
             'parent_id' => 'nullable|exists:remarks,id',
-            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
+            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt',
+            'violator_employee_id' => 'nullable|string|max:50',
+            'violator_name' => 'nullable|string|max:255',
+            'violator_department' => 'nullable|string|max:255'
         ]);
 
         try {
@@ -149,15 +152,30 @@ class DashboardController extends Controller
             $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
             $parentId = $request->input('parent_id');
 
-            $remarkService->addDepartmentRemark(
-                $report,
-                $request->remarks,
-                null,
-                $attachment,
-                $parentId
-            );
+            // Check if this remark includes violator identification
+            if ($request->filled('violator_employee_id') && $request->filled('violator_name')) {
+                $remarkService->addDepartmentRemarkWithViolator(
+                    $report,
+                    $request->remarks,
+                    $request->violator_employee_id,
+                    $request->violator_name,
+                    $request->violator_department,
+                    null,
+                    $attachment,
+                    $parentId
+                );
+                $message = 'Investigation update added successfully. Violator identified and warning system updated.';
+            } else {
+                $remarkService->addDepartmentRemark(
+                    $report,
+                    $request->remarks,
+                    null,
+                    $attachment,
+                    $parentId
+                );
+                $message = $parentId ? 'Reply added successfully.' : 'Department remark added successfully.';
+            }
 
-            $message = $parentId ? 'Reply added successfully.' : 'Department remark added successfully.';
             return back()->with('success', $message);
         } catch (\Exception $e) {
             \Log::error('Failed to add department remark: ' . $e->getMessage());

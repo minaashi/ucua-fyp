@@ -18,20 +18,28 @@ class ViolationEscalationService
     public function checkAndProcessEscalation(Warning $warning)
     {
         try {
-            $user = $warning->recipient ?? $warning->report->user;
+            // Get the violator from the report
+            $violator = $warning->report->getViolatorForWarning();
+
+            // Only process escalation if violator is a system user
+            if (!$violator || !$violator->id) {
+                Log::info("Skipping escalation check - violator is not a system user for warning {$warning->id}");
+                return;
+            }
+
             $escalationRule = EscalationRule::active()->first();
-            
+
             if (!$escalationRule) {
                 $escalationRule = EscalationRule::getDefaultRule();
             }
 
-            // Count warnings within the time period
-            $warningCount = $this->getWarningCountForUser($user->id, $escalationRule->time_period_months);
-            
-            Log::info("Checking escalation for user {$user->id}: {$warningCount} warnings in {$escalationRule->time_period_months} months");
+            // Count warnings within the time period for the violator
+            $warningCount = $this->getWarningCountForUser($violator->id, $escalationRule->time_period_months);
+
+            Log::info("Checking escalation for violator {$violator->id}: {$warningCount} warnings in {$escalationRule->time_period_months} months");
 
             if ($warningCount >= $escalationRule->warning_threshold) {
-                $this->triggerEscalation($user, $escalationRule, $warningCount, $warning);
+                $this->triggerEscalation($violator, $escalationRule, $warningCount, $warning);
             }
 
         } catch (\Exception $e) {
