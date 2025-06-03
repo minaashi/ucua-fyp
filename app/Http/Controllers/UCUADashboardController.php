@@ -240,8 +240,8 @@ class UCUADashboardController extends Controller
 
     public function assignDepartmentsPage()
     {
-        // Fetch reports that are in progress after being assigned a department
-        $reports = Report::where('status', 'review')->get();
+        // Fetch reports that are pending and need department assignment
+        $reports = Report::where('status', 'pending')->get();
         $departments = Department::where('is_active', true)->get();
         return view('ucua-officer.assign-departments', compact('reports', 'departments'));
     }
