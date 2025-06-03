@@ -3,7 +3,7 @@
         <div class="row">
             
             <div class="col-md-8 text-md-end">
-                <p class="mb-0">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
+                <p class="mb-0">Copyright © 2025 Nursyahmina Mosdy</p>
             </div>
         </div>
     </div>

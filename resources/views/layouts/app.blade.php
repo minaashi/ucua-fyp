@@ -32,9 +32,15 @@
 <body class="font-sans antialiased">
     <div id="app" class="min-h-screen flex">
         @if(auth()->guard('web')->check())
-            @include('partials.sidebar')
-        @elseif(auth()->guard('ucua')->check())
-            @include('ucua-officer.partials.sidebar')
+            @if(auth()->user()->hasRole('admin'))
+                @include('admin.partials.sidebar')
+            @elseif(auth()->user()->hasRole('ucua_officer'))
+                @include('ucua-officer.partials.sidebar')
+            @else
+                @include('partials.sidebar')
+            @endif
+        @elseif(auth()->guard('department')->check())
+            {{-- Department users have their own sidebar in their dashboard views --}}
         @endif
         <div class="flex-1 flex flex-col">
             @yield('content')

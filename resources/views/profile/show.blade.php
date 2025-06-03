@@ -99,13 +99,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-blue-800 text-white py-4 mt-8">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-sm">Copyright © {{ date('Y') }} Nursyahmina Mosdy, Dr Cik.Feresa Binti Mohd Foozy</p>
-        </div>
-    </footer>
 </div>
 
 @push('scripts')
