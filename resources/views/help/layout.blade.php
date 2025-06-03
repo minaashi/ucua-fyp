@@ -6,6 +6,8 @@
     <title>@yield('title') - UCUA Help Center</title>
     @vite(['resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .help-search-results {
             max-height: 300px;
@@ -38,6 +40,46 @@
             background-color: #fef3c7;
             padding: 2px 4px;
             border-radius: 3px;
+        }
+
+        /* Ensure proper layout and visibility */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Fix header positioning */
+        header {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        /* Ensure content is visible */
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Fix sidebar positioning */
+        .help-sidebar {
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        /* Debug styles to ensure visibility */
+        .debug-visible {
+            border: 2px solid red !important;
+            background-color: yellow !important;
+            min-height: 50px !important;
+        }
+
+        /* Ensure all text is visible */
+        * {
+            color: inherit !important;
         }
     </style>
 </head>
@@ -82,11 +124,11 @@
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 main-content">
             <div class="flex gap-8">
                 <!-- Sidebar Navigation -->
                 <div class="w-64 flex-shrink-0">
-                    <div class="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
+                    <div class="bg-white rounded-lg shadow-sm border p-6 help-sidebar">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Help Topics</h3>
                         <nav class="space-y-2">
                             @yield('help-navigation')
