@@ -25,40 +25,63 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Name</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Email</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head of Department</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Reports</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($departments as $department)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->email }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            {{ $department->head_name }}<br>
-                            <small class="text-gray-500">{{ $department->head_email }}</small>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ $department->name }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $department->reports_count }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $department->email }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex flex-col">
+                                <span class="font-medium">{{ $department->head_name }}</span>
+                                <span class="text-gray-500 text-xs">{{ $department->head_email }}</span>
+                            </div>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $department->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $department->is_active ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button type="button" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 mr-2" data-toggle="modal" data-target="#editDepartmentModal{{ $department->id }}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
-                            </form>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center space-x-2">
+                                <button type="button"
+                                        class="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                                        data-toggle="modal"
+                                        data-target="#editDepartmentModal{{ $department->id }}">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    Edit
+                                </button>
+                                <form action="{{ route('admin.departments.destroy', $department) }}"
+                                      method="POST"
+                                      class="inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this department?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-gray-500">No departments found</td>
+                        <td colspan="5" class="text-center py-8 text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-building text-4xl text-gray-300 mb-2"></i>
+                                <p class="text-lg font-medium">No departments found</p>
+                                <p class="text-sm">Click "Add New Department" to create your first department.</p>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

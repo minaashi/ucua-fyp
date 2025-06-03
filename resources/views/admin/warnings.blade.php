@@ -18,6 +18,26 @@
         </div>
     </header>
 
+    <!-- Alert for Approved Warnings Waiting to be Sent -->
+    @php
+        $approvedCount = $warnings->where('status', 'approved')->count();
+    @endphp
+    @if($approvedCount > 0)
+        <div class="mb-6 p-4 bg-orange-50 border-l-4 border-orange-400 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-orange-400 text-xl animate-pulse"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-orange-700">
+                        <span class="font-medium">{{ $approvedCount }} warning letter{{ $approvedCount > 1 ? 's' : '' }} approved but not sent yet!</span>
+                        Look for the purple "SEND EMAIL" buttons below to send the warning letters to violators.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Search and Filter Section -->
     <div class="bg-white rounded-lg shadow-md p-4 mb-6">
         <form method="GET" action="{{ route('admin.warnings.index') }}" class="space-y-4">
@@ -120,47 +140,61 @@
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                     {{ $warning->status == 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                       ($warning->status == 'approved' ? 'bg-green-100 text-green-800' :
+                                       ($warning->status == 'approved' ? 'bg-orange-100 text-orange-800 animate-pulse' :
                                         ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
                                          'bg-purple-100 text-purple-800')) }}">
-                                    {{ ucfirst($warning->status) }}
+                                    {{ $warning->status == 'approved' ? 'Ready to Send' : ucfirst($warning->status) }}
                                 </span>
+                                @if($warning->status === 'approved')
+                                    <div class="text-xs text-orange-600 mt-1 font-medium">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>Email not sent yet
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                                 {{ $warning->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                                <div class="relative inline-block text-left">
-                                    <button type="button"
-                                            class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors duration-200"
-                                            onclick="toggleDropdown('dropdown-{{ $warning->id }}')">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div id="dropdown-{{ $warning->id }}" class="hidden absolute right-0 z-10 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div class="py-1">
-                                            <button onclick="viewWarningDetails({{ $warning->id }})"
-                                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                                <i class="fas fa-eye mr-2"></i>View Details
+                                <div class="flex items-center space-x-2">
+                                    @if($warning->status === 'approved')
+                                        <!-- Prominent Send Button for Approved Warnings -->
+                                        <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
+                                                    onclick="return confirm('Are you sure you want to send this warning letter to the violator?')">
+                                                <i class="fas fa-paper-plane mr-1"></i>SEND EMAIL
                                             </button>
-                                            @if($warning->status === 'pending')
-                                                <button onclick="approveWarning({{ $warning->id }})"
-                                                        class="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 flex items-center">
-                                                    <i class="fas fa-check mr-2"></i>Approve
+                                        </form>
+                                    @endif
+
+                                    <div class="relative inline-block text-left">
+                                        <button type="button"
+                                                class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors duration-200"
+                                                onclick="toggleDropdown('dropdown-{{ $warning->id }}')">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div id="dropdown-{{ $warning->id }}" class="hidden absolute right-0 z-10 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                                            <div class="py-1">
+                                                <button onclick="viewWarningDetails({{ $warning->id }})"
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                                    <i class="fas fa-eye mr-2"></i>View Details
                                                 </button>
-                                                <button onclick="rejectWarning({{ $warning->id }})"
-                                                        class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center">
-                                                    <i class="fas fa-times mr-2"></i>Reject
-                                                </button>
-                                            @elseif($warning->status === 'approved')
-                                                <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="w-full">
-                                                    @csrf
-                                                    <button type="submit"
-                                                            class="w-full text-left px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 flex items-center"
-                                                            onclick="return confirm('Are you sure you want to send this warning letter?')">
-                                                        <i class="fas fa-paper-plane mr-2"></i>Send Letter
+                                                @if($warning->status === 'pending')
+                                                    <button onclick="approveWarning({{ $warning->id }})"
+                                                            class="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 flex items-center">
+                                                        <i class="fas fa-check mr-2"></i>Approve
                                                     </button>
-                                                </form>
-                                            @endif
+                                                    <button onclick="rejectWarning({{ $warning->id }})"
+                                                            class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center">
+                                                        <i class="fas fa-times mr-2"></i>Reject
+                                                    </button>
+                                                @elseif($warning->status === 'approved')
+                                                    <div class="px-4 py-2 text-sm text-gray-500 italic">
+                                                        <i class="fas fa-info-circle mr-2"></i>Use purple button to send
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -184,16 +218,36 @@
         <!-- Mobile Card View (visible on mobile) -->
         <div class="lg:hidden space-y-4">
             @forelse($warnings as $warning)
-                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm {{ $warning->status === 'pending' ? 'border-l-4 border-l-yellow-400' : '' }}">
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm {{ $warning->status === 'pending' ? 'border-l-4 border-l-yellow-400' : ($warning->status === 'approved' ? 'border-l-4 border-l-orange-400' : '') }}">
+                    @if($warning->status === 'approved')
+                        <!-- Prominent Send Button for Mobile -->
+                        <div class="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                                    <span class="text-sm font-medium text-orange-800">Ready to Send Email</span>
+                                </div>
+                                <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
+                                            onclick="return confirm('Are you sure you want to send this warning letter to the violator?')">
+                                        <i class="fas fa-paper-plane mr-1"></i>SEND NOW
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center space-x-2">
                             <span class="font-semibold text-gray-900">{{ $warning->formatted_id }}</span>
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                 {{ $warning->status == 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                   ($warning->status == 'approved' ? 'bg-green-100 text-green-800' :
+                                   ($warning->status == 'approved' ? 'bg-orange-100 text-orange-800 animate-pulse' :
                                     ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
                                      'bg-purple-100 text-purple-800')) }}">
-                                {{ ucfirst($warning->status) }}
+                                {{ $warning->status == 'approved' ? 'Ready to Send' : ucfirst($warning->status) }}
                             </span>
                         </div>
                         <div class="relative inline-block text-left">
@@ -218,14 +272,9 @@
                                             <i class="fas fa-times mr-2"></i>Reject
                                         </button>
                                     @elseif($warning->status === 'approved')
-                                        <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="w-full">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="w-full text-left px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 flex items-center"
-                                                    onclick="return confirm('Are you sure you want to send this warning letter?')">
-                                                <i class="fas fa-paper-plane mr-2"></i>Send Letter
-                                            </button>
-                                        </form>
+                                        <div class="px-4 py-2 text-sm text-gray-500 italic">
+                                            <i class="fas fa-info-circle mr-2"></i>Use orange button above to send
+                                        </div>
                                     @endif
                                 </div>
                             </div>

@@ -28,39 +28,39 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-blue-600 text-white flex flex-col min-h-screen transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="p-4 lg:p-6 flex flex-col items-center border-b border-blue-700">
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white text-gray-900 flex flex-col min-h-screen transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-md">
+        <div class="p-4 lg:p-6 flex flex-col items-center border-b border-gray-200">
             <img src="{{ asset('images/ucua-logo.png') }}" alt="JohorPort Logo" class="h-10 lg:h-12 mb-2">
-            <span class="font-bold text-base lg:text-lg">Admin Panel</span>
+            <span class="font-bold text-base lg:text-lg text-gray-800">Admin Panel</span>
         </div>
         <nav class="flex-1 mt-6">
             <ul class="space-y-2">
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 hover:bg-blue-700 rounded transition {{ Request::routeIs('admin.dashboard') ? 'bg-blue-700' : '' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 hover:bg-blue-50 hover:text-blue-600 rounded transition {{ Request::routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }}">
                         <i class="fas fa-tachometer-alt w-5 mr-3"></i>
                         Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.reports.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-700 rounded transition {{ Request::routeIs('admin.reports.index') ? 'bg-blue-700' : '' }}">
+                    <a href="{{ route('admin.reports.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-50 hover:text-blue-600 rounded transition {{ Request::routeIs('admin.reports.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }}">
                         <i class="fas fa-file-alt w-5 mr-3"></i>
                         Report Management
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-700 rounded transition {{ Request::routeIs('admin.users.index') ? 'bg-blue-700' : '' }}">
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-50 hover:text-blue-600 rounded transition {{ Request::routeIs('admin.users.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }}">
                         <i class="fas fa-users w-5 mr-3"></i>
                         User Management
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-700 rounded transition {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-700' : '' }}">
+                    <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-6 py-3 hover:bg-blue-50 hover:text-blue-600 rounded transition {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }}">
                         <i class="fas fa-envelope w-5 mr-3"></i>
                         Warning Letters
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.settings') }}" class="flex items-center px-6 py-3 hover:bg-blue-700 rounded transition {{ Request::routeIs('admin.settings') ? 'bg-blue-700' : '' }}">
+                    <a href="{{ route('admin.settings') }}" class="flex items-center px-6 py-3 hover:bg-blue-50 hover:text-blue-600 rounded transition {{ Request::routeIs('admin.settings') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }}">
                         <i class="fas fa-cog w-5 mr-3"></i>
                         Admin Settings
                     </a>

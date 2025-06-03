@@ -6,45 +6,45 @@
     <nav class="flex-1 mt-6">
         <ul class="space-y-2">
             <li>
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.dashboard') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-tachometer-alt w-5 mr-3"></i>
-                    Dashboard
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-tachometer-alt w-5"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.reports.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.reports.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-file-alt w-5 mr-3"></i>
-                    Report Management
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.reports.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span>Report Management</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.users.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-users w-5 mr-3"></i>
-                    User Management
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.users.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-users w-5"></i>
+                    <span>User Management</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.departments.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.departments.*') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-building w-5 mr-3"></i>
-                    Departments
+                <a href="{{ route('admin.departments.index') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.departments.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-building w-5"></i>
+                    <span>Departments</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-envelope w-5 mr-3"></i>
-                    Warning Letters
+                <a href="{{ route('admin.warnings.index') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.warnings.index') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-envelope w-5"></i>
+                    <span>Warning Letters</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.settings') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('admin.settings') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-cog w-5 mr-3"></i>
-                    Admin Settings
+                <a href="{{ route('admin.settings') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('admin.settings') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Admin Settings</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('help.admin') }}" class="flex items-center px-6 py-3 rounded transition font-medium {{ Request::routeIs('help.admin') ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100' }}">
-                    <i class="fas fa-question-circle w-5 mr-3"></i>
-                    Help
+                <a href="{{ route('help.admin') }}" class="flex items-center px-4 py-2 {{ Request::routeIs('help.admin') ? 'bg-blue-50 text-blue-600' : 'text-gray-600' }} hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-question-circle w-5"></i>
+                    <span>Help</span>
                 </a>
             </li>
             <li class="mt-4">
