@@ -38,12 +38,17 @@ Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
         Route::get('dashboard', [DepartmentDashboardController::class, 'index'])->name('department.dashboard');
         Route::get('pending-reports', [DepartmentDashboardController::class, 'pendingReports'])->name('department.pending-reports');
         Route::get('resolved-reports', [DepartmentDashboardController::class, 'resolvedReports'])->name('department.resolved-reports');
-        
+
         // Report Actions
         Route::get('reports/{report}', [DepartmentDashboardController::class, 'showReport'])->name('department.report.show');
         Route::post('resolve-report', [DepartmentDashboardController::class, 'resolveReport'])->name('department.resolve-report');
         Route::post('add-remarks', [DepartmentDashboardController::class, 'addRemarks'])->name('department.add-remarks');
         Route::post('reports/{report}/export', [DepartmentDashboardController::class, 'exportReport'])->name('department.report.export');
+
+        // Notification routes
+        Route::get('notifications', [DepartmentDashboardController::class, 'notifications'])->name('department.notifications');
+        Route::post('notifications/{notification}/mark-read', [DepartmentDashboardController::class, 'markNotificationAsRead'])->name('department.notifications.mark-read');
+        Route::post('notifications/mark-all-read', [DepartmentDashboardController::class, 'markAllNotificationsAsRead'])->name('department.notifications.mark-all-read');
     });
 });
 

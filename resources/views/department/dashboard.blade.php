@@ -35,6 +35,16 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('department.notifications') }}"
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
+                        <i class="fas fa-bell w-5 {{ $unreadNotificationsCount > 0 ? 'animate-bounce text-red-500' : '' }}"></i>
+                        <span class="ml-2">Notifications</span>
+                        @if($unreadNotificationsCount > 0)
+                            <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $unreadNotificationsCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('help.department') }}"
                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-question-circle w-5"></i>
@@ -95,6 +105,70 @@
                     </div>
                 </a>
             </div>
+
+            <!-- Recent Notifications Section -->
+            @if($notifications->count() > 0)
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-bell mr-2 text-red-500"></i>
+                        Recent Notifications
+                    </h3>
+                    <div class="flex space-x-2">
+                        @if($unreadNotificationsCount > 0)
+                        <form action="{{ route('department.notifications.mark-all-read') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors">
+                                Mark All Read
+                            </button>
+                        </form>
+                        @endif
+                        <a href="{{ route('department.notifications') }}" class="text-sm text-blue-600 hover:text-blue-800">
+                            View All
+                        </a>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    @foreach($notifications->take(3) as $notification)
+                    <div class="border-l-4 {{ $notification->read_at ? 'border-gray-300 bg-gray-50' : 'border-red-500 bg-red-50' }} p-4 rounded-r-lg">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                @if(isset($notification->data['type']) && $notification->data['type'] === 'reminder')
+                                <div class="flex items-center mb-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                        {{ $notification->data['reminder_type'] === 'gentle' ? 'bg-green-100 text-green-800' :
+                                           ($notification->data['reminder_type'] === 'urgent' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800') }}">
+                                        {{ ucfirst($notification->data['reminder_type']) }} Reminder
+                                    </span>
+                                    <span class="ml-2 text-sm text-gray-500">{{ $notification->data['reminder_formatted_id'] ?? '' }}</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 mb-1">
+                                    Report: {{ $notification->data['report_formatted_id'] ?? 'N/A' }}
+                                </p>
+                                <p class="text-sm text-gray-600 mb-2">{{ $notification->data['report_description'] ?? '' }}</p>
+                                @if(isset($notification->data['message']) && $notification->data['message'])
+                                <p class="text-sm text-gray-700 italic">"{{ $notification->data['message'] }}"</p>
+                                @endif
+                                @else
+                                <p class="text-sm font-medium text-gray-900">{{ $notification->data['message'] ?? 'New notification' }}</p>
+                                @endif
+                            </div>
+                            <div class="text-right ml-4">
+                                <p class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                @if(!$notification->read_at)
+                                <button onclick="markAsRead('{{ $notification->id }}')"
+                                        class="text-xs text-blue-600 hover:text-blue-800 mt-1">
+                                    Mark as read
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Recent Reports Table -->
             <div class="bg-white rounded-lg shadow-md">
@@ -211,6 +285,25 @@ $(document).ready(function() {
         $('.alert-danger').fadeOut('slow');
     }, 7000);
 });
+
+// Mark notification as read
+function markAsRead(notificationId) {
+    $.ajax({
+        url: `/department/notifications/${notificationId}/mark-read`,
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                location.reload();
+            }
+        },
+        error: function() {
+            alert('Failed to mark notification as read');
+        }
+    });
+}
 </script>
 @endpush
 

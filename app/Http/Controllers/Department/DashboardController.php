@@ -27,18 +27,29 @@ class DashboardController extends Controller
         $resolvedReports = Report::where('handling_department_id', $department->id)
             ->where('status', 'resolved')
             ->count();
-        
+
         $recentReports = Report::where('handling_department_id', $department->id)
             ->latest()
             ->take(5)
             ->get();
+
+        // Get recent notifications (last 10)
+        $notifications = $department->notifications()
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // Get unread notifications count
+        $unreadNotificationsCount = $department->unreadNotifications()->count();
 
         return view('department.dashboard', compact(
             'totalReports',
             'pendingReports',
             'resolvedReports',
             'recentReports',
-            'department'
+            'department',
+            'notifications',
+            'unreadNotificationsCount'
         ));
     }
 
@@ -207,5 +218,48 @@ class DashboardController extends Controller
         $filename = 'report-RPT-' . str_pad($report->id, 3, '0', STR_PAD_LEFT) . '-' . now()->format('Y-m-d') . '.pdf';
 
         return $pdf->download($filename);
+    }
+
+    /**
+     * Show all notifications for the department
+     */
+    public function notifications()
+    {
+        $department = Auth::guard('department')->user();
+
+        $notifications = $department->notifications()
+            ->latest()
+            ->paginate(15);
+
+        return view('department.notifications', compact('notifications', 'department'));
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function markNotificationAsRead($notificationId)
+    {
+        $department = Auth::guard('department')->user();
+
+        $notification = $department->notifications()->find($notificationId);
+
+        if ($notification) {
+            $notification->markAsRead();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 404);
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllNotificationsAsRead()
+    {
+        $department = Auth::guard('department')->user();
+
+        $department->unreadNotifications->markAsRead();
+
+        return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 }

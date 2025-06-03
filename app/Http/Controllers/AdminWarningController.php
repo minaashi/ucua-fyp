@@ -177,12 +177,21 @@ class AdminWarningController extends Controller
         $ccRecipients = [];
 
         try {
-            // Add department supervisor/manager if exists
-            if ($user->department) {
-                // You can implement department supervisor logic here
-                // For now, we'll add a placeholder department email
-                $departmentEmail = $this->getDepartmentEmail($user->department_id);
-                if ($departmentEmail) {
+            // Add Head of Department (HOD) if exists
+            if ($user->department && $user->department->head_email) {
+                $ccRecipients[] = [
+                    'email' => $user->department->head_email,
+                    'name' => 'Head of ' . $user->department->name
+                ];
+            }
+
+            // Add department email if exists and different from HOD email
+            if ($user->department && $user->department->email) {
+                $departmentEmail = $user->department->email;
+                $hodEmail = $user->department->head_email;
+
+                // Only add department email if it's different from HOD email
+                if ($departmentEmail !== $hodEmail) {
                     $ccRecipients[] = [
                         'email' => $departmentEmail,
                         'name' => $user->department->name . ' Department'
@@ -190,22 +199,16 @@ class AdminWarningController extends Controller
                 }
             }
 
-            // Add safety officer or admin emails
-            try {
-                $safetyOfficers = User::whereHas('roles', function($query) {
-                    $query->where('name', 'admin');
-                })->get();
+            // Add admin users (UCUA officers/safety officers)
+            $adminUsers = User::where('is_admin', 1)->get();
 
-                foreach ($safetyOfficers as $officer) {
-                    if ($officer->email !== $user->email) {
-                        $ccRecipients[] = [
-                            'email' => $officer->email,
-                            'name' => $officer->name
-                        ];
-                    }
+            foreach ($adminUsers as $admin) {
+                if ($admin->email !== $user->email) {
+                    $ccRecipients[] = [
+                        'email' => $admin->email,
+                        'name' => $admin->name . ' (UCUA Officer)'
+                    ];
                 }
-            } catch (\Exception $e) {
-                \Log::warning('Failed to get admin users for CC: ' . $e->getMessage());
             }
 
         } catch (\Exception $e) {
@@ -215,25 +218,7 @@ class AdminWarningController extends Controller
         return $ccRecipients;
     }
 
-    /**
-     * Get department email (placeholder - implement based on your department structure)
-     */
-    private function getDepartmentEmail($departmentId): ?string
-    {
-        // This should be implemented based on your department structure
-        // For now, return a placeholder email format
-        try {
-            $department = \App\Models\Department::find($departmentId);
-            if ($department) {
-                // You can add an email field to departments table or use a naming convention
-                return strtolower(str_replace(' ', '.', $department->name)) . '@ucua.com';
-            }
-        } catch (\Exception $e) {
-            \Log::warning('Failed to get department email: ' . $e->getMessage());
-        }
 
-        return null;
-    }
 
     /**
      * Get warning details for AJAX requests

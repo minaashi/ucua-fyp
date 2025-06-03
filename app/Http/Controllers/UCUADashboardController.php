@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\ReportAssignedToDepartmentNotification;
+use App\Notifications\ReminderNotification;
 use Illuminate\Support\Facades\Log;
 
 class UCUADashboardController extends Controller
@@ -188,9 +189,9 @@ class UCUADashboardController extends Controller
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
-            
+
             // Create reminder record
-            $report->reminders()->create([
+            $reminder = $report->reminders()->create([
                 'type' => $request->reminder_type,
                 'message' => $request->reminder_message,
                 'sent_by' => Auth::id()
@@ -203,11 +204,15 @@ class UCUADashboardController extends Controller
                 ]);
             }
 
+            // Send notification to department
+            $this->notifyDepartmentOfReminder($reminder);
+
             DB::commit();
 
-            return redirect()->back()->with('success', 'Reminder sent successfully.');
+            return redirect()->back()->with('success', 'Reminder sent successfully to ' . $report->handlingDepartment->name . ' department.');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Failed to send reminder: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to send reminder. Please try again.');
         }
     }
@@ -324,6 +329,49 @@ class UCUADashboardController extends Controller
         } catch (\Exception $e) {
             \Log::error('Failed to add UCUA remark: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to add comment. Please try again.');
+        }
+    }
+
+    /**
+     * Send notification to department when reminder is sent
+     */
+    private function notifyDepartmentOfReminder(Reminder $reminder): void
+    {
+        try {
+            $report = $reminder->report;
+            $department = $report->handlingDepartment;
+
+            if (!$department) {
+                Log::warning('Cannot send reminder notification: No department assigned to report', [
+                    'reminder_id' => $reminder->id,
+                    'report_id' => $report->id
+                ]);
+                return;
+            }
+
+            // Send notification to department
+            $department->notify(new ReminderNotification($reminder));
+
+            // Also send to department head if different email
+            if ($department->head_email && $department->head_email !== $department->email) {
+                \Illuminate\Support\Facades\Notification::route('mail', $department->head_email)
+                    ->notify(new ReminderNotification($reminder));
+            }
+
+            Log::info('Reminder notification sent successfully', [
+                'reminder_id' => $reminder->id,
+                'reminder_type' => $reminder->type,
+                'report_id' => $report->id,
+                'department_id' => $department->id,
+                'department_name' => $department->name
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send reminder notification to department', [
+                'reminder_id' => $reminder->id,
+                'error' => $e->getMessage()
+            ]);
+            // Don't throw exception to avoid breaking the reminder creation
         }
     }
 }
