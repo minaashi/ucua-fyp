@@ -152,11 +152,28 @@
         <div class="warning-box">
             <p><strong>Reason for Warning:</strong></p>
             <p>{{ $warning->reason }}</p>
+
+            @if($report->unsafe_condition)
+            <p><strong>Unsafe Condition Identified:</strong></p>
+            <p>{{ $report->unsafe_condition }}</p>
+            @endif
+
+            @if($report->unsafe_act)
+            <p><strong>Unsafe Act Identified:</strong></p>
+            <p>{{ $report->unsafe_act }}</p>
+            @endif
+
+            <p><strong>Location:</strong> {{ $report->location }}</p>
+            <p><strong>Report Description:</strong></p>
+            <p>{{ $report->description }}</p>
         </div>
 
         <h3>Required Corrective Action</h3>
         <div class="warning-box">
+            <p><strong>Immediate Actions Required:</strong></p>
             <p>{{ $warning->suggested_action }}</p>
+
+            <p><strong>Compliance Deadline:</strong> Please acknowledge receipt and implement corrective actions within 7 days of receiving this warning.</p>
         </div>
 
         @if($template && $emailContent)
@@ -166,13 +183,35 @@
         </div>
         @endif
 
-        <h3>Important Notice</h3>
-        <ul>
-            <li>This warning will remain on your employment record</li>
-            <li>Failure to comply with corrective actions may result in further disciplinary measures</li>
-            <li>Please acknowledge receipt of this warning by contacting your supervisor</li>
-            <li>If you have questions, contact the Safety Department immediately</li>
-        </ul>
+        <h3>Important Notice & Next Steps</h3>
+        <div class="warning-box">
+            <p><strong>Record Keeping:</strong></p>
+            <ul>
+                <li>This warning will remain on your employment record as per company policy</li>
+                <li>Warning ID: {{ $warning->formatted_id }} for future reference</li>
+            </ul>
+
+            <p><strong>Required Actions:</strong></p>
+            <ul>
+                <li>Acknowledge receipt of this warning by contacting your supervisor within 48 hours</li>
+                <li>Implement all corrective actions within the specified timeframe</li>
+                <li>Attend any required safety training or meetings as directed</li>
+            </ul>
+
+            <p><strong>Consequences of Non-Compliance:</strong></p>
+            <ul>
+                <li>Failure to comply with corrective actions may result in further disciplinary measures</li>
+                <li>Repeated safety violations may lead to escalation, including possible suspension or termination</li>
+                <li>Additional safety violations within 3 months may trigger automatic escalation procedures</li>
+            </ul>
+
+            <p><strong>Support & Questions:</strong></p>
+            <ul>
+                <li>Contact the Safety Department immediately if you have questions about this warning</li>
+                <li>Request additional safety training if needed to prevent future violations</li>
+                <li>You have the right to respond to this warning within 7 days if you wish to provide additional context</li>
+            </ul>
+        </div>
 
         @if($warning->type === 'severe')
         <div class="urgent">

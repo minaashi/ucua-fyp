@@ -11,7 +11,6 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class WarningLetterMail extends Mailable implements ShouldQueue
 {
@@ -74,25 +73,14 @@ class WarningLetterMail extends Mailable implements ShouldQueue
 
     /**
      * Get the attachments for the message.
+     *
+     * Note: PDF attachments have been removed to improve email deliverability.
+     * All warning letter content is now included directly in the email body.
      */
     public function attachments(): array
     {
-        $attachments = [];
-
-        try {
-            // Generate PDF warning letter
-            $pdf = $this->generateWarningLetterPDF();
-            
-            $attachments[] = Attachment::fromData(
-                fn () => $pdf->output(),
-                'warning-letter-' . $this->warning->id . '.pdf'
-            )->withMime('application/pdf');
-
-        } catch (\Exception $e) {
-            \Log::error('Failed to generate PDF attachment: ' . $e->getMessage());
-        }
-
-        return $attachments;
+        // Return empty array - no attachments to improve email deliverability
+        return [];
     }
 
     /**
@@ -152,30 +140,10 @@ class WarningLetterMail extends Mailable implements ShouldQueue
      */
     private function getDefaultWarningMessage(): string
     {
-        return "This is an official safety warning regarding your recent safety violation. Please review the attached warning letter and take immediate corrective action.";
+        return "This is an official safety warning regarding your recent safety violation. Please review the warning details below and take immediate corrective action.";
     }
 
-    /**
-     * Generate PDF warning letter
-     */
-    private function generateWarningLetterPDF()
-    {
-        $data = [
-            'warning' => $this->warning,
-            'recipient' => $this->recipient,
-            'report' => $this->warning->report,
-            'variables' => $this->getTemplateVariables(),
-            'content' => $this->getEmailContent()
-        ];
 
-        return Pdf::loadView('pdf.warning-letter', $data)
-                  ->setPaper('a4', 'portrait')
-                  ->setOptions([
-                      'defaultFont' => 'sans-serif',
-                      'isHtml5ParserEnabled' => true,
-                      'isRemoteEnabled' => true
-                  ]);
-    }
 
     /**
      * Handle a job failure.

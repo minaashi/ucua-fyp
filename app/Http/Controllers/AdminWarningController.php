@@ -126,7 +126,7 @@ class AdminWarningController extends Controller
             // Prepare CC recipients (department supervisor, etc.)
             $ccRecipients = $this->getCCRecipients($violator);
 
-            // Send enhanced email with PDF attachment
+            // Send enhanced email with comprehensive warning details
             Mail::to($violator->email)->send(new WarningLetterMail($warning, $violator, $ccRecipients));
 
             // Update warning status
@@ -142,7 +142,7 @@ class AdminWarningController extends Controller
             $escalationService = new ViolationEscalationService();
             $escalationService->checkAndProcessEscalation($warning);
 
-            return redirect()->back()->with('success', 'Warning letter sent successfully to violator with PDF attachment.');
+            return redirect()->back()->with('success', 'Warning letter sent successfully to violator via email.');
 
         } catch (\Exception $e) {
             \Log::error('Failed to send warning letter: ' . $e->getMessage());
