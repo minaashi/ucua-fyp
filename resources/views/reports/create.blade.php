@@ -29,10 +29,49 @@
             <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-6">
                 @csrf
                 
+                <!-- Anonymous Reporting Option -->
+                <div class="mb-8">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1"
+                                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                       onchange="toggleAnonymousMode()">
+                            </div>
+                            <div class="ml-3">
+                                <label for="is_anonymous" class="text-sm font-medium text-blue-900">
+                                    <i class="fas fa-user-secret mr-1"></i>
+                                    Submit this report anonymously
+                                </label>
+                                <p class="text-xs text-blue-700 mt-1">
+                                    When checked, your identity will be hidden from all users (admin, UCUA officers, departments) while maintaining the investigation process.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Anonymous Mode Explanation -->
+                        <div id="anonymous-explanation" class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded hidden">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-yellow-600 mt-0.5 mr-2"></i>
+                                <div class="text-xs text-yellow-800">
+                                    <p class="font-medium mb-1">Anonymous Reporting Information:</p>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Your name and email will be hidden from all system users</li>
+                                        <li>Employee ID, department, and phone number remain visible for investigation purposes</li>
+                                        <li>The report will follow the same review and investigation process</li>
+                                        <li>You can still track your report status through your dashboard</li>
+                                        <li>Warning letters and resolution processes work normally</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Personal Information Section -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-700 mb-4">Personal Information</h2>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="employee_id">
@@ -237,9 +276,20 @@
 </div>
 
 <script>
+function toggleAnonymousMode() {
+    const checkbox = document.getElementById('is_anonymous');
+    const explanation = document.getElementById('anonymous-explanation');
+
+    if (checkbox.checked) {
+        explanation.classList.remove('hidden');
+    } else {
+        explanation.classList.add('hidden');
+    }
+}
+
 function toggleCategory() {
     const selectedCategory = document.querySelector('input[name="category_type"]:checked').value;
-    
+
     document.getElementById('unsafeConditionSection').style.display = (selectedCategory === 'unsafe_condition') ? 'block' : 'none';
     document.getElementById('unsafeActSection').style.display = (selectedCategory === 'unsafe_act') ? 'block' : 'none';
 

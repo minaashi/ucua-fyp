@@ -69,6 +69,7 @@ class ReportController extends Controller
             'other_unsafe_condition' => 'required_if:unsafe_condition,Other|string|nullable',
             'unsafe_act' => 'required_if:category_type,unsafe_act|string|nullable',
             'other_unsafe_act' => 'required_if:unsafe_act,Other|string|nullable',
+            'is_anonymous' => 'nullable|boolean',
         ]);
 
         // Handle file upload
@@ -107,10 +108,16 @@ class ReportController extends Controller
             'description' => $validated['description'],
             'attachment' => $attachmentPath,
             'status' => 'pending',
+            'is_anonymous' => $request->has('is_anonymous') ? true : false,
         ]);
 
+        // Prepare success message based on anonymous status
+        $successMessage = $report->is_anonymous
+            ? 'Your anonymous report has been submitted successfully! Your identity will remain hidden while the investigation proceeds.'
+            : 'Your report has been submitted successfully!';
+
         return redirect()->route('reports.track')
-            ->with('success', 'Your report has been submitted successfully!');
+            ->with('success', $successMessage);
     }
 
     // Show form to edit an existing report (Admin-side)

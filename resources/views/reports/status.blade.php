@@ -28,7 +28,15 @@
             <div class="bg-white border rounded-lg shadow-sm p-6 mb-6">
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <h2 class="text-xl font-semibold">Report RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</h2>
+                        <div class="flex items-center space-x-2 mb-1">
+                            <h2 class="text-xl font-semibold">Report RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</h2>
+                            @if($report->is_anonymous)
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <i class="fas fa-user-secret mr-1"></i>
+                                    Anonymous
+                                </span>
+                            @endif
+                        </div>
                         <p class="text-gray-600">{{ Str::limit($report->description, 100) }}</p>
                     </div>
                     <div class="flex items-center space-x-3">
