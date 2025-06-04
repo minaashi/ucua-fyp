@@ -102,7 +102,7 @@
 <body>
     <div class="header">
         <h1>🚨 SAFETY WARNING LETTER</h1>
-        <p>{{ $companyName ?? 'UCUA' }} - Safety Department</p>
+        <p>{{ $companyName ?? 'UCUA' }} - UCUA Department</p>
     </div>
 
     <div class="content">
@@ -207,7 +207,7 @@
 
             <p><strong>Support & Questions:</strong></p>
             <ul>
-                <li>Contact the Safety Department immediately if you have questions about this warning</li>
+                <li>Contact the UCUA Department immediately if you have questions about this warning</li>
                 <li>Request additional safety training if needed to prevent future violations</li>
                 <li>You have the right to respond to this warning within 7 days if you wish to provide additional context</li>
             </ul>
@@ -224,8 +224,8 @@
         </div>
 
         <div class="footer">
-            <p><strong>This is an automated message from the {{ $companyName ?? 'UCUA' }} Safety Management System.</strong></p>
-            <p>For questions or concerns, please contact your supervisor or the Safety Department.</p>
+            <p><strong>This is an automated message from the {{ $companyName ?? 'UCUA' }} Reporting System.</strong></p>
+            <p>For questions or concerns, please contact your supervisor or the UCUA Department.</p>
             <p>Warning ID: {{ $warning->formatted_id }} | Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</p>
             
             @if($warning->approvedBy)
