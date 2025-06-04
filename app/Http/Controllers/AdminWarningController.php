@@ -10,6 +10,7 @@ use App\Notifications\WarningLetterNotification;
 use App\Mail\WarningLetterMail;
 use App\Services\ViolationEscalationService;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Artisan;
 
 class AdminWarningController extends Controller
 {
@@ -142,7 +143,15 @@ class AdminWarningController extends Controller
             $escalationService = new ViolationEscalationService();
             $escalationService->checkAndProcessEscalation($warning);
 
-            return redirect()->back()->with('success', 'Warning letter sent successfully to violator via email.');
+            // Auto-process the queued email immediately
+            try {
+                Artisan::call('queue:work', ['--once' => true, '--timeout' => 60]);
+                $message = 'Warning letter sent and delivered successfully to violator via email.';
+            } catch (\Exception $e) {
+                $message = 'Warning letter queued successfully. Email will be delivered shortly.';
+            }
+
+            return redirect()->back()->with('success', $message);
 
         } catch (\Exception $e) {
             \Log::error('Failed to send warning letter: ' . $e->getMessage());
