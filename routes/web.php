@@ -66,6 +66,7 @@ Route::middleware(['auth', 'email.verified'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/track-report', [ReportController::class, 'trackStatus'])->name('reports.track');
     Route::get('/report-history', [DashboardController::class, 'reportHistory'])->name('reports.history');
+    Route::get('/reports/{report}/details', [DashboardController::class, 'showReportDetails'])->name('reports.details');
 
     // User Profile Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

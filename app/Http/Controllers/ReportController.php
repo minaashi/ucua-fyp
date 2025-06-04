@@ -161,7 +161,12 @@ class ReportController extends Controller
     // Track Report Status: Show reports based on their status (for User-side)
     public function trackStatus()
     {
-        $reports = auth()->user()->reports()->orderBy('created_at', 'desc')->get();
+        $reports = auth()->user()->reports()
+                    ->with(['handlingDepartment', 'statusHistory' => function($query) {
+                        $query->with(['department', 'changedBy'])->orderBy('created_at', 'desc');
+                    }])
+                    ->orderBy('created_at', 'desc')
+                    ->get();
 
         // Return the view with all the user's reports
         return view('reports.status', compact('reports'));
