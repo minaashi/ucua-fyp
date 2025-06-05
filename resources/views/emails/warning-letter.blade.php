@@ -102,6 +102,7 @@
 <body>
     <div class="header">
         <h1>🚨 SAFETY WARNING LETTER</h1>
+        <h2 style="margin: 10px 0 5px 0; font-size: 18px;">{{ $warning->formatted_id }}</h2>
         <p>{{ $companyName ?? 'UCUA' }} - UCUA Department</p>
     </div>
 
@@ -115,7 +116,8 @@
         @endif
 
         <div class="warning-box">
-            <p><strong>Warning Level:</strong> 
+            <p><strong>Warning Letter ID:</strong> {{ $warning->formatted_id }}</p>
+            <p><strong>Warning Level:</strong>
                 <span class="warning-level {{ $warning->type }}">{{ ucfirst($warning->type) }} Warning</span>
             </p>
             <p>This official warning letter is issued due to a safety violation identified in your recent report.</p>
@@ -135,8 +137,8 @@
                 <td>{{ $recipient->department->name ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <th>Report ID</th>
-                <td>#{{ $report->id }}</td>
+                <th>Warning Letter ID</th>
+                <td>{{ $warning->formatted_id }}</td>
             </tr>
             <tr>
                 <th>Incident Date</th>

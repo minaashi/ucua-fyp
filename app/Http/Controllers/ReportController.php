@@ -61,7 +61,7 @@ class ReportController extends Controller
             'violator_department' => 'nullable|string',
             'location' => 'required|string',
             'other_location' => 'nullable|string',
-            'incident_date' => 'required|date|before_or_equal:now',
+            'incident_date' => 'required|date',
             'description' => 'required|string',
             'attachment' => 'nullable|file|mimes:jpg,png,pdf|max:5120', // 5MB max
             'category_type' => 'required|string|in:unsafe_condition,unsafe_act',
@@ -71,6 +71,23 @@ class ReportController extends Controller
             'other_unsafe_act' => 'required_if:unsafe_act,Other|string|nullable',
             'is_anonymous' => 'nullable|boolean',
         ]);
+
+        // Additional server-side validation for incident date with timezone handling
+        try {
+            $incidentDate = \Carbon\Carbon::parse($validated['incident_date']);
+            $now = \Carbon\Carbon::now();
+
+            // Add a small buffer (5 minutes) to handle processing delays
+            if ($incidentDate->gt($now->addMinutes(5))) {
+                return back()->withErrors([
+                    'incident_date' => 'The incident date and time cannot be in the future.'
+                ])->withInput();
+            }
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'incident_date' => 'Invalid date format provided.'
+            ])->withInput();
+        }
 
         // Handle file upload
         $attachmentPath = null;

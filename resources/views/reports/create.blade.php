@@ -228,7 +228,7 @@
                             </label>
                             <input type="datetime-local" id="incident_date" name="incident_date"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   required>
+                                   value="{{ old('incident_date') }}" required>
                             <p class="text-xs text-gray-500 mt-1">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 You can only select dates and times up to the current moment
@@ -248,7 +248,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="attachment">
-                                Upload Attachment*
+                                Upload Attachment (Optional)
                             </label>
                             <input type="file" id="attachment" name="attachment"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -313,15 +313,18 @@ function toggleOtherField() {
     document.getElementById('otherLocationDiv').style.display = (location === 'Other') ? '' : 'none';
 }
 
-// Function to set maximum date/time to current moment
+// Function to set maximum date/time with timezone buffer
 function setMaxDateTime() {
     const now = new Date();
+    // Add 5 minute buffer to handle processing delays
+    const maxTime = new Date(now.getTime() + (5 * 60 * 1000));
+
     // Format to YYYY-MM-DDTHH:MM (required for datetime-local input)
-    const maxDateTime = now.getFullYear() + '-' +
-                       String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                       String(now.getDate()).padStart(2, '0') + 'T' +
-                       String(now.getHours()).padStart(2, '0') + ':' +
-                       String(now.getMinutes()).padStart(2, '0');
+    const maxDateTime = maxTime.getFullYear() + '-' +
+                       String(maxTime.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(maxTime.getDate()).padStart(2, '0') + 'T' +
+                       String(maxTime.getHours()).padStart(2, '0') + ':' +
+                       String(maxTime.getMinutes()).padStart(2, '0');
 
     const incidentDateInput = document.getElementById('incident_date');
     if (incidentDateInput) {
@@ -331,6 +334,7 @@ function setMaxDateTime() {
 
 // Set initial max date/time when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Set max datetime immediately
     setMaxDateTime();
 
     // Update max date/time every minute to handle edge cases
@@ -345,7 +349,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selectedDate = new Date(incidentDate);
                 const now = new Date();
 
-                if (selectedDate > now) {
+                // Add 5 minute buffer to handle processing delays
+                const maxAllowedTime = new Date(now.getTime() + (5 * 60 * 1000)); // 5 minutes from now
+
+                if (selectedDate > maxAllowedTime) {
                     e.preventDefault();
                     alert('The incident date and time cannot be in the future. Please select a date and time that has already occurred.');
                     return false;
