@@ -95,6 +95,9 @@ class RegisterController extends Controller
             'email_verified_at' => null,
         ]);
 
+        // Automatically assign port_worker role to all new registrations
+        $user->assignRole('port_worker');
+
         $otp = $this->generateSecureOtp();
         $user->otp = $otp;
         $user->otp_expires_at = Carbon::now()->addMinutes(5);
