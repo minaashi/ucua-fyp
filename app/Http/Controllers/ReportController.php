@@ -56,9 +56,6 @@ class ReportController extends Controller
         $validated = $request->validate([
             'employee_id' => 'required|string',
             'phone' => 'required|string',
-            'violator_employee_id' => 'nullable|string',
-            'violator_name' => 'nullable|string',
-            'violator_department' => 'nullable|string',
             'location' => 'required|string',
             'other_location' => 'nullable|string',
             'incident_date' => 'required|date',
@@ -110,9 +107,6 @@ class ReportController extends Controller
         $report = Report::create([
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
-            'violator_employee_id' => $validated['violator_employee_id'],
-            'violator_name' => $validated['violator_name'],
-            'violator_department' => $validated['violator_department'],
             'department' => Auth::user()->department->name, // Use authenticated user's department name
             'phone' => $validated['phone'],
             'category' => $validated['category_type'],
