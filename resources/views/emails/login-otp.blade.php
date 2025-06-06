@@ -18,8 +18,8 @@
             margin-bottom: 30px;
         }
         .otp-container {
-            background-color: #f8f9fa;
-            border: 2px solid #28a745;
+            background-color: rgba(246, 248, 246, 0.05);
+            border: 2px solid rgba(9, 12, 9, 0.05);
             border-radius: 10px;
             padding: 20px;
             text-align: center;
@@ -28,13 +28,13 @@
         .otp-code {
             font-size: 32px;
             font-weight: bold;
-            color: #28a745;
+            color:rgb(40, 167, 135);
             letter-spacing: 3px;
             font-family: 'Courier New', monospace;
             background-color: #ffffff;
             padding: 15px 25px;
             border-radius: 8px;
-            border: 1px solid #28a745;
+            border: 1px solidrgb(3, 8, 4);
             display: inline-block;
             margin: 10px 0;
         }
@@ -56,7 +56,7 @@
 </head>
 <body>
     <div class="header">
-        <h1 style="color: #28a745;">Dear {{ $userName }},</h1>
+        <h1 style="color:rgb(0, 0, 0);">Dear {{ $userName }},</h1>
     </div>
 
     <p>Your One-Time Password (OTP) for login verification is:</p>
