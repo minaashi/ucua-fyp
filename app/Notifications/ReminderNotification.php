@@ -139,9 +139,9 @@ class ReminderNotification extends Notification
      */
     private function getDepartmentReportUrl(): string
     {
-        // Assuming you have a route for department to view specific reports
+        // Use the correct route for department to view specific reports
         try {
-            return route('department.reports.show', $this->report->id);
+            return route('department.report.show', $this->report->id);
         } catch (\Exception $e) {
             // Fallback to department dashboard
             return route('department.dashboard');

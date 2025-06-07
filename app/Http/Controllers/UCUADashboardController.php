@@ -193,15 +193,17 @@ class UCUADashboardController extends Controller
             'user_id' => Auth::id()
         ]);
 
-        $request->validate([
-            'report_id' => 'required|exists:reports,id',
-            'reminder_type' => 'required|in:gentle,urgent,final',
-            'reminder_message' => 'nullable|string|max:1000',
-            'extend_deadline' => 'boolean',
-            'new_deadline' => 'required_if:extend_deadline,true|date|after:today'
-        ]);
-
         try {
+            $request->validate([
+                'report_id' => 'required|exists:reports,id',
+                'reminder_type' => 'required|in:gentle,urgent,final',
+                'reminder_message' => 'nullable|string|max:1000',
+                'extend_deadline' => 'boolean',
+                'new_deadline' => 'required_if:extend_deadline,1|nullable|date|after:today'
+            ]);
+
+            Log::info('Validation passed');
+
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
@@ -225,7 +227,9 @@ class UCUADashboardController extends Controller
             }
 
             // Send notification to department
+            Log::info('About to send notification to department');
             $this->notifyDepartmentOfReminder($reminder);
+            Log::info('Notification sent successfully');
 
             DB::commit();
             Log::info('Reminder process completed successfully');
@@ -236,13 +240,18 @@ class UCUADashboardController extends Controller
             }
 
             return redirect()->back()->with('success', 'Reminder sent successfully to ' . $report->handlingDepartment->name . ' department.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', ['errors' => $e->errors()]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to send reminder: ' . $e->getMessage(), [
                 'exception' => $e,
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ]);
-            return redirect()->back()->with('error', 'Failed to send reminder. Please try again.');
+            return redirect()->back()->with('error', 'Failed to send reminder. Please try again. Error: ' . $e->getMessage());
         }
     }
 
@@ -395,8 +404,13 @@ class UCUADashboardController extends Controller
     private function notifyDepartmentOfReminder(Reminder $reminder): void
     {
         try {
+            Log::info('Starting notification process', ['reminder_id' => $reminder->id]);
+
             $report = $reminder->report;
+            Log::info('Retrieved report', ['report_id' => $report->id]);
+
             $department = $report->handlingDepartment;
+            Log::info('Retrieved department', ['department_id' => $department ? $department->id : null]);
 
             if (!$department) {
                 Log::warning('Cannot send reminder notification: No department assigned to report', [
@@ -406,13 +420,22 @@ class UCUADashboardController extends Controller
                 return;
             }
 
+            Log::info('About to send notification to department', [
+                'department_id' => $department->id,
+                'department_name' => $department->name,
+                'department_email' => $department->email
+            ]);
+
             // Send notification to department
             $department->notify(new ReminderNotification($reminder));
+            Log::info('Main notification sent');
 
             // Also send to department head if different email
             if ($department->head_email && $department->head_email !== $department->email) {
+                Log::info('Sending to department head', ['head_email' => $department->head_email]);
                 \Illuminate\Support\Facades\Notification::route('mail', $department->head_email)
                     ->notify(new ReminderNotification($reminder));
+                Log::info('Head notification sent');
             }
 
             Log::info('Reminder notification sent successfully', [
@@ -426,7 +449,10 @@ class UCUADashboardController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to send reminder notification to department', [
                 'reminder_id' => $reminder->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
             ]);
             // Don't throw exception to avoid breaking the reminder creation
         }

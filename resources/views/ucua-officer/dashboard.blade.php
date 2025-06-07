@@ -389,6 +389,7 @@ function sendReminder(reportId, status, reportCode) {
     $('#reminder_type').val('');
     $('#reminder_message').val('');
     $('#extend_deadline').prop('checked', false);
+    $('#new_deadline').val(''); // Clear the new deadline value
     $('#new_deadline_group').hide();
     $('#new_deadline').prop('required', false);
 
