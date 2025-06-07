@@ -31,7 +31,7 @@
                 <div class="ml-3">
                     <p class="text-sm text-orange-700">
                         <span class="font-medium">{{ $approvedCount }} warning letter{{ $approvedCount > 1 ? 's' : '' }} approved but not sent yet!</span>
-                        Look for the purple "SEND EMAIL" buttons below to send the warning letters to violators.
+                        Look for purple "SEND EMAIL" buttons for internal employees, or blue "MANUAL DELIVERY" indicators for external violators.
                     </p>
                 </div>
             </div>
@@ -140,15 +140,26 @@
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                     {{ $warning->status == 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                       ($warning->status == 'approved' ? 'bg-orange-100 text-orange-800 animate-pulse' :
-                                        ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
-                                         'bg-purple-100 text-purple-800')) }}">
-                                    {{ $warning->status == 'approved' ? 'Ready to Send' : ucfirst($warning->status) }}
+                                       ($warning->status == 'approved' && $warning->canBeSentViaEmail() ? 'bg-orange-100 text-orange-800 animate-pulse' :
+                                        ($warning->status == 'approved' && $warning->isExternalViolator() ? 'bg-blue-100 text-blue-800' :
+                                         ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
+                                          'bg-purple-100 text-purple-800'))) }}">
+                                    {{ $warning->getDeliveryStatus() }}
                                 </span>
                                 @if($warning->status === 'approved')
-                                    <div class="text-xs text-orange-600 mt-1 font-medium">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>Email not sent yet
-                                    </div>
+                                    @if($warning->canBeSentViaEmail())
+                                        <div class="text-xs text-orange-600 mt-1 font-medium">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>Email not sent yet
+                                        </div>
+                                    @elseif($warning->isExternalViolator())
+                                        <div class="text-xs text-blue-600 mt-1 font-medium">
+                                            <i class="fas fa-hand-paper mr-1"></i>Manual delivery required
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-gray-600 mt-1 font-medium">
+                                            <i class="fas fa-search mr-1"></i>Awaiting violator identification
+                                        </div>
+                                    @endif
                                 @endif
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -157,15 +168,28 @@
                             <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                 <div class="flex items-center space-x-2">
                                     @if($warning->status === 'approved')
-                                        <!-- Prominent Send Button for Approved Warnings -->
-                                        <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
-                                                    onclick="return confirm('Are you sure you want to send this warning letter to the violator?')">
-                                                <i class="fas fa-paper-plane mr-1"></i>SEND EMAIL
-                                            </button>
-                                        </form>
+                                        @if($warning->canBeSentViaEmail())
+                                            <!-- Email Send Button for Internal Users -->
+                                            <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
+                                                        onclick="return confirm('Are you sure you want to send this warning letter to the violator via email?')">
+                                                    <i class="fas fa-paper-plane mr-1"></i>SEND EMAIL
+                                                </button>
+                                            </form>
+                                        @elseif($warning->isExternalViolator())
+                                            <!-- External Violator - Manual Delivery Required -->
+                                            <span class="inline-flex items-center px-3 py-1 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-default"
+                                                  title="External violator - manual delivery will be handled separately">
+                                                <i class="fas fa-hand-paper mr-1"></i>MANUAL DELIVERY
+                                            </span>
+                                        @else
+                                            <!-- No Action Available - Violator Not Identified -->
+                                            <span class="inline-flex items-center px-3 py-1 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed">
+                                                <i class="fas fa-search mr-1"></i>AWAITING ID
+                                            </span>
+                                        @endif
                                     @endif
 
                                     <div class="relative inline-block text-left">
@@ -191,7 +215,13 @@
                                                     </button>
                                                 @elseif($warning->status === 'approved')
                                                     <div class="px-4 py-2 text-sm text-gray-500 italic">
-                                                        <i class="fas fa-info-circle mr-2"></i>Use purple button to send
+                                                        @if($warning->canBeSentViaEmail())
+                                                            <i class="fas fa-info-circle mr-2"></i>Use purple button to send email
+                                                        @elseif($warning->isExternalViolator())
+                                                            <i class="fas fa-hand-paper mr-2"></i>External violator - manual delivery required
+                                                        @else
+                                                            <i class="fas fa-exclamation-triangle mr-2"></i>Awaiting violator identification
+                                                        @endif
                                                     </div>
                                                 @endif
                                             </div>
@@ -220,23 +250,44 @@
             @forelse($warnings as $warning)
                 <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm {{ $warning->status === 'pending' ? 'border-l-4 border-l-yellow-400' : ($warning->status === 'approved' ? 'border-l-4 border-l-orange-400' : '') }}">
                     @if($warning->status === 'approved')
-                        <!-- Prominent Send Button for Mobile -->
-                        <div class="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
-                                    <span class="text-sm font-medium text-orange-800">Ready to Send Email</span>
+                        @if($warning->canBeSentViaEmail())
+                            <!-- Email Send Button for Mobile -->
+                            <div class="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                                        <span class="text-sm font-medium text-orange-800">Ready to Send Email</span>
+                                    </div>
+                                    <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
+                                                onclick="return confirm('Are you sure you want to send this warning letter to the violator via email?')">
+                                            <i class="fas fa-paper-plane mr-1"></i>SEND NOW
+                                        </button>
+                                    </form>
                                 </div>
-                                <form action="{{ route('admin.warnings.send', $warning) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit"
-                                            class="inline-flex items-center px-3 py-1 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 active:bg-purple-900 focus:outline-none focus:border-purple-900 focus:ring ring-purple-300 disabled:opacity-25 transition ease-in-out duration-150 animate-pulse"
-                                            onclick="return confirm('Are you sure you want to send this warning letter to the violator?')">
-                                        <i class="fas fa-paper-plane mr-1"></i>SEND NOW
-                                    </button>
-                                </form>
                             </div>
-                        </div>
+                        @elseif($warning->isExternalViolator())
+                            <!-- External Violator - Manual Delivery for Mobile -->
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-hand-paper text-blue-500 mr-2"></i>
+                                    <div>
+                                        <span class="text-sm font-medium text-blue-800">External Violator</span>
+                                        <p class="text-xs text-blue-600 mt-1">Manual delivery will be handled separately</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- No Action Available for Mobile -->
+                            <div class="mb-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-search text-gray-500 mr-2"></i>
+                                    <span class="text-sm font-medium text-gray-800">Awaiting Violator Identification</span>
+                                </div>
+                            </div>
+                        @endif
                     @endif
 
                     <div class="flex justify-between items-start mb-3">
@@ -244,10 +295,11 @@
                             <span class="font-semibold text-gray-900">{{ $warning->formatted_id }}</span>
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                 {{ $warning->status == 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                   ($warning->status == 'approved' ? 'bg-orange-100 text-orange-800 animate-pulse' :
-                                    ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
-                                     'bg-purple-100 text-purple-800')) }}">
-                                {{ $warning->status == 'approved' ? 'Ready to Send' : ucfirst($warning->status) }}
+                                   ($warning->status == 'approved' && $warning->canBeSentViaEmail() ? 'bg-orange-100 text-orange-800 animate-pulse' :
+                                    ($warning->status == 'approved' && $warning->isExternalViolator() ? 'bg-blue-100 text-blue-800' :
+                                     ($warning->status == 'rejected' ? 'bg-red-100 text-red-800' :
+                                      'bg-purple-100 text-purple-800'))) }}">
+                                {{ $warning->getDeliveryStatus() }}
                             </span>
                         </div>
                         <div class="relative inline-block text-left">
@@ -273,7 +325,13 @@
                                         </button>
                                     @elseif($warning->status === 'approved')
                                         <div class="px-4 py-2 text-sm text-gray-500 italic">
-                                            <i class="fas fa-info-circle mr-2"></i>Use orange button above to send
+                                            @if($warning->canBeSentViaEmail())
+                                                <i class="fas fa-info-circle mr-2"></i>Use orange button above to send email
+                                            @elseif($warning->isExternalViolator())
+                                                <i class="fas fa-hand-paper mr-2"></i>External violator - manual delivery required
+                                            @else
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>Awaiting violator identification
+                                            @endif
                                         </div>
                                     @endif
                                 </div>

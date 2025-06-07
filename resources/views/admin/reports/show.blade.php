@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold">Report Review</h1>
-                <p class="text-blue-200">Report ID: RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</p>
+                <p class="text-blue-200">Report ID: {{ $report->display_id }}</p>
             </div>
             <div class="flex space-x-2">
                 <a href="{{ route('admin.reports.index') }}" class="bg-white text-blue-800 px-4 py-2 rounded shadow hover:bg-gray-100 flex items-center">
@@ -28,7 +28,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Report ID</label>
-                        <p class="text-gray-900 font-semibold">RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-gray-900 font-semibold">{{ $report->display_id }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>

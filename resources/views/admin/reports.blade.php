@@ -65,7 +65,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($reports as $report)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $report->display_id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->location }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <form action="{{ route('admin.reports.update', $report->id) }}" method="POST" class="flex items-center">
@@ -123,7 +123,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="rejectReportModalLabel{{ $report->id }}">Reject Report RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</h5>
+                                        <h5 class="modal-title" id="rejectReportModalLabel{{ $report->id }}">Reject Report {{ $report->display_id }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <form action="{{ route('admin.reports.reject', $report->id) }}" method="POST">

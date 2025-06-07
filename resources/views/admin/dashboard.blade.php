@@ -42,7 +42,7 @@
             <tbody>
                 @forelse($recentReports as $report)
                 <tr>
-                    <td class="py-2">RPT-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</td>
+                    <td class="py-2">{{ $report->display_id }}</td>
                     <td class="py-2">{{ $report->location }}</td>
                     <td class="py-2">
                         <span class="px-2 py-1 rounded text-xs font-semibold

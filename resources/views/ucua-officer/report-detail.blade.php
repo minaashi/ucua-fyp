@@ -9,7 +9,7 @@
                 <a href="{{ route('ucua.dashboard') }}" class="text-white hover:text-gray-200">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
                 </a>
-                <h1 class="text-2xl font-bold">Report Details - RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</h1>
+                <h1 class="text-2xl font-bold">Report Details - {{ $report->display_id }}</h1>
             </div>
             <div class="flex items-center space-x-4">
                 <span>Welcome, {{ auth()->user()->name }}</span>
@@ -57,7 +57,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Report ID</label>
-                            <p class="text-gray-900">RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</p>
+                            <p class="text-gray-900">{{ $report->display_id }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Submission Date</label>

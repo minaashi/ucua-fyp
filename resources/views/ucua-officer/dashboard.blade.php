@@ -109,7 +109,7 @@
                             @forelse($recentReports as $report)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
+                                    {{ $report->display_id }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
@@ -182,13 +182,31 @@
 
 
 
-                                        <!-- Suggest Warning Button -->
-                                        <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
-                                                class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                                                title="Suggest Warning Letter">
-                                            <i class="fas fa-exclamation-triangle mr-1"></i>
-                                            Warning
-                                        </button>
+                                        <!-- Suggest Warning Button (only for internal violators) -->
+                                        @php
+                                            $violator = $report->getViolatorForWarning();
+                                            $isInternalViolator = $violator && isset($violator->id) && !empty($violator->email);
+                                        @endphp
+                                        @if($isInternalViolator)
+                                            <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                    class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                                    title="Suggest Warning Letter">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Warning
+                                            </button>
+                                        @elseif($violator && !$isInternalViolator)
+                                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+                                                  title="Warning letters are only available for internal employees">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                External Violator
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+                                                  title="Violator must be identified before warning can be suggested">
+                                                <i class="fas fa-search mr-1"></i>
+                                                ID Required
+                                            </span>
+                                        @endif
 
                                         <!-- Send Reminder Button (only if assigned and has deadline) -->
                                         @if($report->handlingDepartment && $report->deadline)

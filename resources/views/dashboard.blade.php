@@ -59,7 +59,7 @@
                     <div class="border-l-4 border-green-500 bg-green-50 p-4 rounded-r-lg">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-semibold text-gray-800">
-                                Report RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }} - Resolved
+                                Report {{ $report->display_id }} - Resolved
                             </h3>
                             <span class="text-sm text-gray-500">
                                 {{ $report->resolved_at->format('M d, Y') }}
@@ -91,7 +91,7 @@
                     <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-semibold text-gray-800">
-                                RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
+                                {{ $report->display_id }}
                             </h3>
                             <span class="px-2 py-1 rounded-full text-xs font-medium
                                 @if($report->status == 'pending') bg-yellow-100 text-yellow-800

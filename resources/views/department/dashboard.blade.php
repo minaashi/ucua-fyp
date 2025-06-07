@@ -191,7 +191,7 @@
                                 @forelse($recentReports as $report)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
+                                        {{ $report->display_id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -216,7 +216,7 @@
                                             </a>
 
                                             <!-- Remark Button -->
-                                            <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                            <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
                                                     class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
                                                     title="Add Department Remark">
                                                 <i class="fas fa-comment mr-1"></i>
@@ -225,7 +225,7 @@
 
                                             <!-- Mark as Resolved Button (only for non-resolved reports) -->
                                             @if($report->status !== 'resolved')
-                                            <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                            <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
                                                     class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
                                                     title="Mark as Resolved">
                                                 <i class="fas fa-check mr-1"></i>

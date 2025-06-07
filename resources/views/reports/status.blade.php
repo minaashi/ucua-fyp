@@ -29,7 +29,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <div class="flex items-center space-x-2 mb-1">
-                            <h2 class="text-xl font-semibold">Report RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}</h2>
+                            <h2 class="text-xl font-semibold">Report {{ $report->display_id }}</h2>
                             @if($report->is_anonymous)
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     <i class="fas fa-user-secret mr-1"></i>

@@ -151,9 +151,10 @@
                 @endforeach
               </select>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
               <label class="form-label">Password <small>(leave blank to keep current)</small></label>
               <input type="password" name="password" class="form-control">
+              <i class="fas fa-eye password-toggle position-absolute" style="top: 38px; right: 16px; cursor: pointer;"></i>
             </div>
           </div>
           <div class="modal-footer">
@@ -266,8 +267,8 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Password visibility toggle for modal
-    document.querySelectorAll('#adminRegisterModal .password-toggle').forEach(toggle => {
+    // Password visibility toggle for all modals
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
         toggle.addEventListener('click', function() {
             const input = this.previousElementSibling;
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -278,4 +279,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

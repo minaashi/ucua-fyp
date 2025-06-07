@@ -45,7 +45,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-red-900">
                             @if($reminder->report)
                                 <a href="{{ route('ucua.report.show', $reminder->report->id) }}" class="hover:text-red-700">
-                                    Report #{{ $reminder->report->id }}
+                                    {{ $reminder->report->display_id }}
                                 </a>
                             @else
                                 <span class="text-gray-500">No Report</span>

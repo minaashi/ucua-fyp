@@ -74,7 +74,7 @@
                                 @forelse($reports as $report)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}
+                                        {{ $report->display_id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         @if($report->resolved_at)
@@ -115,7 +115,7 @@
                                             </a>
 
                                             <!-- Export Button -->
-                                            <button onclick="exportReport({{ $report->id }}, 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                            <button onclick="exportReport({{ $report->id }}, '{{ $report->display_id }}')"
                                                     class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors duration-200"
                                                     title="Export Report">
                                                 <i class="fas fa-download mr-1"></i>
