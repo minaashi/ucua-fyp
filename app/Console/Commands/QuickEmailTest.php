@@ -195,24 +195,31 @@ class QuickEmailTest extends Command
         $this->info('✅ Configuration: PASSED');
         $this->info('✅ Basic Email: PASSED');
 
-        // Queue-specific recommendations
-        $this->newLine();
-        $this->info('🎯 WARNING LETTER EMAIL ISSUE DIAGNOSIS:');
-        $this->warn('⚠️ Your WarningLetterMail implements ShouldQueue');
-        $this->warn('⚠️ This means emails are QUEUED, not sent immediately');
+        // Check current queue status
+        $warningMailContent = file_get_contents(app_path('Mail/WarningLetterMail.php'));
+        $usesQueue = strpos($warningMailContent, 'implements ShouldQueue') !== false;
 
         $this->newLine();
-        $this->info('🔧 SOLUTIONS:');
-        $this->info('Option 1 (Recommended): Run queue worker');
-        $this->info('   php artisan queue:work');
-        $this->info('Option 2: Send emails immediately');
-        $this->info('   php artisan warning:fix-immediate-send');
+        if ($usesQueue) {
+            $this->info('🎯 WARNING LETTER EMAIL STATUS:');
+            $this->warn('⚠️ Your WarningLetterMail implements ShouldQueue');
+            $this->warn('⚠️ This means emails are QUEUED, not sent immediately');
+
+            $this->newLine();
+            $this->info('🔧 SOLUTIONS:');
+            $this->info('Option 1 (Recommended): Run queue worker');
+            $this->info('   php artisan queue:work');
+            $this->info('Option 2: Send emails immediately');
+            $this->info('   php artisan warning:fix-immediate-send');
+        } else {
+            $this->info('🎯 WARNING LETTER EMAIL STATUS:');
+            $this->info('✅ Warning letters send IMMEDIATELY (no queuing)');
+            $this->info('✅ Reminder emails send IMMEDIATELY');
+        }
 
         $this->newLine();
-        $this->info('📧 TO TEST WARNING LETTERS:');
-        $this->info('1. Send a test warning letter');
-        $this->info('2. Run: php artisan queue:work --once');
-        $this->info('3. Check your email inbox');
+        $this->info('📧 TO TEST FULL EMAIL SYSTEM:');
+        $this->info('Run: php artisan email:test-full-system');
 
         $this->newLine();
         $this->info('⏱️ Quick test completed in ~60 seconds');

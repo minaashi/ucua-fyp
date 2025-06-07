@@ -157,6 +157,21 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
     Route::post('/suggest-warning', [UCUADashboardController::class, 'suggestWarning'])->name('suggest-warning');
     Route::post('/send-reminder', [UCUADashboardController::class, 'sendReminder'])->name('send-reminder');
     Route::post('/add-remarks', [UCUADashboardController::class, 'addRemarks'])->name('add-remarks');
+
+    // Debug route for testing reminders
+    Route::get('/test-reminder', function() {
+        $reminderCount = App\Models\Reminder::count();
+        $jobCount = DB::table('jobs')->count();
+        $recentLogs = collect(file('storage/logs/laravel.log'))->filter(function($line) {
+            return strpos($line, 'Reminder') !== false;
+        })->take(-5);
+
+        return response()->json([
+            'reminder_count' => $reminderCount,
+            'job_count' => $jobCount,
+            'recent_reminder_logs' => $recentLogs->values()
+        ]);
+    });
     Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');
     Route::get('/warnings/{warning}/details', [UCUADashboardController::class, 'getWarningDetails'])->name('warnings.details');
     Route::get('/reminders', [UCUADashboardController::class, 'remindersPage'])->name('reminders');
@@ -224,4 +239,8 @@ Route::middleware(['auth:department'])->group(function () {
 Route::get('/login/otp', [App\Http\Controllers\Auth\LoginOtpController::class, 'showOtpForm'])->name('login.otp.form');
 Route::post('/login/otp/verify', [App\Http\Controllers\Auth\LoginOtpController::class, 'verifyOtp'])->name('login.otp.verify');
 Route::post('/login/otp/resend', [App\Http\Controllers\Auth\LoginOtpController::class, 'resendOtp'])->name('login.otp.resend');
+
+
+
+
 

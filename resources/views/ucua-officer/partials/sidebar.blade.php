@@ -33,7 +33,17 @@
                    class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
                     <i class="fas fa-bell w-5 animate-bounce text-red-500"></i>
                     <span class="ml-2 font-semibold">Reminders</span>
-                    <span class="ml-2 bg-red-200 text-red-700 text-xs px-2 py-1 rounded-full">ALERTS</span>
+                    @php
+                        $urgentCount = \App\Models\Report::where('status', '!=', 'resolved')
+                            ->whereNotNull('deadline')
+                            ->where('deadline', '<=', now()->addDays(3))
+                            ->count();
+                    @endphp
+                    @if($urgentCount > 0)
+                        <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">{{ $urgentCount }}</span>
+                    @else
+                        <span class="ml-2 bg-green-200 text-green-700 text-xs px-2 py-1 rounded-full">OK</span>
+                    @endif
                 </a>
             </li>
             <li>

@@ -123,17 +123,31 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => [
+                'nullable',
+                'string',
+                'min:12',
+                'max:32',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,32}$/',
+            ],
             'role' => 'required|exists:roles,name',
             'department_id' => 'nullable|exists:departments,id'
         ]);
 
         $departmentId = $validated['department_id'] ?? null;
 
-        $user->update([
+        $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'department_id' => $departmentId,
-        ]);
+        ];
+
+        // Only update password if provided
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($updateData);
 
         $user->syncRoles([$validated['role']]);
 

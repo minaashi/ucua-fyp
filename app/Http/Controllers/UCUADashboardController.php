@@ -28,10 +28,15 @@ class UCUADashboardController extends Controller
         $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
-        // Get reports with deadlines within the next 7 days
-        $deadlineReports = Report::whereNotNull('deadline')
-            ->where('deadline', '<=', now()->addDays(7))
-            ->where('deadline', '>=', now())
+        // Get reports with deadlines within the next 3 days (urgent reminders)
+        // Include overdue reports and exclude resolved reports
+        $deadlineReports = Report::where('status', '!=', 'resolved')
+            ->whereNotNull('deadline')
+            ->where('deadline', '<=', now()->addDays(3))
+            ->with(['handlingDepartment', 'user', 'reminders' => function($query) {
+                $query->latest();
+            }])
+            ->orderBy('deadline', 'asc')
             ->get();
 
         // Get recent reports with pagination - show more to see assignment status
@@ -109,9 +114,9 @@ class UCUADashboardController extends Controller
                 $remarkService->addUCUARemark(
                     $report,
                     $request->initial_remarks,
-                    null,
-                    null,
-                    null
+                    null,  // user (will use Auth::user())
+                    null,  // attachment
+                    null   // parent_id
                 );
             }
 
@@ -161,6 +166,11 @@ class UCUADashboardController extends Controller
                 return redirect()->back()->with('error', 'Cannot suggest warning: Violator has not been identified yet. Please wait for investigation to identify the person involved, or contact the handling department for updates.');
             }
 
+            // Check if violator is internal (system user) - only allow warnings for internal violators
+            if (!isset($violator->id) || empty($violator->email)) {
+                return redirect()->back()->with('error', 'Warning letters are only available for internal employees. External violators should be handled through alternative disciplinary procedures.');
+            }
+
             $report->warnings()->create([
                 'type' => $request->warning_type,
                 'reason' => $request->warning_reason,
@@ -177,6 +187,12 @@ class UCUADashboardController extends Controller
 
     public function sendReminder(Request $request)
     {
+        // Debug logging
+        Log::info('Reminder submission started', [
+            'request_data' => $request->all(),
+            'user_id' => Auth::id()
+        ]);
+
         $request->validate([
             'report_id' => 'required|exists:reports,id',
             'reminder_type' => 'required|in:gentle,urgent,final',
@@ -189,6 +205,7 @@ class UCUADashboardController extends Controller
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
+            Log::info('Report found', ['report_id' => $report->id, 'has_department' => $report->handlingDepartment ? true : false]);
 
             // Create reminder record
             $reminder = $report->reminders()->create([
@@ -197,22 +214,34 @@ class UCUADashboardController extends Controller
                 'sent_by' => Auth::id()
             ]);
 
+            Log::info('Reminder created', ['reminder_id' => $reminder->id, 'type' => $reminder->type]);
+
             // Update deadline if requested
             if ($request->extend_deadline) {
                 $report->update([
                     'deadline' => $request->new_deadline
                 ]);
+                Log::info('Deadline updated', ['new_deadline' => $request->new_deadline]);
             }
 
             // Send notification to department
             $this->notifyDepartmentOfReminder($reminder);
 
             DB::commit();
+            Log::info('Reminder process completed successfully');
+
+            // If we're on the reminders page, redirect to it to refresh the data
+            if (request()->header('referer') && str_contains(request()->header('referer'), '/reminders')) {
+                return redirect()->route('ucua.reminders')->with('success', 'Reminder sent successfully to ' . $report->handlingDepartment->name . ' department.');
+            }
 
             return redirect()->back()->with('success', 'Reminder sent successfully to ' . $report->handlingDepartment->name . ' department.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to send reminder: ' . $e->getMessage());
+            Log::error('Failed to send reminder: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
             return redirect()->back()->with('error', 'Failed to send reminder. Please try again.');
         }
     }
@@ -236,6 +265,7 @@ class UCUADashboardController extends Controller
             ->map(function($report) {
                 return [
                     'id' => $report->id,
+                    'display_id' => $report->display_id,
                     'status' => $report->status,
                     'has_handling_department' => $report->handlingDepartment ? true : false,
                     'handling_department_name' => $report->handlingDepartment ? $report->handlingDepartment->name : null,
@@ -260,6 +290,7 @@ class UCUADashboardController extends Controller
 
     public function remindersPage()
     {
+        // Get previously sent reminders
         $reminders = Reminder::with(['report', 'sentBy'])
             ->latest()
             ->paginate(10);
@@ -267,7 +298,33 @@ class UCUADashboardController extends Controller
         $totalReminders = Reminder::count();
         $recentReminders = Reminder::where('created_at', '>=', now()->subDays(7))->count();
 
-        return view('ucua-officer.reminders', compact('reminders', 'totalReminders', 'recentReminders'));
+        // Get reports that need reminders (urgent reports with approaching deadlines)
+        $reportsNeedingReminders = Report::where('status', '!=', 'resolved')
+            ->whereNotNull('deadline')
+            ->where('deadline', '<=', now()->addDays(3))
+            ->with(['handlingDepartment', 'user', 'reminders' => function($query) {
+                $query->latest()->take(1); // Get latest reminder for each report
+            }])
+            ->orderBy('deadline', 'asc')
+            ->get();
+
+        // Separate overdue and upcoming reports
+        $overdueReports = $reportsNeedingReminders->filter(function($report) {
+            return $report->deadline && $report->deadline->isPast();
+        });
+
+        $upcomingReports = $reportsNeedingReminders->filter(function($report) {
+            return $report->deadline && !$report->deadline->isPast();
+        });
+
+        return view('ucua-officer.reminders', compact(
+            'reminders',
+            'totalReminders',
+            'recentReminders',
+            'reportsNeedingReminders',
+            'overdueReports',
+            'upcomingReports'
+        ));
     }
 
     /**
@@ -319,7 +376,7 @@ class UCUADashboardController extends Controller
             $remarkService->addUCUARemark(
                 $report,
                 $request->content,
-                null,
+                null,       // user (will use Auth::user())
                 $attachment,
                 $parentId
             );

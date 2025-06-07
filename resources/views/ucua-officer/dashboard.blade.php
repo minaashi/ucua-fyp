@@ -44,10 +44,21 @@
             </div>
 
             <!-- Deadline Reminders Card -->
-            <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-red-500">
-                <h3 class="text-lg font-semibold text-gray-700">Deadline Reminders</h3>
-                <p class="text-3xl font-bold text-red-500 mt-2">{{ $deadlineReports->count() }}</p>
-                <p class="text-sm text-gray-500 mt-1">Reports nearing deadline</p>
+            <div class="bg-white rounded-lg shadow-md p-6 border-t-4 {{ $deadlineReports->count() > 0 ? 'border-red-500 ring-2 ring-red-200' : 'border-green-500' }}">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                            @if($deadlineReports->count() > 0)
+                                <i class="fas fa-exclamation-triangle text-red-500 mr-2 animate-pulse"></i>
+                            @else
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            @endif
+                            Urgent Reports
+                        </h3>
+                        <p class="text-3xl font-bold {{ $deadlineReports->count() > 0 ? 'text-red-500' : 'text-green-500' }} mt-2">{{ $deadlineReports->count() }}</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ $deadlineReports->count() > 0 ? 'Need immediate attention' : 'All on track' }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -208,15 +219,7 @@
                                             </span>
                                         @endif
 
-                                        <!-- Send Reminder Button (only if assigned and has deadline) -->
-                                        @if($report->handlingDepartment && $report->deadline)
-                                        <button onclick="sendReminder({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
-                                                class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full hover:bg-red-200 transition-colors duration-200"
-                                                title="Send Follow-up Reminder">
-                                            <i class="fas fa-bell mr-1"></i>
-                                            Reminder
-                                        </button>
-                                        @endif
+
                                     </div>
                                 </td>
                             </tr>
@@ -236,20 +239,103 @@
         <!-- Deadline Reminders Section -->
         <div class="mt-6 bg-white rounded-lg shadow-md">
             <div class="p-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">Deadline Reminders</h2>
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                    Deadline Reminders
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">Reports with deadlines within 3 days or overdue ({{ $deadlineReports->count() }} found)</p>
             </div>
             <div class="p-4">
                 <div class="space-y-4">
                     @forelse($deadlineReports as $report)
-                    <div class="flex items-center justify-between bg-red-50 p-4 rounded-lg">
-                        <div>
-                            <h3 class="font-semibold text-red-800">Report #{{ $report->id }}</h3>
-                            <p class="text-sm text-red-600">Deadline: {{ $report->deadline->format('Y-m-d') }}</p>
+                    @php
+                        $daysLeft = $report->deadline ? (int) now()->diffInDays($report->deadline, false) : null;
+                        $isOverdue = $report->deadline && $report->deadline->isPast();
+                        $urgencyClass = $isOverdue ? 'bg-red-100 border-red-300' : ($daysLeft <= 1 ? 'bg-orange-100 border-orange-300' : 'bg-yellow-100 border-yellow-300');
+                        $textClass = $isOverdue ? 'text-red-800' : ($daysLeft <= 1 ? 'text-orange-800' : 'text-yellow-800');
+                        $reportId = $report->display_id ?? 'RPT-' . str_pad($report->id, 3, '0', STR_PAD_LEFT);
+                    @endphp
+                    <div class="flex items-center justify-between {{ $urgencyClass }} p-4 rounded-lg border-2">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="font-bold {{ $textClass }} text-lg">{{ $reportId }}</h3>
+                                @if($isOverdue)
+                                    <span class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">OVERDUE</span>
+                                @elseif($daysLeft <= 1)
+                                    <span class="px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">URGENT</span>
+                                @else
+                                    <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">DUE SOON</span>
+                                @endif
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <div>
+                                    <p class="font-medium {{ $textClass }}">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        Deadline: {{ $report->deadline->format('d/m/Y') }}
+                                    </p>
+                                    <p class="text-xs {{ $textClass }}">
+                                        @if($isOverdue)
+                                            <i class="fas fa-clock text-red-500 mr-1"></i>
+                                            {{ abs($daysLeft) }} day{{ abs($daysLeft) != 1 ? 's' : '' }} overdue
+                                        @else
+                                            <i class="fas fa-hourglass-half text-orange-500 mr-1"></i>
+                                            {{ $daysLeft }} day{{ $daysLeft != 1 ? 's' : '' }} remaining
+                                        @endif
+                                    </p>
+                                </div>
+                                <div>
+                                    @if($report->handlingDepartment)
+                                        <p class="text-xs text-gray-700">
+                                            <i class="fas fa-building mr-1"></i>
+                                            Assigned to: <span class="font-medium">{{ $report->handlingDepartment->name }}</span>
+                                        </p>
+                                    @else
+                                        <p class="text-xs text-red-600">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>
+                                            Not assigned to department
+                                        </p>
+                                    @endif
+                                    <p class="text-xs text-gray-600 mt-1">
+                                        <i class="fas fa-flag mr-1"></i>
+                                        Status: <span class="capitalize font-medium">{{ str_replace('_', ' ', $report->status) }}</span>
+                                    </p>
+                                    @php
+                                        $reminderCount = $report->reminders ? $report->reminders->count() : 0;
+                                        $lastReminder = $report->reminders ? $report->reminders->first() : null;
+                                    @endphp
+                                    @if($reminderCount > 0)
+                                    <p class="text-xs text-blue-600 mt-1">
+                                        <i class="fas fa-bell mr-1"></i>
+                                        {{ $reminderCount }} reminder{{ $reminderCount != 1 ? 's' : '' }} sent
+                                        @if($lastReminder)
+                                            <span class="ml-1 px-2 py-0.5 rounded text-xs font-medium
+                                                {{ $lastReminder->type === 'gentle' ? 'bg-green-100 text-green-700' :
+                                                   ($lastReminder->type === 'urgent' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700') }}">
+                                                Last: {{ ucfirst($lastReminder->type) }}
+                                            </span>
+                                        @endif
+                                    </p>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        
+                        <div class="flex flex-col gap-2 ml-4">
+                            <a href="{{ route('ucua.report.show', $report->id) }}"
+                               class="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors duration-200">
+                                <i class="fas fa-eye mr-2"></i>
+                                View Details
+                            </a>
+                        </div>
                     </div>
                     @empty
-                    <p class="text-center text-gray-500">No reports nearing deadline</p>
+                    <div class="text-center py-12">
+                        <div class="mb-4">
+                            <i class="fas fa-calendar-check text-green-400 text-6xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">All Clear!</h3>
+                        <p class="text-gray-500 text-lg mb-1">No urgent reports found</p>
+                        <p class="text-gray-400 text-sm">All reports are on track with their deadlines</p>
+                    </div>
                     @endforelse
                 </div>
             </div>

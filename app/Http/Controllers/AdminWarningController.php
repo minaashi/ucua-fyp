@@ -32,7 +32,8 @@ class AdminWarningController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->whereHas('report', function($reportQuery) use ($search) {
-                    $reportQuery->where('id', 'like', "%{$search}%");
+                    $reportQuery->where('id', 'like', "%{$search}%")
+                               ->orWhere('formatted_id', 'like', "%{$search}%");
                 })
                 ->orWhereHas('suggestedBy', function($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%");
@@ -177,6 +178,8 @@ class AdminWarningController extends Controller
         return redirect()->route('admin.warnings')
             ->with('success', 'Warning letter resent successfully.');
     }
+
+
 
     /**
      * Get CC recipients for warning letter emails

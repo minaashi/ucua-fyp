@@ -5,16 +5,17 @@ namespace App\Mail;
 use App\Models\Warning;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+// use Illuminate\Contracts\Queue\ShouldQueue; // Removed for immediate sending
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 
-class WarningLetterMail extends Mailable implements ShouldQueue
+class WarningLetterMail extends Mailable // implements ShouldQueue // Removed for immediate sending
 {
-    use Queueable, SerializesModels;
+    // use Queueable, SerializesModels; // Removed for immediate sending
+    use SerializesModels;
 
     public $warning;
     public $recipient;
@@ -94,7 +95,7 @@ class WarningLetterMail extends Mailable implements ShouldQueue
             return $rendered['subject'];
         }
 
-        return "Safety Warning Letter {$this->warning->formatted_id} - Report #{$this->warning->report->id}";
+        return "Safety Warning Letter {$this->warning->formatted_id} - Report {$this->warning->report->display_id}";
     }
 
     /**
@@ -130,7 +131,7 @@ class WarningLetterMail extends Mailable implements ShouldQueue
             'warning_level' => ucfirst($this->warning->type),
             'supervisor_name' => $this->warning->approvedBy->name ?? 'Safety Officer',
             'company_name' => config('app.name', 'UCUA'),
-            'report_id' => $report->id,
+            'report_id' => $report->display_id,
             'warning_id' => $this->warning->formatted_id
         ];
     }

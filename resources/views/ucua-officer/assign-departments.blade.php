@@ -63,7 +63,7 @@
                             <tbody>
                                 @foreach($allReports as $debugReport)
                                 <tr class="border-b border-blue-200">
-                                    <td class="px-3 py-2">{{ $debugReport['id'] }}</td>
+                                    <td class="px-3 py-2">{{ $debugReport['display_id'] }}</td>
                                     <td class="px-3 py-2">{{ $debugReport['employee_id'] }}</td>
                                     <td class="px-3 py-2">
                                         <span class="px-2 py-1 rounded text-xs {{ $debugReport['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : ($debugReport['status'] === 'review' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
@@ -102,7 +102,7 @@
                     <div class="border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-between bg-gray-50 hover:shadow-lg transition-shadow">
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-gray-400">Report ID: <span class="font-semibold text-gray-700">#{{ $report->id }}</span></span>
+                                <span class="text-xs text-gray-400">Report ID: <span class="font-semibold text-gray-700">{{ $report->display_id }}</span></span>
                                 <span class="inline-block px-2 py-1 text-xs rounded 
                                     {{ $report->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                                        ($report->status === 'review' ? 'bg-blue-100 text-blue-800' : 

@@ -109,4 +109,91 @@ class Warning extends Model
     {
         return $this->status === 'sent';
     }
-} 
+
+    /**
+     * Check if warning can be sent via email (only for internal violators)
+     */
+    public function canBeSentViaEmail()
+    {
+        if (!$this->isApproved()) {
+            return false;
+        }
+
+        $violator = $this->report->getViolatorForWarning();
+        return $violator && !empty($violator->email) && $this->isInternalViolator();
+    }
+
+    /**
+     * Check if violator is internal (system user)
+     */
+    public function isInternalViolator()
+    {
+        $violator = $this->report->getViolatorForWarning();
+        if (!$violator) {
+            return false;
+        }
+
+        // Check if violator exists in the system (has an ID, meaning it's not a virtual user)
+        return isset($violator->id) && !empty($violator->email);
+    }
+
+    /**
+     * Check if violator is external (not a system user)
+     */
+    public function isExternalViolator()
+    {
+        $violator = $this->report->getViolatorForWarning();
+        if (!$violator) {
+            return false;
+        }
+
+        // External violator: has violator info but no system user account
+        return !isset($violator->id) || empty($violator->email);
+    }
+
+    /**
+     * Get delivery status for display
+     */
+    public function getDeliveryStatus()
+    {
+        if ($this->status === 'pending') {
+            return 'Pending Approval';
+        }
+
+        if ($this->status === 'rejected') {
+            return 'Rejected';
+        }
+
+        if ($this->status === 'sent') {
+            return 'Sent';
+        }
+
+        if ($this->status === 'approved') {
+            if ($this->canBeSentViaEmail()) {
+                return 'Ready to Send';
+            } elseif ($this->isExternalViolator()) {
+                return 'External - Manual Delivery';
+            } else {
+                return 'Violator Not Identified';
+            }
+        }
+
+        return ucfirst($this->status);
+    }
+
+    /**
+     * Get violator information for this warning
+     */
+    public function getViolatorInfo()
+    {
+        return $this->report->getViolatorForWarning();
+    }
+
+    /**
+     * Check if violator has been identified
+     */
+    public function hasViolatorIdentified()
+    {
+        return $this->report->hasViolatorIdentified();
+    }
+}

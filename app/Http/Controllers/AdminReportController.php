@@ -32,7 +32,8 @@ class AdminReportController extends Controller
                   ->orWhere('unsafe_condition', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('employee_id', 'like', "%{$search}%");
+                  ->orWhere('employee_id', 'like', "%{$search}%")
+                  ->orWhere('formatted_id', 'like', "%{$search}%");
             });
         }
 

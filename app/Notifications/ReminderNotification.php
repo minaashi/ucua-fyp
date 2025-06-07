@@ -4,14 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Reminder;
 use App\Models\Report;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ReminderNotification extends Notification implements ShouldQueue
+class ReminderNotification extends Notification
 {
-    use Queueable;
 
     protected $reminder;
     protected $report;
@@ -39,7 +36,6 @@ class ReminderNotification extends Notification implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         $reminderTypeText = $this->getReminderTypeText();
-        $urgencyLevel = $this->getUrgencyLevel();
         
         $mail = (new MailMessage)
             ->subject("Safety Report Reminder: {$reminderTypeText} - Report #{$this->report->id}")

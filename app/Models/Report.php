@@ -41,7 +41,8 @@ class Report extends Model
         'deadline',
         'attachment',
         'resolution_notes',
-        'resolved_at'
+        'resolved_at',
+        'formatted_id'
     ];
 
     protected $casts = [
@@ -50,6 +51,39 @@ class Report extends Model
         'resolved_at' => 'datetime',
         'is_anonymous' => 'boolean'
     ];
+
+    /**
+     * Boot method to automatically generate formatted ID
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($report) {
+            if (empty($report->formatted_id)) {
+                $report->formatted_id = static::generateFormattedId();
+            }
+        });
+    }
+
+    /**
+     * Generate the next formatted ID (RPT-XXX)
+     */
+    public static function generateFormattedId(): string
+    {
+        $lastReport = static::orderBy('id', 'desc')->first();
+        $nextNumber = $lastReport ? $lastReport->id + 1 : 1;
+
+        return 'RPT-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the formatted ID for display
+     */
+    public function getDisplayIdAttribute(): string
+    {
+        return $this->formatted_id ?: 'RPT-' . str_pad($this->id, 3, '0', STR_PAD_LEFT);
+    }
 
     // Relationship with the user
     public function user()
@@ -204,7 +238,7 @@ class Report extends Model
             return null;
         }
 
-        return now()->diffInDays($this->deadline, false);
+        return (int) now()->diffInDays($this->deadline, false);
     }
 
     /**
@@ -241,7 +275,7 @@ class Report extends Model
         if (!$this->deadline) {
             return null;
         }
-        return now()->diffInDays($this->deadline, false);
+        return (int) now()->diffInDays($this->deadline, false);
     }
 
     /**
