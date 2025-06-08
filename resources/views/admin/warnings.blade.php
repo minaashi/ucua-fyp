@@ -20,7 +20,9 @@
 
     <!-- Alert for Approved Warnings Waiting to be Sent -->
     @php
-        $approvedCount = $warnings->where('status', 'approved')->count();
+        $approvedCount = $warnings->where('status', 'approved')->filter(function($warning) {
+            return $warning->canBeSentViaEmail() || $warning->isExternalViolator();
+        })->count();
     @endphp
     @if($approvedCount > 0)
         <div class="mb-6 p-4 bg-orange-50 border-l-4 border-orange-400 rounded-lg">

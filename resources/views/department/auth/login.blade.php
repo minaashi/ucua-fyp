@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
         <div class="right-panel">
             <div class="auth-card">
                 <h3 class="text-center fw-bold mb-4">Department Login</h3>
-                <form method="POST" action="{{ route('department.login') }}">
+                <form method="POST" action="{{ route('department.login.submit') }}">
                     @csrf
 
                     @if(session('error'))

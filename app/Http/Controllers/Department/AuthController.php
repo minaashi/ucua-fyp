@@ -22,7 +22,7 @@ class AuthController extends Controller
         if (Auth::guard('department')->check()) {
             return redirect()->route('department.dashboard');
         }
-        return view('department.login');
+        return view('department.auth.login');
     }
 
     public function login(Request $request)

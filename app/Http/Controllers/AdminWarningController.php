@@ -112,26 +112,27 @@ class AdminWarningController extends Controller
             return redirect()->back()->with('error', 'Warning must be approved before sending.');
         }
 
+        if ($warning->isSent()) {
+            return redirect()->back()->with('error', 'Warning letter has already been sent.');
+        }
+
         try {
-            // Get the violator for this warning
             $violator = $warning->report->getViolatorForWarning();
 
             if (!$violator) {
                 return redirect()->back()->with('error', 'No violator identified for this warning.');
             }
 
-            // Check if violator has an email address
             if (!$violator->email) {
                 return redirect()->back()->with('error', 'Violator does not have an email address. Please update their contact information.');
             }
 
-            // Prepare CC recipients (department supervisor, etc.)
             $ccRecipients = $this->getCCRecipients($violator);
 
-            // Send enhanced email with comprehensive warning details
+            // Try to send the email
             Mail::to($violator->email)->send(new WarningLetterMail($warning, $violator, $ccRecipients));
 
-            // Update warning status
+            // Update status only if email sent successfully
             $warning->update([
                 'status' => 'sent',
                 'sent_at' => now(),
@@ -140,27 +141,15 @@ class AdminWarningController extends Controller
                 'recipient_id' => $violator->id ?? null
             ]);
 
-            // Check for escalation after sending warning
+            // Escalation logic...
             $escalationService = new ViolationEscalationService();
             $escalationService->checkAndProcessEscalation($warning);
 
-            // Auto-process the queued email immediately
-            try {
-                Artisan::call('queue:work', ['--once' => true, '--timeout' => 60]);
-                $message = 'Warning letter sent and delivered successfully to violator via email.';
-            } catch (\Exception $e) {
-                $message = 'Warning letter queued successfully. Email will be delivered shortly.';
-            }
-
-            return redirect()->back()->with('success', $message);
+            return redirect()->back()->with('success', 'Warning letter sent and delivered successfully to violator via email.');
 
         } catch (\Exception $e) {
             \Log::error('Failed to send warning letter: ' . $e->getMessage());
-
-            $warning->update([
-                'email_delivery_status' => 'failed'
-            ]);
-
+            $warning->update(['email_delivery_status' => 'failed']);
             return redirect()->back()->with('error', 'Failed to send warning letter. Please try again.');
         }
     }

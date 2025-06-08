@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Department;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Remark;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -261,5 +262,39 @@ class DashboardController extends Controller
         $department->unreadNotifications->markAsRead();
 
         return redirect()->back()->with('success', 'All notifications marked as read.');
+    }
+
+    /**
+     * Lookup user information by employee ID for violator identification
+     */
+    public function lookupUser($employeeId)
+    {
+        try {
+            // Find user by worker_id (employee ID)
+            $user = User::where('worker_id', $employeeId)
+                       ->with('department')
+                       ->first();
+
+            if ($user) {
+                return response()->json([
+                    'success' => true,
+                    'user' => [
+                        'name' => $user->name,
+                        'department' => $user->department ? $user->department->name : 'Unknown Department',
+                        'employee_id' => $user->worker_id
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Employee ID not found in system'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error looking up employee information'
+            ], 500);
+        }
     }
 }

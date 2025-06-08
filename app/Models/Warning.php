@@ -115,7 +115,8 @@ class Warning extends Model
      */
     public function canBeSentViaEmail()
     {
-        if (!$this->isApproved()) {
+        // Must be approved and not already sent
+        if (!$this->isApproved() || $this->isSent()) {
             return false;
         }
 

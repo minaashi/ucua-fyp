@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
 class WarningLetterMail extends Mailable // implements ShouldQueue // Removed for immediate sending
@@ -46,9 +47,15 @@ class WarningLetterMail extends Mailable // implements ShouldQueue // Removed fo
 
         // Add CC recipients if any
         if (!empty($this->ccRecipients)) {
-            $envelope->cc = array_map(function($email) {
-                return is_array($email) ? $email['email'] : $email;
-            }, $this->ccRecipients);
+            $ccAddresses = [];
+            foreach ($this->ccRecipients as $cc) {
+                if (is_array($cc) && isset($cc['email'])) {
+                    $ccAddresses[] = new Address($cc['email'], $cc['name'] ?? '');
+                } elseif (is_string($cc)) {
+                    $ccAddresses[] = new Address($cc);
+                }
+            }
+            $envelope->cc = $ccAddresses;
         }
 
         return $envelope;

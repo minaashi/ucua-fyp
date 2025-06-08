@@ -62,6 +62,10 @@
                                        placeholder="Enter violator's employee ID"
                                        style="background-color: #fef2f2;">
                                 <p class="text-xs text-red-600 mt-1 font-medium">This person will receive warning letters</p>
+                                <p class="text-xs text-blue-600 mt-1 font-medium">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Name and department will auto-populate when you enter the Employee ID
+                                </p>
                             </div>
                             <div>
                                 <label for="violator_name" class="block text-sm font-bold text-red-700 mb-2">
@@ -72,6 +76,10 @@
                                        class="w-full rounded-md border-red-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-lg font-medium"
                                        placeholder="Enter violator's full name"
                                        style="background-color: #fef2f2;">
+                                <div id="violator_name_status" class="text-xs mt-1 hidden">
+                                    <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                                    <span class="text-green-600">Auto-populated from Employee ID</span>
+                                </div>
                             </div>
                             <div class="md:col-span-2">
                                 <label for="violator_department" class="block text-sm font-bold text-red-700 mb-2">
@@ -166,6 +174,62 @@ $(document).ready(function() {
             $('#submit-btn-text').text('Add Remark');
             $('#submit-remark-btn').removeClass('btn-danger').addClass('btn-success');
             $('#submit-remark-btn i').removeClass('fa-user-check').addClass('fa-comment');
+        }
+    });
+
+    // Auto-populate violator information when employee ID is entered
+    $('#violator_employee_id').on('input', function() {
+        var employeeId = $(this).val().trim();
+
+        if (employeeId.length >= 3) { // Start lookup after 3 characters
+            // Show loading state
+            $('#violator_name').val('Loading...').prop('disabled', true);
+            $('#violator_department').val('Loading...').prop('disabled', true);
+
+            // Make AJAX request to lookup user
+            $.ajax({
+                url: '{{ route("department.lookup-user", ":employeeId") }}'.replace(':employeeId', employeeId),
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Populate fields with user data
+                        $('#violator_name').val(response.user.name).prop('disabled', false);
+                        $('#violator_department').val(response.user.department).prop('disabled', false);
+
+                        // Add visual feedback
+                        $('#violator_name, #violator_department').addClass('border-green-500 bg-green-50');
+
+                        // Update button text if investigation toggle is checked
+                        if ($('#investigation-toggle').is(':checked')) {
+                            $('#submit-btn-text').html('<strong>⚠️ IDENTIFY ' + response.user.name.toUpperCase() + ' AS VIOLATOR</strong>');
+                        }
+                    } else {
+                        // Employee not found
+                        $('#violator_name').val('').prop('disabled', false).attr('placeholder', 'Employee ID not found - enter manually');
+                        $('#violator_department').val('').prop('disabled', false).attr('placeholder', 'Enter department manually');
+
+                        // Add visual feedback for not found
+                        $('#violator_name, #violator_department').removeClass('border-green-500 bg-green-50').addClass('border-yellow-500 bg-yellow-50');
+                    }
+                },
+                error: function() {
+                    // Error occurred
+                    $('#violator_name').val('').prop('disabled', false).attr('placeholder', 'Error loading - enter manually');
+                    $('#violator_department').val('').prop('disabled', false).attr('placeholder', 'Error loading - enter manually');
+
+                    // Add visual feedback for error
+                    $('#violator_name, #violator_department').removeClass('border-green-500 bg-green-50').addClass('border-red-500 bg-red-50');
+                }
+            });
+        } else if (employeeId.length === 0) {
+            // Clear fields when employee ID is empty
+            $('#violator_name').val('').prop('disabled', false).attr('placeholder', 'Enter violator\'s full name');
+            $('#violator_department').val('').prop('disabled', false).attr('placeholder', 'Enter violator\'s department');
+            $('#violator_name, #violator_department').removeClass('border-green-500 bg-green-50 border-yellow-500 bg-yellow-50 border-red-500 bg-red-50');
+
+            if ($('#investigation-toggle').is(':checked')) {
+                $('#submit-btn-text').text('Complete Investigation & Identify Violator');
+            }
         }
     });
 

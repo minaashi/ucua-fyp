@@ -27,7 +27,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Department Routes
-Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'department'], function () {
     // Public routes (no auth required)
     Route::get('login', [DepartmentAuthController::class, 'showLoginForm'])->name('department.login');
     Route::post('login', [DepartmentAuthController::class, 'login'])->name('department.login.submit');
@@ -49,6 +49,9 @@ Route::group(['prefix' => 'department', 'middleware' => ['web']], function () {
         Route::get('notifications', [DepartmentDashboardController::class, 'notifications'])->name('department.notifications');
         Route::post('notifications/{notification}/mark-read', [DepartmentDashboardController::class, 'markNotificationAsRead'])->name('department.notifications.mark-read');
         Route::post('notifications/mark-all-read', [DepartmentDashboardController::class, 'markAllNotificationsAsRead'])->name('department.notifications.mark-all-read');
+
+        // User lookup route for violator identification
+        Route::get('lookup-user/{employeeId}', [DepartmentDashboardController::class, 'lookupUser'])->name('department.lookup-user');
     });
 });
 

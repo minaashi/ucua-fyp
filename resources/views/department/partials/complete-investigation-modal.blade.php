@@ -69,6 +69,10 @@
                                        placeholder="Enter violator's employee ID"
                                        required>
                                 <p class="text-xs text-red-600 mt-1">This person will receive warning letters</p>
+                                <p class="text-xs text-blue-600 mt-1">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Name and department will auto-populate when you enter the Employee ID
+                                </p>
                             </div>
 
                             <div>
@@ -158,5 +162,54 @@ function completeInvestigation(reportId, reportCode, status) {
     // Show modal
     $('#completeInvestigationModal').modal('show');
 }
+
+// Auto-populate violator information when employee ID is entered
+$(document).ready(function() {
+    $('#final_violator_employee_id').on('input', function() {
+        var employeeId = $(this).val().trim();
+
+        if (employeeId.length >= 3) { // Start lookup after 3 characters
+            // Show loading state
+            $('#final_violator_name').val('Loading...').prop('disabled', true);
+            $('#final_violator_department').val('Loading...').prop('disabled', true);
+
+            // Make AJAX request to lookup user
+            $.ajax({
+                url: '{{ route("department.lookup-user", ":employeeId") }}'.replace(':employeeId', employeeId),
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Populate fields with user data
+                        $('#final_violator_name').val(response.user.name).prop('disabled', false);
+                        $('#final_violator_department').val(response.user.department).prop('disabled', false);
+
+                        // Add visual feedback
+                        $('#final_violator_name, #final_violator_department').addClass('border-green-500 bg-green-50');
+                    } else {
+                        // Employee not found
+                        $('#final_violator_name').val('').prop('disabled', false).attr('placeholder', 'Employee ID not found - enter manually');
+                        $('#final_violator_department').val('').prop('disabled', false).attr('placeholder', 'Enter department manually');
+
+                        // Add visual feedback for not found
+                        $('#final_violator_name, #final_violator_department').removeClass('border-green-500 bg-green-50').addClass('border-yellow-500 bg-yellow-50');
+                    }
+                },
+                error: function() {
+                    // Error occurred
+                    $('#final_violator_name').val('').prop('disabled', false).attr('placeholder', 'Error loading - enter manually');
+                    $('#final_violator_department').val('').prop('disabled', false).attr('placeholder', 'Error loading - enter manually');
+
+                    // Add visual feedback for error
+                    $('#final_violator_name, #final_violator_department').removeClass('border-green-500 bg-green-50').addClass('border-red-500 bg-red-50');
+                }
+            });
+        } else if (employeeId.length === 0) {
+            // Clear fields when employee ID is empty
+            $('#final_violator_name').val('').prop('disabled', false).attr('placeholder', 'Enter violator\'s full name');
+            $('#final_violator_department').val('').prop('disabled', false).attr('placeholder', 'Enter violator\'s department');
+            $('#final_violator_name, #final_violator_department').removeClass('border-green-500 bg-green-50 border-yellow-500 bg-yellow-50 border-red-500 bg-red-50');
+        }
+    });
+});
 </script>
 @endpush
