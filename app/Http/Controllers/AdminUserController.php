@@ -56,6 +56,7 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/',
             'password' => [
                 'required',
                 'string',
@@ -73,6 +74,7 @@ class AdminUserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'department_id' => $departmentId,
             'email_verified_at' => now(), // Auto-verify emails for admin-created users
@@ -123,6 +125,7 @@ class AdminUserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/',
             'password' => [
                 'nullable',
                 'string',
@@ -139,6 +142,7 @@ class AdminUserController extends Controller
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'department_id' => $departmentId,
         ];
 

@@ -55,7 +55,6 @@ class ReportController extends Controller
     {
         $validated = $request->validate([
             'employee_id' => 'required|string',
-            'phone' => 'required|string',
             'location' => 'required|string',
             'other_location' => 'nullable|string',
             'incident_date' => 'required|date',
@@ -108,7 +107,7 @@ class ReportController extends Controller
             'user_id' => Auth::id(),
             'employee_id' => $validated['employee_id'],
             'department' => Auth::user()->department->name, // Use authenticated user's department name
-            'phone' => $validated['phone'],
+            'phone' => Auth::user()->phone ?? 'Not provided', // Use authenticated user's phone number
             'category' => $validated['category_type'],
             'unsafe_condition' => $validated['unsafe_condition'],
             'other_unsafe_condition' => $validated['other_unsafe_condition'],

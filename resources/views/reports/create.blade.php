@@ -57,7 +57,7 @@
                                     <p class="font-medium mb-1">Anonymous Reporting Information:</p>
                                     <ul class="list-disc list-inside space-y-1">
                                         <li>Your name and email will be hidden from all system users</li>
-                                        <li>Employee ID, department, and phone number remain visible for investigation purposes</li>
+                                        <li>Employee ID, department, and phone number (from your profile) remain visible for investigation purposes</li>
                                         <li>The report will follow the same review and investigation process</li>
                                         <li>You can still track your report status through your dashboard</li>
                                         <li>Warning letters and resolution processes work normally</li>
@@ -92,12 +92,12 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1" for="phone">
-                                Phone Number*
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="phone_display">
+                                Phone Number
                             </label>
-                            <input type="tel" id="phone" name="phone" 
-                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   required>
+                            <input type="text" id="phone_display" class="w-full rounded-md border-gray-300 shadow-sm bg-gray-50"
+                                   value="{{ Auth::user()->phone ?? 'Not provided in profile' }}" readonly>
+                            <small class="text-gray-500 text-xs">Phone number from your profile will be used automatically</small>
                         </div>
 
                         

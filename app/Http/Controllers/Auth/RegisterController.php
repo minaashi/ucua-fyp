@@ -58,6 +58,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'worker_id' => ['required', 'string', 'unique:users'],
+            'phone' => ['required', 'string', 'regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/'],
             'department_id' => ['required', 'exists:departments,id'],
             'password' => [
                 'required',
@@ -90,6 +91,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'worker_id' => $data['worker_id'],
+            'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
             'department_id' => $data['department_id'],
             'email_verified_at' => null,

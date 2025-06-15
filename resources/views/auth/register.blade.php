@@ -90,12 +90,26 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input id="worker_id" type="text" 
-                            class="form-control @error('worker_id') is-invalid @enderror" 
-                            name="worker_id" value="{{ old('worker_id') }}" 
+                        <input id="worker_id" type="text"
+                            class="form-control @error('worker_id') is-invalid @enderror"
+                            name="worker_id" value="{{ old('worker_id') }}"
                             placeholder="Worker ID" required>
                         <label for="worker_id">Worker ID</label>
                         @error('worker_id')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input id="phone" type="tel"
+                            class="form-control @error('phone') is-invalid @enderror"
+                            name="phone" value="{{ old('phone') }}"
+                            placeholder="Phone Number" required>
+                        <label for="phone">Phone Number</label>
+                        <small class="form-text text-muted">Format: +60123456789 or 0123456789</small>
+                        @error('phone')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
