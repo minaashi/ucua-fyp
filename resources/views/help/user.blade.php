@@ -2,7 +2,7 @@
 
 @section('title', 'User Help')
 @section('page-title', 'User Help Center')
-@section('page-subtitle', 'Complete guide for port workers and regular users')
+@section('page-subtitle', 'Complete guide for port workers')
 @section('dashboard-route', route('dashboard'))
 @section('search-route', route('help.search'))
 
