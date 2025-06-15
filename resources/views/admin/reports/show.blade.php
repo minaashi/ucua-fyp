@@ -181,27 +181,38 @@
                 <h3 class="text-lg font-bold mb-4 text-gray-800">Quick Actions</h3>
                 <div class="space-y-3">
                     @if($report->status === 'pending')
-                    <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center justify-center" onclick="return confirm('Are you sure you want to accept this report?')">
-                            <i class="fas fa-check mr-2"></i>
-                            Accept Report
+                        <!-- Accept Button - Only for pending status -->
+                        <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center justify-center" onclick="return confirm('Are you sure you want to accept this report?')">
+                                <i class="fas fa-check mr-2"></i>
+                                Accept Report
+                            </button>
+                        </form>
+
+                        <!-- Reject Button - Only for pending status -->
+                        <button type="button" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center justify-center" data-toggle="modal" data-target="#rejectModal">
+                            <i class="fas fa-times mr-2"></i>
+                            Reject Report
                         </button>
-                    </form>
                     @endif
-                    
-                    @if($report->status !== 'resolved')
-                    <button type="button" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center" data-toggle="modal" data-target="#updateStatusModal">
-                        <i class="fas fa-edit mr-2"></i>
-                        Update Status
-                    </button>
+
+                    @if(in_array($report->status, ['pending', 'review', 'in_progress']))
+                        <!-- Update Status Button - Available for non-resolved/non-rejected reports -->
+                        <button type="button" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center" data-toggle="modal" data-target="#updateStatusModal">
+                            <i class="fas fa-edit mr-2"></i>
+                            Update Status
+                        </button>
                     @endif
-                    
-                    @if($report->status !== 'rejected')
-                    <button type="button" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center justify-center" data-toggle="modal" data-target="#rejectModal">
-                        <i class="fas fa-times mr-2"></i>
-                        Reject Report
-                    </button>
+
+
+
+                    @if($report->status === 'rejected')
+                        <!-- Status Info - For rejected reports -->
+                        <div class="w-full bg-red-100 text-red-800 px-4 py-2 rounded flex items-center justify-center">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            Report Rejected
+                        </div>
                     @endif
                 </div>
             </div>
@@ -438,12 +449,13 @@
         </div>
     </div>
 
-    <!-- Reject Modal -->
+    @if($report->status === 'pending')
+    <!-- Reject Modal - Only for pending reports -->
     <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="rejectModalLabel">Reject Report</h5>
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Report {{ $report->display_id }}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -453,7 +465,11 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="remarks" class="form-label">Rejection Reason</label>
-                            <textarea class="form-control" id="remarks" name="remarks" rows="4" required placeholder="Please provide a reason for rejecting this report..."></textarea>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="4" required placeholder="Please provide a detailed reason for rejecting this report..."></textarea>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>Warning:</strong> Rejecting this report will prevent further processing. This action should only be taken for invalid or duplicate reports.
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -464,5 +480,6 @@
             </div>
         </div>
     </div>
+    @endif
 
 @endsection

@@ -207,7 +207,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex flex-wrap gap-2">
-                                            <!-- Review Button -->
+                                            <!-- Review Button - Always Available -->
                                             <a href="{{ route('department.report.show', $report->id) }}"
                                                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
                                                title="Review Report Details">
@@ -215,22 +215,42 @@
                                                 Review
                                             </a>
 
-                                            <!-- Remark Button -->
-                                            <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
-                                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
-                                                    title="Add Department Remark">
-                                                <i class="fas fa-comment mr-1"></i>
-                                                Remark
-                                            </button>
+                                            @if(in_array($report->status, ['pending', 'in_progress', 'review']))
+                                                <!-- Remark Button - Available for pending, in_progress, and review status -->
+                                                <button onclick="addRemarks({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
+                                                        class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hover:bg-green-200 transition-colors duration-200"
+                                                        title="Add Department Remark">
+                                                    <i class="fas fa-comment mr-1"></i>
+                                                    Remark
+                                                </button>
+                                            @endif
 
-                                            <!-- Mark as Resolved Button (only for non-resolved reports) -->
-                                            @if($report->status !== 'resolved')
-                                            <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
-                                                    class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
-                                                    title="Mark as Resolved">
-                                                <i class="fas fa-check mr-1"></i>
-                                                Resolve
-                                            </button>
+                                            @if($report->status === 'review')
+                                                <!-- Accept Button - Only for review status -->
+                                                <button onclick="acceptReport({{ $report->id }}, '{{ $report->display_id }}')"
+                                                        class="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full hover:bg-emerald-200 transition-colors duration-200"
+                                                        title="Accept Report">
+                                                    <i class="fas fa-thumbs-up mr-1"></i>
+                                                    Accept
+                                                </button>
+
+                                                <!-- Reject Button - Only for review status -->
+                                                <button onclick="rejectReport({{ $report->id }}, '{{ $report->display_id }}')"
+                                                        class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full hover:bg-red-200 transition-colors duration-200"
+                                                        title="Reject Report">
+                                                    <i class="fas fa-thumbs-down mr-1"></i>
+                                                    Reject
+                                                </button>
+                                            @endif
+
+                                            @if(in_array($report->status, ['pending', 'in_progress']))
+                                                <!-- Resolve Button - Only for pending and in_progress status -->
+                                                <button onclick="markAsResolved({{ $report->id }}, '{{ $report->status }}', '{{ $report->display_id }}')"
+                                                        class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-200 transition-colors duration-200"
+                                                        title="Mark as Resolved">
+                                                    <i class="fas fa-check mr-1"></i>
+                                                    Resolve
+                                                </button>
                                             @endif
                                         </div>
                                     </td>
@@ -303,6 +323,68 @@ function markAsRead(notificationId) {
             alert('Failed to mark notification as read');
         }
     });
+}
+
+// Accept Report Function
+function acceptReport(reportId, reportCode) {
+    if (confirm(`Are you sure you want to accept report ${reportCode}? This will change its status to "In Progress".`)) {
+        // Show loading state
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Accepting...';
+        button.disabled = true;
+
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/department/reports/${reportId}/accept`;
+
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Reject Report Function
+function rejectReport(reportId, reportCode) {
+    const reason = prompt(`Please provide a reason for rejecting report ${reportCode}:`);
+    if (reason && reason.trim() !== '') {
+        // Show loading state
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Rejecting...';
+        button.disabled = true;
+
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/department/reports/${reportId}/reject`;
+
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+
+        // Add rejection reason
+        const reasonInput = document.createElement('input');
+        reasonInput.type = 'hidden';
+        reasonInput.name = 'rejection_reason';
+        reasonInput.value = reason;
+        form.appendChild(reasonInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    } else if (reason !== null) {
+        alert('Please provide a reason for rejection.');
+    }
 }
 </script>
 @endpush

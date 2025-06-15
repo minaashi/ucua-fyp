@@ -352,6 +352,17 @@ class HelpController extends Controller
                         ]
                     ],
                     [
+                        'title' => 'Dynamic Actions Based on Report Status',
+                        'content' => 'Understanding which actions are available based on the current status of each report.',
+                        'steps' => [
+                            'PENDING/IN PROGRESS Reports: Review, Remark, and Resolve actions available',
+                            'REVIEW Status Reports: Review, Remark, Accept, and Reject actions available',
+                            'RESOLVED Reports: Only Review action available (plus Export for documentation)',
+                            'REJECTED Reports: Only Review action available for viewing details',
+                            'Actions automatically adjust based on report workflow status'
+                        ]
+                    ],
+                    [
                         'title' => 'Understanding Report Types',
                         'content' => 'Learn the difference between unsafe acts and unsafe conditions.',
                         'steps' => [

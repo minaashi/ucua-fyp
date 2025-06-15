@@ -93,55 +93,72 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $report->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex space-x-2">
+                                    <!-- Review Button - Always Available -->
                                     <a href="{{ route('admin.reports.show', $report->id) }}" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 inline-flex items-center" title="Review Report">
                                         <i class="fas fa-eye mr-1"></i>
                                         Review
                                     </a>
-                                    <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onclick="return confirm('Are you sure you want to accept this report?')">
-                                            Accept
+
+                                    @if($report->status === 'pending')
+                                        <!-- Accept Button - Only for pending status -->
+                                        <form action="{{ route('admin.reports.accept', $report->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" onclick="return confirm('Are you sure you want to accept this report?')" title="Accept Report">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Accept
+                                            </button>
+                                        </form>
+
+                                        <!-- Reject Button - Only for pending status -->
+                                        <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" data-toggle="modal" data-target="#rejectReportModal{{ $report->id }}" title="Reject Report">
+                                            <i class="fas fa-times mr-1"></i>
+                                            Reject
                                         </button>
-                                    </form>
-                                    <button type="button" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" data-toggle="modal" data-target="#rejectReportModal{{ $report->id }}">
-                                        Reject
-                                    </button>
-                                    <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onclick="return confirm('Are you sure you want to delete this report?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @endif
+
+                                    @if(in_array($report->status, ['pending', 'review', 'in_progress']))
+                                        <!-- Delete Button - Available for non-resolved reports -->
+                                        <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600" onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+
+
                                 </div>
                             </td>
                         </tr>
                         <!-- Modals for view and update status can be refactored similarly if needed -->
 
-                        <!-- Reject Report Modal -->
-                        <div class="modal fade" id="rejectReportModal{{ $report->id }}" tabindex="-1" aria-labelledby="rejectReportModalLabel{{ $report->id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="rejectReportModalLabel{{ $report->id }}">Reject Report {{ $report->display_id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <form action="{{ route('admin.reports.reject', $report->id) }}" method="POST">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="remarks{{ $report->id }}" class="form-label">Remarks</label>
-                                                <textarea class="form-control" id="remarks{{ $report->id }}" name="remarks" rows="4" required></textarea>
+                        @if($report->status === 'pending')
+                            <!-- Reject Report Modal - Only for pending reports -->
+                            <div class="modal fade" id="rejectReportModal{{ $report->id }}" tabindex="-1" aria-labelledby="rejectReportModalLabel{{ $report->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="rejectReportModalLabel{{ $report->id }}">Reject Report {{ $report->display_id }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ route('admin.reports.reject', $report->id) }}" method="POST">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="remarks{{ $report->id }}" class="form-label">Rejection Reason</label>
+                                                    <textarea class="form-control" id="remarks{{ $report->id }}" name="remarks" rows="4" placeholder="Please provide a reason for rejecting this report..." required></textarea>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-danger">Reject Report</button>
-                                        </div>
-                                    </form>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger">Reject Report</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @empty
                         <tr>
                             <td colspan="6" class="text-center py-4 text-gray-500">No reports found</td>

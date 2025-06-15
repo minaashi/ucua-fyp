@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
         $totalReports = Report::where('handling_department_id', $department->id)->count();
         $pendingReports = Report::where('handling_department_id', $department->id)
-            ->whereIn('status', ['pending', 'in_progress'])
+            ->whereIn('status', ['pending', 'in_progress', 'review'])
             ->count();
         $resolvedReports = Report::where('handling_department_id', $department->id)
             ->where('status', 'resolved')
@@ -58,9 +58,9 @@ class DashboardController extends Controller
     {
         $department = Auth::guard('department')->user();
 
-        // Include both 'pending' and 'in_progress' status for active reports
+        // Include 'pending', 'in_progress', and 'review' status for active reports
         $reports = Report::where('handling_department_id', $department->id)
-            ->whereIn('status', ['pending', 'in_progress'])
+            ->whereIn('status', ['pending', 'in_progress', 'review'])
             ->latest()
             ->paginate(10);
 
@@ -143,6 +143,69 @@ class DashboardController extends Controller
 
         return redirect()->route('department.dashboard')
             ->with('success', 'Report has been resolved successfully.');
+    }
+
+    public function acceptReport(Request $request, Report $report)
+    {
+        $department = Auth::guard('department')->user();
+
+        // Check if report belongs to this department
+        if ($report->handling_department_id !== $department->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if report is in review status
+        if ($report->status !== 'review') {
+            return redirect()->back()
+                ->with('error', 'Report can only be accepted when it is in review status.');
+        }
+
+        $report->update([
+            'status' => 'in_progress'
+        ]);
+
+        // Log the status change
+        $report->updateStatus(
+            'in_progress',
+            'Report accepted by department'
+        );
+
+        return redirect()->back()
+            ->with('success', 'Report has been accepted and is now in progress.');
+    }
+
+    public function rejectReport(Request $request, Report $report)
+    {
+        $department = Auth::guard('department')->user();
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        // Check if report belongs to this department
+        if ($report->handling_department_id !== $department->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if report is in review status
+        if ($report->status !== 'review') {
+            return redirect()->back()
+                ->with('error', 'Report can only be rejected when it is in review status.');
+        }
+
+        $report->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason
+        ]);
+
+        // Log the status change
+        $report->updateStatus(
+            'rejected',
+            'Report rejected by department: ' . $request->rejection_reason
+        );
+
+        return redirect()->back()
+            ->with('success', 'Report has been rejected.');
     }
 
     public function addRemarks(Request $request)

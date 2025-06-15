@@ -44,6 +44,8 @@ Route::group(['prefix' => 'department'], function () {
         Route::post('resolve-report', [DepartmentDashboardController::class, 'resolveReport'])->name('department.resolve-report');
         Route::post('add-remarks', [DepartmentDashboardController::class, 'addRemarks'])->name('department.add-remarks');
         Route::post('reports/{report}/export', [DepartmentDashboardController::class, 'exportReport'])->name('department.report.export');
+        Route::post('reports/{report}/accept', [DepartmentDashboardController::class, 'acceptReport'])->name('department.report.accept');
+        Route::post('reports/{report}/reject', [DepartmentDashboardController::class, 'rejectReport'])->name('department.report.reject');
 
         // Notification routes
         Route::get('notifications', [DepartmentDashboardController::class, 'notifications'])->name('department.notifications');

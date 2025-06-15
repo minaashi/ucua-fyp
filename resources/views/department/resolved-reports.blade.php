@@ -106,7 +106,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex flex-wrap gap-2">
-                                            <!-- Review Button -->
+                                            <!-- Review Button - Primary action for resolved reports -->
                                             <a href="{{ route('department.report.show', $report->id) }}"
                                                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors duration-200"
                                                title="Review Report Details">
@@ -114,7 +114,7 @@
                                                 Review
                                             </a>
 
-                                            <!-- Export Button -->
+                                            <!-- Export Button - Secondary action for resolved reports -->
                                             <button onclick="exportReport({{ $report->id }}, '{{ $report->display_id }}')"
                                                     class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors duration-200"
                                                     title="Export Report">

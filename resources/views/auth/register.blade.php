@@ -91,26 +91,18 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <div class="input-group">
-                            <div class="form-floating">
-                                <input id="worker_id" type="text"
-                                    class="form-control @error('worker_id') is-invalid @enderror"
-                                    name="worker_id" value="{{ old('worker_id') }}"
-                                    placeholder="Worker ID" required>
-                                <label for="worker_id">Worker ID</label>
-                            </div>
-                            <button type="button" id="suggest-worker-id" class="btn btn-outline-secondary"
-                                    onclick="suggestWorkerId()" disabled title="Generate next available Worker ID">
-                                <i class="fas fa-magic"></i> Suggest
-                            </button>
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input id="worker_id" type="text"
+                            class="form-control @error('worker_id') is-invalid @enderror"
+                            name="worker_id" value="{{ old('worker_id') }}"
+                            placeholder="Worker ID" required>
+                        <label for="worker_id">Worker ID</label>
                         <div id="worker-id-help" class="form-text text-muted mt-1" style="display: none;">
                             <i class="fas fa-info-circle"></i>
                             <span id="worker-id-format">Select a department to see the expected format</span>
                         </div>
                         @error('worker_id')
-                            <span class="invalid-feedback d-block" role="alert">
+                            <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
                         @enderror
@@ -407,12 +399,11 @@
         console.log('All password enhancement JavaScript initialized');
     });
 
-    // Worker ID suggestion functions
+    // Worker ID format helper function
     function updateWorkerIdSuggestion() {
         const departmentSelect = document.getElementById('department');
         const workerIdHelp = document.getElementById('worker-id-help');
         const workerIdFormat = document.getElementById('worker-id-format');
-        const suggestButton = document.getElementById('suggest-worker-id');
 
         if (departmentSelect.value) {
             const selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
@@ -420,48 +411,9 @@
 
             workerIdFormat.textContent = `Expected format: ${prefix}XXX (e.g., ${prefix}001, ${prefix}002)`;
             workerIdHelp.style.display = 'block';
-            suggestButton.disabled = false;
         } else {
             workerIdHelp.style.display = 'none';
-            suggestButton.disabled = true;
         }
-    }
-
-    function suggestWorkerId() {
-        const departmentSelect = document.getElementById('department');
-        const workerIdInput = document.getElementById('worker_id');
-
-        if (!departmentSelect.value) {
-            alert('Please select a department first.');
-            return;
-        }
-
-        // Show loading state
-        const suggestButton = document.getElementById('suggest-worker-id');
-        const originalText = suggestButton.innerHTML;
-        suggestButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-        suggestButton.disabled = true;
-
-        // Fetch next worker ID from API
-        fetch(`{{ route('api.next-worker-id') }}?department_id=${departmentSelect.value}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.worker_id) {
-                    workerIdInput.value = data.worker_id;
-                    workerIdInput.focus();
-                } else {
-                    alert('Error generating worker ID: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error connecting to server. Please try again.');
-            })
-            .finally(() => {
-                // Restore button state
-                suggestButton.innerHTML = originalText;
-                suggestButton.disabled = false;
-            });
     }
 
     // Initialize on page load

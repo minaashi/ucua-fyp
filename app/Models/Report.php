@@ -42,7 +42,8 @@ class Report extends Model
         'attachment',
         'resolution_notes',
         'resolved_at',
-        'formatted_id'
+        'formatted_id',
+        'rejection_reason'
     ];
 
     protected $casts = [

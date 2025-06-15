@@ -124,6 +124,152 @@
         </div>
     @endforeach
 
+    <!-- Dynamic Actions Guide -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-cogs text-purple-600 mr-3"></i>
+            Dynamic Actions Guide
+        </h3>
+
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+            <h4 class="font-semibold text-purple-800 mb-3">📋 Smart Action System</h4>
+            <p class="text-purple-700">
+                The system automatically shows relevant actions based on each report's current status.
+                This ensures you only see actions that are appropriate for the report's workflow stage.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Pending/In Progress Reports -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h4 class="font-semibold text-yellow-800 mb-3 flex items-center">
+                    <i class="fas fa-clock text-yellow-600 mr-2"></i>
+                    Pending & In Progress Reports
+                </h4>
+                <div class="space-y-2 text-yellow-700">
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-eye mr-1"></i>Review
+                        </span>
+                        <span class="text-sm">View full report details</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-comment mr-1"></i>Remark
+                        </span>
+                        <span class="text-sm">Add department comments</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-check mr-1"></i>Resolve
+                        </span>
+                        <span class="text-sm">Mark as completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Status Reports -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-semibold text-blue-800 mb-3 flex items-center">
+                    <i class="fas fa-search text-blue-600 mr-2"></i>
+                    Review Status Reports
+                </h4>
+                <div class="space-y-2 text-blue-700">
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-eye mr-1"></i>Review
+                        </span>
+                        <span class="text-sm">View report details</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-comment mr-1"></i>Remark
+                        </span>
+                        <span class="text-sm">Add department feedback</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-thumbs-up mr-1"></i>Accept
+                        </span>
+                        <span class="text-sm">Accept the report</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-thumbs-down mr-1"></i>Reject
+                        </span>
+                        <span class="text-sm">Reject the report</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resolved Reports -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 mb-3 flex items-center">
+                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                    Resolved Reports
+                </h4>
+                <div class="space-y-2 text-green-700">
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-eye mr-1"></i>Review
+                        </span>
+                        <span class="text-sm">View completed report</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-download mr-1"></i>Export
+                        </span>
+                        <span class="text-sm">Download report documentation</span>
+                    </div>
+                    <p class="text-sm text-green-600 mt-2 italic">
+                        ✓ No further actions needed - report is complete
+                    </p>
+                </div>
+            </div>
+
+            <!-- Rejected Reports -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h4 class="font-semibold text-red-800 mb-3 flex items-center">
+                    <i class="fas fa-times-circle text-red-600 mr-2"></i>
+                    Rejected Reports
+                </h4>
+                <div class="space-y-2 text-red-700">
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full mr-2">
+                            <i class="fas fa-eye mr-1"></i>Review
+                        </span>
+                        <span class="text-sm">View rejection details</span>
+                    </div>
+                    <p class="text-sm text-red-600 mt-2 italic">
+                        ⚠️ Report has been rejected - review for understanding
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-6">
+            <h4 class="font-semibold text-gray-800 mb-3">💡 Pro Tips</h4>
+            <ul class="space-y-2 text-gray-700 text-sm">
+                <li class="flex items-start">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-1"></i>
+                    <span>Actions automatically update when report status changes</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-1"></i>
+                    <span>Review action is always available to view report details</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-1"></i>
+                    <span>Use Accept/Reject actions carefully for review status reports</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2 mt-1"></i>
+                    <span>Export function helps maintain documentation records</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <!-- Response Guidelines -->
     <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
         <h3 class="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -340,6 +486,51 @@
                             <li>Toggle the "Investigation Update" checkbox in the remarks section</li>
                             <li>Violator identification fields will appear below the toggle</li>
                             <li>If still not visible, refresh the page and try again</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                        onclick="toggleAccordion('dept-faq6')">
+                    <div class="flex justify-between items-center">
+                        <span>Why don't I see Accept/Reject buttons for some reports?</span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="dept-faq6-icon"></i>
+                    </div>
+                </button>
+                <div id="dept-faq6" class="hidden px-4 pb-3">
+                    <div class="text-gray-700 space-y-2">
+                        <p><strong>Explanation:</strong></p>
+                        <p>Actions are dynamically displayed based on report status:</p>
+                        <ul class="list-disc list-inside space-y-1 ml-4">
+                            <li><strong>Accept/Reject buttons:</strong> Only appear for reports with "Review" status</li>
+                            <li><strong>Resolve button:</strong> Only appears for "Pending" and "In Progress" reports</li>
+                            <li><strong>Remark button:</strong> Available for "Pending", "In Progress", and "Review" status</li>
+                            <li><strong>Review button:</strong> Always available to view report details</li>
+                            <li>This ensures you only see relevant actions for each report's workflow stage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg">
+                <button class="w-full px-4 py-3 text-left font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                        onclick="toggleAccordion('dept-faq7')">
+                    <div class="flex justify-between items-center">
+                        <span>What happens when I accept or reject a report?</span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="dept-faq7-icon"></i>
+                    </div>
+                </button>
+                <div id="dept-faq7" class="hidden px-4 pb-3">
+                    <div class="text-gray-700 space-y-2">
+                        <p><strong>Action Results:</strong></p>
+                        <ul class="list-disc list-inside space-y-1 ml-4">
+                            <li><strong>Accept:</strong> Changes report status to "In Progress" - you can then add remarks and eventually resolve it</li>
+                            <li><strong>Reject:</strong> Changes report status to "Rejected" - only Review action will be available afterward</li>
+                            <li><strong>Important:</strong> These actions are permanent and will notify relevant parties</li>
+                            <li>Always review the report thoroughly before accepting or rejecting</li>
+                            <li>Add appropriate remarks to explain your decision</li>
                         </ul>
                     </div>
                 </div>
