@@ -22,6 +22,7 @@ class Department extends Authenticatable
         'is_active',
         'otp',
         'otp_expires_at',
+        'worker_id_identifier',
     ];
 
     protected $hidden = [
@@ -41,4 +42,48 @@ class Department extends Authenticatable
     {
         return $this->hasMany(User::class, 'department_id');
     }
-} 
+
+    /**
+     * Generate the next worker ID for this department
+     */
+    public function generateNextWorkerId(): string
+    {
+        if (empty($this->worker_id_identifier)) {
+            // Fallback to generic PW prefix if no identifier is set
+            $prefix = 'PW';
+        } else {
+            $prefix = $this->worker_id_identifier;
+        }
+
+        // Find the highest existing worker ID for this department
+        $lastUser = User::where('department_id', $this->id)
+            ->where('worker_id', 'LIKE', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(worker_id, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+            ->first();
+
+        if ($lastUser && preg_match('/(\d+)$/', $lastUser->worker_id, $matches)) {
+            $nextNumber = intval($matches[1]) + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the worker ID prefix for this department
+     */
+    public function getWorkerIdPrefix(): string
+    {
+        return $this->worker_id_identifier ?? 'PW';
+    }
+
+    /**
+     * Check if a worker ID belongs to this department
+     */
+    public function ownsWorkerId(string $workerId): bool
+    {
+        $prefix = $this->getWorkerIdPrefix();
+        return str_starts_with($workerId, $prefix);
+    }
+}

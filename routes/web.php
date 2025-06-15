@@ -211,6 +211,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/otp/verify', [OtpVerificationController::class, 'showOtpForm'])->name('otp.form');
     Route::post('/otp/verify', [OtpVerificationController::class, 'verifyOtp'])->name('otp.verify');
     Route::post('/otp/resend', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+
+    // Worker ID generation API
+    Route::get('/api/next-worker-id', [RegisterController::class, 'getNextWorkerId'])->name('api.next-worker-id');
 });
 
 // Help System Routes

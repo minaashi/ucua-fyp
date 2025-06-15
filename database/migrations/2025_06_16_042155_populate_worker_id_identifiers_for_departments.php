@@ -12,10 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('departments', function (Blueprint $table) {
-            $table->string('worker_id_identifier')->nullable()->after('name');
-        });
-
         // Populate worker_id_identifier for existing departments
         $this->populateWorkerIdIdentifiers();
     }
@@ -26,24 +22,43 @@ return new class extends Migration
     private function populateWorkerIdIdentifiers(): void
     {
         $departmentMappings = [
+            // Exact matches first
             'UCUA Department' => 'UCUA',
             'Port Security Department (PSD)' => 'PSD',
-            'PSD' => 'PSD',
             'Operations Department' => 'OPS',
-            'Operations' => 'OPS',
             'Maintenance Department' => 'MNT',
-            'Maintenance' => 'MNT',
             'Safety Department' => 'SAF',
-            'Safety' => 'SAF',
             'Security Department' => 'SEC',
+
+            // Partial matches for variations
+            'PSD' => 'PSD',
+            'Operations' => 'OPS',
+            'Maintenance' => 'MNT',
+            'Safety' => 'SAF',
             'Security' => 'SEC',
+            'SS Department' => 'SS',
         ];
 
         foreach ($departmentMappings as $departmentName => $identifier) {
-            DB::table('departments')
-                ->where('name', 'LIKE', "%{$departmentName}%")
+            // Try exact match first
+            $updated = DB::table('departments')
+                ->where('name', $departmentName)
                 ->whereNull('worker_id_identifier')
                 ->update(['worker_id_identifier' => $identifier]);
+
+            // If no exact match, try partial match
+            if ($updated === 0) {
+                DB::table('departments')
+                    ->where('name', 'LIKE', "%{$departmentName}%")
+                    ->whereNull('worker_id_identifier')
+                    ->update(['worker_id_identifier' => $identifier]);
+            }
+        }
+
+        // Log the results
+        $departments = DB::table('departments')->select('id', 'name', 'worker_id_identifier')->get();
+        foreach ($departments as $dept) {
+            echo "Department ID {$dept->id}: {$dept->name} -> {$dept->worker_id_identifier}\n";
         }
     }
 
@@ -52,8 +67,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('departments', function (Blueprint $table) {
-            $table->dropColumn('worker_id_identifier');
-        });
+        // Reset worker_id_identifier to null
+        DB::table('departments')->update(['worker_id_identifier' => null]);
     }
 };

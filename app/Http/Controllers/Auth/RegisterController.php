@@ -57,7 +57,16 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'worker_id' => ['required', 'string', 'unique:users'],
+            'worker_id' => ['required', 'string', 'unique:users', function ($attribute, $value, $fail) use ($data) {
+                // Validate that worker_id matches the department's prefix
+                if (isset($data['department_id'])) {
+                    $department = \App\Models\Department::find($data['department_id']);
+                    if ($department && !$department->ownsWorkerId($value)) {
+                        $expectedPrefix = $department->getWorkerIdPrefix();
+                        $fail("The worker ID must start with {$expectedPrefix} for the selected department.");
+                    }
+                }
+            }],
             'phone' => ['required', 'string', 'regex:/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/'],
             'department_id' => ['required', 'exists:departments,id'],
             'password' => [
@@ -194,5 +203,31 @@ class RegisterController extends Controller
         Mail::to($user->email)->send(new OtpMail($otp, $user->name));
 
         return back()->with('status', 'A new OTP has been sent to your email address.');
+    }
+
+    /**
+     * Get the next available worker ID for a department
+     */
+    public function getNextWorkerId(Request $request)
+    {
+        $departmentId = $request->get('department_id');
+
+        if (!$departmentId) {
+            return response()->json(['error' => 'Department ID is required'], 400);
+        }
+
+        $department = \App\Models\Department::find($departmentId);
+
+        if (!$department) {
+            return response()->json(['error' => 'Department not found'], 404);
+        }
+
+        $nextWorkerId = $department->generateNextWorkerId();
+
+        return response()->json([
+            'worker_id' => $nextWorkerId,
+            'prefix' => $department->getWorkerIdPrefix(),
+            'department_name' => $department->name
+        ]);
     }
 }
