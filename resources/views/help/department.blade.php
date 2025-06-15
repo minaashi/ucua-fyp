@@ -74,18 +74,17 @@
                             <h4 class="font-semibold text-red-800 mb-2">🚨 Unsafe Acts (Requires Violator ID)</h4>
                             <ul class="text-sm text-red-700 space-y-1">
                                 <li>• Not wearing required PPE</li>
-                                <li>• Improper lifting techniques</li>
-                                <li>• Ignoring safety procedures</li>
-                                <li>• Running in workplace areas</li>
+                                <li>• Speeding in workplace areas</li>
+                                <li>• Smoking in prohibited areas</li>
                             </ul>
                         </div>
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                             <h4 class="font-semibold text-blue-800 mb-2">⚠️ Unsafe Conditions (Fix the Issue)</h4>
                             <ul class="text-sm text-blue-700 space-y-1">
                                 <li>• Slippery surfaces</li>
-                                <li>• Poor lighting conditions</li>
+                                <li>• Exposed live wires</li>
                                 <li>• Damaged equipment</li>
-                                <li>• Blocked emergency exits</li>
+                                <li>• Gas Leaks</li>
                             </ul>
                         </div>
                     </div>
