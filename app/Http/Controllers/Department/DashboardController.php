@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -64,7 +65,10 @@ class DashboardController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('department.pending-reports', compact('reports', 'department'));
+        // Get unread notifications count for sidebar
+        $unreadNotificationsCount = $department->unreadNotifications()->count();
+
+        return view('department.pending-reports', compact('reports', 'department', 'unreadNotificationsCount'));
     }
 
     public function resolvedReports()
@@ -76,7 +80,10 @@ class DashboardController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('department.resolved-reports', compact('reports', 'department'));
+        // Get unread notifications count for sidebar
+        $unreadNotificationsCount = $department->unreadNotifications()->count();
+
+        return view('department.resolved-reports', compact('reports', 'department', 'unreadNotificationsCount'));
     }
 
     public function showReport(Report $report)
@@ -128,7 +135,15 @@ class DashboardController extends Controller
             'resolution_date' => 'required|date|before_or_equal:today',
         ]);
 
+        // Additional validation to ensure resolution date is not before report creation
         $report = Report::findOrFail($request->report_id);
+        $resolutionDate = Carbon::parse($request->resolution_date);
+
+        if ($resolutionDate->lt($report->created_at->startOfDay())) {
+            return redirect()->back()
+                ->withErrors(['resolution_date' => 'Resolution date cannot be earlier than the report creation date (' . $report->created_at->format('d/m/Y') . ').'])
+                ->withInput();
+        }
 
         // Check if report belongs to this department
         if ($report->handling_department_id !== $department->id) {

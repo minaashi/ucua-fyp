@@ -21,7 +21,7 @@ class AdminWarningController extends Controller
 
     public function index(Request $request)
     {
-        $query = Warning::with(['report', 'suggestedBy', 'approvedBy', 'recipient']);
+        $query = Warning::with(['report.user', 'suggestedBy', 'approvedBy', 'recipient']);
 
         // Apply filters
         if ($request->filled('status')) {
@@ -43,13 +43,24 @@ class AdminWarningController extends Controller
             });
         }
 
+        // Check if grouping by report is requested
+        $groupByReport = $request->get('group_by_report', false);
+
         $warnings = $query->latest()->paginate(10)->appends($request->query());
 
+        // Get warning statistics with report grouping info
         $totalWarnings = Warning::count();
         $pendingWarnings = Warning::where('status', 'pending')->count();
         $approvedWarnings = Warning::where('status', 'approved')->count();
         $sentWarnings = Warning::where('status', 'sent')->count();
         $rejectedWarnings = Warning::where('status', 'rejected')->count();
+
+        // Get reports with multiple warnings for better display
+        $reportsWithMultipleWarnings = Warning::select('report_id')
+            ->groupBy('report_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('report_id')
+            ->toArray();
 
         return view('admin.warnings', compact(
             'warnings',
@@ -57,7 +68,9 @@ class AdminWarningController extends Controller
             'pendingWarnings',
             'approvedWarnings',
             'sentWarnings',
-            'rejectedWarnings'
+            'rejectedWarnings',
+            'groupByReport',
+            'reportsWithMultipleWarnings'
         ));
     }
 

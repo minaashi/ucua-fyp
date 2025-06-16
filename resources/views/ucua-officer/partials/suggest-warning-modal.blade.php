@@ -25,6 +25,16 @@
                         <p class="mb-0"><strong>Current Status:</strong> <span id="warningDisplayReportStatus"></span></p>
                     </div>
 
+                    <!-- Existing Warnings Display (will be populated by JavaScript) -->
+                    <div id="existingWarningsAlert" class="alert alert-info mb-4" style="display: none;">
+                        <h6 class="mb-2"><i class="fas fa-layer-group mr-2"></i>Existing Warning Suggestions</h6>
+                        <div id="existingWarningsList"></div>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-lightbulb mr-1"></i>
+                            Consider escalating to a higher warning level if the violation is repeated or more serious.
+                        </small>
+                    </div>
+
                     <div class="form-group">
                         <label for="warning_type" class="font-weight-bold">Warning Type <span class="text-danger">*</span></label>
                         <select name="warning_type" id="warning_type" class="form-control" required>

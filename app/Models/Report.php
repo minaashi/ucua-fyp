@@ -322,6 +322,30 @@ class Report extends Model
     }
 
     /**
+     * Check if this report has multiple warnings
+     */
+    public function hasMultipleWarnings()
+    {
+        return $this->warnings()->count() > 1;
+    }
+
+    /**
+     * Get warning count for this report
+     */
+    public function getWarningCount()
+    {
+        return $this->warnings()->count();
+    }
+
+    /**
+     * Get warnings grouped by type for this report
+     */
+    public function getWarningsByType()
+    {
+        return $this->warnings()->get()->groupBy('type');
+    }
+
+    /**
      * Get violator display name
      */
     public function getViolatorDisplayName()

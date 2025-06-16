@@ -171,6 +171,25 @@ class UCUADashboardController extends Controller
                 return redirect()->back()->with('error', 'Warning letters are only available for internal employees. External violators should be handled through alternative disciplinary procedures.');
             }
 
+            // Check for existing warning of the same type for this report and violator
+            $existingWarning = Warning::where('report_id', $report->id)
+                ->where('type', $request->warning_type)
+                ->where(function($query) use ($violator) {
+                    if ($violator->id) {
+                        $query->where('recipient_id', $violator->id);
+                    } else {
+                        // For external violators, check by violator employee ID in the report
+                        $query->whereHas('report', function($q) use ($violator) {
+                            $q->where('violator_employee_id', $violator->worker_id ?? $violator->employee_id);
+                        });
+                    }
+                })
+                ->first();
+
+            if ($existingWarning) {
+                return redirect()->back()->with('error', 'A ' . $request->warning_type . ' warning has already been suggested for this violator on this report. Please check existing warnings or suggest a different warning level if escalation is needed.');
+            }
+
             $report->warnings()->create([
                 'type' => $request->warning_type,
                 'reason' => $request->warning_reason,
@@ -287,14 +306,34 @@ class UCUADashboardController extends Controller
 
     public function warningsPage()
     {
-        $warnings = Warning::with(['report', 'suggestedBy'])
+        $warnings = Warning::with(['report.user', 'suggestedBy'])
+            ->where('suggested_by', Auth::id()) // Only show warnings suggested by current UCUA officer
             ->latest()
             ->paginate(10);
 
-        $totalWarnings = Warning::count();
-        $pendingWarnings = Warning::where('status', 'pending')->count();
+        $totalWarnings = Warning::where('suggested_by', Auth::id())->count();
+        $pendingWarnings = Warning::where('suggested_by', Auth::id())->where('status', 'pending')->count();
+        $approvedWarnings = Warning::where('suggested_by', Auth::id())->where('status', 'approved')->count();
+        $sentWarnings = Warning::where('suggested_by', Auth::id())->where('status', 'sent')->count();
+        $rejectedWarnings = Warning::where('suggested_by', Auth::id())->where('status', 'rejected')->count();
 
-        return view('ucua-officer.warnings', compact('warnings', 'totalWarnings', 'pendingWarnings'));
+        // Get reports with multiple warnings for better display
+        $reportsWithMultipleWarnings = Warning::where('suggested_by', Auth::id())
+            ->select('report_id')
+            ->groupBy('report_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('report_id')
+            ->toArray();
+
+        return view('ucua-officer.warnings', compact(
+            'warnings',
+            'totalWarnings',
+            'pendingWarnings',
+            'approvedWarnings',
+            'sentWarnings',
+            'rejectedWarnings',
+            'reportsWithMultipleWarnings'
+        ));
     }
 
     public function remindersPage()
@@ -455,6 +494,42 @@ class UCUADashboardController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             // Don't throw exception to avoid breaking the reminder creation
+        }
+    }
+
+    /**
+     * Get existing warnings for a report (for modal display)
+     */
+    public function getExistingWarnings(Report $report)
+    {
+        try {
+            // Get warnings suggested by current UCUA officer for this report
+            $warnings = $report->warnings()
+                ->where('suggested_by', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get(['id', 'type', 'reason', 'status', 'created_at']);
+
+            $suggestedTypes = $warnings->pluck('type')->toArray();
+
+            return response()->json([
+                'success' => true,
+                'warnings' => $warnings->map(function($warning) {
+                    return [
+                        'id' => $warning->id,
+                        'type' => $warning->type,
+                        'reason' => $warning->reason,
+                        'status' => $warning->status,
+                        'created_at' => $warning->created_at->format('M d, Y')
+                    ];
+                }),
+                'suggested_types' => $suggestedTypes,
+                'available_types' => array_diff(['minor', 'moderate', 'severe'], $suggestedTypes)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading existing warnings'
+            ], 500);
         }
     }
 }

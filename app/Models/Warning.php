@@ -63,6 +63,44 @@ class Warning extends Model
         return $this->belongsTo(WarningTemplate::class, 'template_id');
     }
 
+    /**
+     * Get the sequence number of this warning for the same report
+     */
+    public function getSequenceNumber()
+    {
+        return Warning::where('report_id', $this->report_id)
+            ->where('created_at', '<=', $this->created_at)
+            ->count();
+    }
+
+    /**
+     * Get total number of warnings for the same report
+     */
+    public function getTotalWarningsForReport()
+    {
+        return Warning::where('report_id', $this->report_id)->count();
+    }
+
+    /**
+     * Check if this report has multiple warnings
+     */
+    public function hasMultipleWarnings()
+    {
+        return $this->getTotalWarningsForReport() > 1;
+    }
+
+    /**
+     * Get formatted sequence display
+     */
+    public function getSequenceDisplay()
+    {
+        if (!$this->hasMultipleWarnings()) {
+            return null;
+        }
+
+        return "Warning {$this->getSequenceNumber()} of {$this->getTotalWarningsForReport()}";
+    }
+
     public function escalations()
     {
         return $this->belongsToMany(ViolationEscalation::class, 'escalation_warnings');
@@ -101,7 +139,26 @@ class Warning extends Model
     // Get formatted ID for display
     public function getDisplayIdAttribute()
     {
-        return $this->formatted_id;
+        return $this->getFormattedIdAttribute();
+    }
+
+    /**
+     * Check if there's already a warning of the same type for the same report and violator
+     */
+    public static function hasDuplicateWarning($reportId, $type, $violatorId = null, $excludeWarningId = null)
+    {
+        $query = static::where('report_id', $reportId)
+            ->where('type', $type);
+
+        if ($violatorId) {
+            $query->where('recipient_id', $violatorId);
+        }
+
+        if ($excludeWarningId) {
+            $query->where('id', '!=', $excludeWarningId);
+        }
+
+        return $query->exists();
     }
 
     // Check if warning has been sent
