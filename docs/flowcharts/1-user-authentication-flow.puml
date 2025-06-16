@@ -1,0 +1,144 @@
+@startuml User Authentication Flow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - User Authentication Flow
+
+start
+
+:User accesses login page;
+
+if (User Type?) then (Regular User)
+  :Navigate to /login;
+  :Enter email & password;
+  
+  if (Credentials valid?) then (Yes)
+    if (Email verified?) then (Yes)
+      :Generate 6-character OTP\n(5-minute expiration);
+      :Send OTP to email;
+      :Redirect to OTP verification\nwith user_type='user';
+      
+      :Enter OTP;
+      if (OTP valid & not expired?) then (Yes)
+        :Login with 'web' guard;
+        :Redirect to /dashboard;
+        stop
+      else (No)
+        :Show OTP error;
+        :Return to OTP form;
+        stop
+      endif
+    else (No)
+      :Show email verification required;
+      stop
+    endif
+  else (No)
+    :Show invalid credentials error;
+    stop
+  endif
+
+elseif (Admin) then
+  :Navigate to /admin/login;
+  :Enter email & password;
+  
+  if (Credentials valid?) then (Yes)
+    if (Has admin role?) then (Yes)
+      if (Email verified?) then (Yes)
+        :Generate 6-character OTP\n(5-minute expiration);
+        :Send OTP to email;
+        :Redirect to OTP verification\nwith user_type='admin';
+        
+        :Enter OTP;
+        if (OTP valid & not expired?) then (Yes)
+          :Login with 'web' guard;
+          :Check user role;
+          :Redirect to /admin/dashboard;
+          stop
+        else (No)
+          :Show OTP error;
+          stop
+        endif
+      else (No)
+        :Show email verification required;
+        stop
+      endif
+    else (No)
+      :Show unauthorized access error;
+      stop
+    endif
+  else (No)
+    :Show invalid credentials error;
+    stop
+  endif
+
+elseif (UCUA Officer) then
+  :Navigate to /ucua/login;
+  :Enter email & password;
+  
+  if (Credentials valid?) then (Yes)
+    if (Has ucua_officer role?) then (Yes)
+      if (Email verified?) then (Yes)
+        :Generate 6-character OTP\n(5-minute expiration);
+        :Send OTP to email;
+        :Redirect to OTP verification\nwith user_type='ucua';
+        
+        :Enter OTP;
+        if (OTP valid & not expired?) then (Yes)
+          :Login with 'web' guard;
+          :Check user role;
+          :Redirect to /ucua/dashboard;
+          stop
+        else (No)
+          :Show OTP error;
+          stop
+        endif
+      else (No)
+        :Show email verification required;
+        stop
+      endif
+    else (No)
+      :Show unauthorized access error;
+      stop
+    endif
+  else (No)
+    :Show invalid credentials error;
+    stop
+  endif
+
+else (Department)
+  :Navigate to /department/login;
+  :Enter email & password;
+  
+  if (Credentials valid?) then (Yes)
+    :Generate 6-character OTP\n(5-minute expiration);
+    :Send OTP to department email;
+    :Redirect to OTP verification\nwith user_type='department';
+    
+    :Enter OTP;
+    if (OTP valid & not expired?) then (Yes)
+      :Login with 'department' guard;
+      :Redirect to /department/dashboard;
+      stop
+    else (No)
+      :Show OTP error;
+      stop
+    endif
+  else (No)
+    :Show invalid credentials error;
+    stop
+  endif
+endif
+
+note right
+  **Authentication Notes:**
+  - All users except departments use 'web' guard
+  - Departments use 'department' guard
+  - OTP: 6 characters (mixed case, numbers, special chars)
+  - OTP expires in 5 minutes
+  - Admin & UCUA officers skip email verification
+  - Regular users must verify email first
+end note
+
+@enduml

@@ -1,0 +1,223 @@
+@startuml User Role Permissions Matrix
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - User Role Permissions Matrix
+
+!define ALLOWED #90EE90
+!define DENIED #FFB6C1
+!define LIMITED #FFFFE0
+
+package "Authentication & Access" {
+  |Regular User|
+  :Login via /login;
+  :Use 'web' guard;
+  :Email verification required;
+  :OTP verification required;
+  
+  |Department|
+  :Login via /department/login;
+  :Use 'department' guard;
+  :No email verification;
+  :OTP verification required;
+  
+  |UCUA Officer|
+  :Login via /ucua/login;
+  :Use 'web' guard;
+  :No email verification (manual setup);
+  :OTP verification required;
+  :Has 'ucua_officer' role;
+  
+  |Admin|
+  :Login via /admin/login;
+  :Use 'web' guard;
+  :No email verification (manual setup);
+  :OTP verification required;
+  :Has 'admin' role;
+}
+
+package "Report Management" {
+  |Regular User|
+  start
+  :Submit new reports;
+  note right: ALLOWED
+  :View own reports;
+  note right: ALLOWED
+  :Edit pending reports;
+  note right: LIMITED
+  :View resolution notes;
+  note right: ALLOWED
+  :Anonymous reporting;
+  note right: ALLOWED
+  :View department remarks;
+  note right: DENIED
+  stop
+  
+  |Department|
+  start
+  :Submit reports;
+  note right: DENIED
+  :View assigned reports only;
+  note right: LIMITED
+  :Add department remarks;
+  note right: ALLOWED
+  :Identify violators;
+  note right: ALLOWED
+  :Resolve reports;
+  note right: ALLOWED
+  :View all reports;
+  note right: DENIED
+  stop
+  
+  |UCUA Officer|
+  start
+  :View all reports;
+  note right: ALLOWED
+  :Assign departments;
+  note right: ALLOWED
+  :Set deadlines;
+  note right: ALLOWED
+  :View department remarks;
+  note right: ALLOWED
+  :Suggest warning letters;
+  note right: ALLOWED
+  :Send reminders;
+  note right: ALLOWED
+  :Update report status;
+  note right: ALLOWED
+  stop
+  
+  |Admin|
+  start
+  :View all reports;
+  note right: ALLOWED
+  :Create reports;
+  note right: ALLOWED
+  :Update any report;
+  note right: ALLOWED
+  :Delete reports;
+  note right: ALLOWED
+  :View all remarks;
+  note right: ALLOWED
+  :Override assignments;
+  note right: ALLOWED
+  stop
+}
+
+package "Warning Letter System" {
+  |Regular User|
+  start
+  :Suggest warnings;
+  note right: DENIED
+  :View warning letters;
+  note right: DENIED
+  :Approve warnings;
+  note right: DENIED
+  stop
+  
+  |Department|
+  start
+  :Suggest warnings;
+  note right: DENIED
+  :View warning letters;
+  note right: DENIED
+  :Approve warnings;
+  note right: DENIED
+  stop
+  
+  |UCUA Officer|
+  start
+  :Suggest warning letters;
+  note right: ALLOWED
+  :View all warnings;
+  note right: ALLOWED
+  :Edit suggestions;
+  note right: LIMITED
+  :Approve warnings;
+  note right: DENIED
+  :Send warnings;
+  note right: DENIED
+  stop
+  
+  |Admin|
+  start
+  :View all warnings;
+  note right: ALLOWED
+  :Approve warnings;
+  note right: ALLOWED
+  :Reject warnings;
+  note right: ALLOWED
+  :Send warning letters;
+  note right: ALLOWED
+  :Manage templates;
+  note right: ALLOWED
+  :View escalations;
+  note right: ALLOWED
+  stop
+}
+
+package "User Management" {
+  |Regular User|
+  start
+  :Manage own profile;
+  note right: ALLOWED
+  :View other users;
+  note right: DENIED
+  :Create users;
+  note right: DENIED
+  stop
+  
+  |Department|
+  start
+  :Manage own profile;
+  note right: ALLOWED
+  :View department staff;
+  note right: LIMITED
+  :Create users;
+  note right: DENIED
+  stop
+  
+  |UCUA Officer|
+  start
+  :View user profiles;
+  note right: LIMITED
+  :Create users;
+  note right: DENIED
+  :Assign roles;
+  note right: DENIED
+  stop
+  
+  |Admin|
+  start
+  :View all users;
+  note right: ALLOWED
+  :Create users;
+  note right: ALLOWED
+  :Edit users;
+  note right: ALLOWED
+  :Assign roles;
+  note right: ALLOWED
+  :Manage departments;
+  note right: ALLOWED
+  :System settings;
+  note right: ALLOWED
+  stop
+}
+
+note bottom
+  **Legend:**
+  - ALLOWED: Full access to feature
+  - DENIED: No access to feature  
+  - LIMITED: Restricted access (own data, assigned data, etc.)
+  
+  **Guard Usage:**
+  - Regular Users, UCUA Officers, Admin: 'web' guard
+  - Departments: 'department' guard
+  
+  **Role Hierarchy:**
+  Admin > UCUA Officer > Department > Regular User
+end note
+
+@enduml

@@ -1,0 +1,307 @@
+@startuml Database Schema
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 9
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Database Schema
+
+!define PRIMARY_KEY #FFE082
+!define FOREIGN_KEY #FFCDD2
+!define REGULAR_FIELD #F5F5F5
+
+entity "users" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * name : varchar(255)
+  * email : varchar(255) <<unique>>
+  * worker_id : varchar(255) <<unique>>
+  * password : varchar(255)
+  * department_id : bigint <<FK>> FOREIGN_KEY
+  is_admin : boolean
+  profile_picture : varchar(255)
+  email_verified_at : timestamp
+  otp : varchar(6)
+  otp_expires_at : timestamp
+  remember_token : varchar(100)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "departments" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * name : varchar(255) <<unique>>
+  * email : varchar(255) <<unique>>
+  * password : varchar(255)
+  head_name : varchar(255)
+  head_email : varchar(255)
+  head_phone : varchar(255)
+  is_active : boolean
+  otp : varchar(6)
+  otp_expires_at : timestamp
+  remember_token : varchar(100)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "reports" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * user_id : bigint <<FK>> FOREIGN_KEY
+  * employee_id : varchar(255)
+  violator_employee_id : varchar(255)
+  violator_name : varchar(255)
+  violator_department : varchar(255)
+  * department : varchar(255)
+  * phone : varchar(255)
+  unsafe_condition : text
+  other_unsafe_condition : text
+  unsafe_act : text
+  other_unsafe_act : text
+  * location : varchar(255)
+  other_location : varchar(255)
+  * incident_date : datetime
+  * description : text
+  * status : enum('pending','review','in_progress','resolved')
+  * category : enum('unsafe_condition','unsafe_act')
+  is_anonymous : boolean
+  handling_department_id : bigint <<FK>> FOREIGN_KEY
+  handling_staff_id : bigint <<FK>> FOREIGN_KEY
+  remarks : text
+  assignment_remark : text
+  deadline : date
+  attachment : varchar(255)
+  resolution_notes : text
+  resolved_at : datetime
+  * formatted_id : varchar(255) <<unique>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "warnings" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * type : enum('minor','moderate','severe')
+  * reason : text
+  * suggested_action : text
+  * suggested_by : bigint <<FK>> FOREIGN_KEY
+  * report_id : bigint <<FK>> FOREIGN_KEY
+  * status : enum('pending','approved','rejected','sent')
+  approved_by : bigint <<FK>> FOREIGN_KEY
+  admin_notes : text
+  approved_at : timestamp
+  sent_at : timestamp
+  recipient_id : bigint <<FK>> FOREIGN_KEY
+  warning_message : text
+  template_id : bigint <<FK>> FOREIGN_KEY
+  email_sent_at : timestamp
+  email_delivery_status : enum('pending','sent','failed')
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "remarks" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * report_id : bigint <<FK>> FOREIGN_KEY
+  * content : text
+  user_id : bigint <<FK>> FOREIGN_KEY
+  department_id : bigint <<FK>> FOREIGN_KEY
+  parent_id : bigint <<FK>> FOREIGN_KEY
+  attachment : varchar(255)
+  is_internal : boolean
+  violator_identified : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "reminders" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * report_id : bigint <<FK>> FOREIGN_KEY
+  * department_id : bigint <<FK>> FOREIGN_KEY
+  * sent_by : bigint <<FK>> FOREIGN_KEY
+  * message : text
+  * reminder_type : enum('deadline','follow_up','escalation')
+  sent_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "roles" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * name : varchar(255)
+  * guard_name : varchar(255)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "permissions" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * name : varchar(255)
+  * guard_name : varchar(255)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "model_has_roles" {
+  * role_id : bigint <<FK>> FOREIGN_KEY
+  * model_type : varchar(255)
+  * model_id : bigint
+  --
+  <<composite PK>>
+}
+
+entity "model_has_permissions" {
+  * permission_id : bigint <<FK>> FOREIGN_KEY
+  * model_type : varchar(255)
+  * model_id : bigint
+  --
+  <<composite PK>>
+}
+
+entity "role_has_permissions" {
+  * permission_id : bigint <<FK>> FOREIGN_KEY
+  * role_id : bigint <<FK>> FOREIGN_KEY
+  --
+  <<composite PK>>
+}
+
+entity "report_status_history" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * report_id : bigint <<FK>> FOREIGN_KEY
+  * previous_status : varchar(255)
+  * new_status : varchar(255)
+  changed_by : bigint <<FK>> FOREIGN_KEY
+  department_id : bigint <<FK>> FOREIGN_KEY
+  * changed_by_type : enum('user','admin','ucua_officer','department')
+  reason : text
+  metadata : json
+  created_at : timestamp
+}
+
+entity "escalation_rules" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * warning_threshold : integer
+  * time_period_months : integer
+  * reset_period_months : integer
+  * is_active : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "escalations" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * user_id : bigint <<FK>> FOREIGN_KEY
+  * warning_id : bigint <<FK>> FOREIGN_KEY
+  * escalation_rule_id : bigint <<FK>> FOREIGN_KEY
+  * escalation_type : enum('warning_threshold','repeat_violation')
+  * escalated_at : timestamp
+  notified_hod : boolean
+  notified_offender : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "warning_templates" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * name : varchar(255)
+  * type : enum('minor','moderate','severe')
+  * subject : varchar(255)
+  * content : text
+  * is_active : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "admin_settings" {
+  * id : bigint <<PK>> PRIMARY_KEY
+  --
+  * key : varchar(255) <<unique>>
+  * value : text
+  * description : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' Relationships
+users ||--o{ reports : "submits"
+users ||--o{ warnings : "suggested_by"
+users ||--o{ warnings : "approved_by"
+users ||--o{ warnings : "recipient"
+users ||--o{ remarks : "creates"
+users ||--o{ reminders : "sends"
+users ||--o{ escalations : "escalated"
+users }o--|| departments : "belongs_to"
+
+departments ||--o{ reports : "handles"
+departments ||--o{ remarks : "creates"
+departments ||--o{ reminders : "receives"
+
+reports ||--o{ warnings : "generates"
+reports ||--o{ remarks : "has"
+reports ||--o{ reminders : "triggers"
+reports ||--o{ report_status_history : "tracks"
+
+warnings ||--o{ escalations : "triggers"
+warnings }o--|| warning_templates : "uses"
+
+roles ||--o{ model_has_roles : "assigned_to"
+permissions ||--o{ model_has_permissions : "granted_to"
+roles ||--o{ role_has_permissions : "has"
+permissions ||--o{ role_has_permissions : "belongs_to"
+
+escalation_rules ||--o{ escalations : "defines"
+
+note top of users
+  **Authentication Provider for:**
+  - Regular Users (port_worker role)
+  - Admin Users (admin role)
+  - UCUA Officers (ucua_officer role)
+  
+  **Uses 'web' guard**
+end note
+
+note top of departments
+  **Authentication Provider for:**
+  - Department Users
+  
+  **Uses 'department' guard**
+end note
+
+note top of reports
+  **Core Entity:**
+  - Separate unsafe_condition/unsafe_act fields
+  - Anonymous reporting support
+  - Status tracking with history
+  - Standardized RPT-XXX ID format
+end note
+
+note top of warnings
+  **Warning Letter System:**
+  - Only for unsafe_act violations
+  - Three severity levels
+  - Admin approval required
+  - Email delivery tracking
+  - WL-XXX ID format
+end note
+
+note bottom
+  **Key Features:**
+  - Multi-guard authentication (web/department)
+  - Role-based permissions with Spatie
+  - Comprehensive audit trail
+  - Escalation rule engine
+  - Anonymous reporting with privacy
+  - Standardized ID formats (RPT-XXX, WL-XXX)
+  - Email verification and OTP support
+end note
+
+@enduml

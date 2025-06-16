@@ -1,0 +1,140 @@
+@startuml Department Assignment Process
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Department Assignment Process
+
+start
+
+:UCUA Officer logs into dashboard;
+:View pending reports (status = 'pending');
+
+:Select report for assignment;
+:Navigate to "Assign Departments" page;
+
+:Review report details:
+- Report ID (RPT-XXX)
+- Incident description
+- Location
+- Category (unsafe_condition/unsafe_act)
+- Submitted by (if not anonymous);
+
+:Open assignment modal;
+
+:Fill assignment form:
+- Select handling department
+- Set deadline (future date required)
+- Add assignment remarks/notes
+- Provide context for department;
+
+if (Form validation passes?) then (Yes)
+  :Update report record:
+  - handling_department_id
+  - deadline
+  - status = 'in_progress'
+  - assignment_remark;
+  
+  :Send notification to department;
+  :Log assignment action;
+  :Show success message;
+  
+  partition "Department Review Process" {
+    :Department receives notification;
+    :Department logs into dashboard;
+    :View assigned reports;
+    
+    :Select report to review;
+    :View full report details;
+    
+    if (Investigation required?) then (Yes)
+      :Conduct investigation;
+      
+      if (Report type = unsafe_act?) then (Yes)
+        :Identify violator;
+        :Check violator identification checkbox;
+        :Record violator details;
+      else (No - unsafe_condition)
+        :Focus on condition remediation;
+        :No violator identification needed;
+      endif
+      
+    else (No)
+      :Proceed with direct action;
+    endif
+    
+    :Add department remarks:
+    - Investigation findings
+    - Actions taken
+    - Corrective measures
+    - Violator identification (if applicable);
+    
+    note right
+      **Department Remarks:**
+      - Confidential from regular users
+      - Visible to UCUA Officers & Admin
+      - Include timestamps
+      - No user identification shown
+    end note
+    
+    if (Ready to resolve?) then (Yes)
+      :Open resolve modal;
+      :Add resolution notes:
+      - How issue was resolved
+      - Actions taken
+      - Prevention measures;
+      :Set resolution date;
+      :Update status = 'resolved';
+      :Set resolved_at timestamp;
+      
+      :Notify report submitter;
+      :Show resolution in user dashboard;
+      
+    else (No)
+      :Save remarks;
+      :Continue investigation;
+      :Update progress;
+    endif
+  }
+  
+else (No)
+  :Show validation errors;
+  :Return to assignment form;
+  stop
+endif
+
+if (Report resolved?) then (Yes)
+  :UCUA Officer can view resolution;
+  
+  if (Unsafe act with violator?) then (Yes)
+    :Consider warning letter;
+    :Follow warning letter workflow;
+  else (No)
+    :Case closed;
+  endif
+  
+  stop
+else (No)
+  :Monitor progress;
+  :Check deadlines;
+  :Send reminders if needed;
+  stop
+endif
+
+note bottom
+  **Assignment Rules:**
+  - Only UCUA Officers can assign departments
+  - Deadline must be future date
+  - Assignment remarks help department understand context
+  - Status changes: pending → in_progress → resolved
+  
+  **Department Capabilities:**
+  - View only assigned reports
+  - Add confidential remarks
+  - Identify violators (unsafe_act only)
+  - Resolve reports with notes
+  - Communicate with UCUA Officers
+end note
+
+@enduml

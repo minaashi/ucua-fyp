@@ -1,0 +1,150 @@
+@startuml UCUA Safety Reporting System Overview
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Complete Workflow Overview
+
+!define USER_COLOR #E1F5FE
+!define DEPT_COLOR #F3E5F5
+!define UCUA_COLOR #E8F5E8
+!define ADMIN_COLOR #FFF3E0
+
+package "User Authentication Layer" USER_COLOR {
+  rectangle "Regular Users\n(/login)" as RegularAuth
+  rectangle "Department\n(/department/login)" as DeptAuth
+  rectangle "UCUA Officer\n(/ucua/login)" as UCUAAuth
+  rectangle "Admin\n(/admin/login)" as AdminAuth
+  
+  note as AuthNote
+    **All authentication includes:**
+    - Email/password validation
+    - OTP verification (6-char, 5-min expiry)
+    - Role-based redirects
+    - Guard assignment (web/department)
+  end note
+}
+
+package "Report Lifecycle" {
+  
+  rectangle "Report Submission\n(Regular Users)" USER_COLOR {
+    :Submit incident report
+    - Auto-populate employee ID
+    - Past dates only
+    - Optional anonymous
+    - Unsafe condition/act
+    - Generate RPT-XXX ID;
+  }
+  
+  rectangle "UCUA Review\n(UCUA Officers)" UCUA_COLOR {
+    :Review pending reports
+    - Assign to departments
+    - Set deadlines
+    - Add assignment remarks
+    - Status: pending → in_progress;
+  }
+  
+  rectangle "Department Processing\n(Departments)" DEPT_COLOR {
+    :Handle assigned reports
+    - Investigate incidents
+    - Identify violators (unsafe_act)
+    - Add confidential remarks
+    - Resolve with notes
+    - Status: in_progress → resolved;
+  }
+  
+  rectangle "Admin Oversight\n(Admin)" ADMIN_COLOR {
+    :System administration
+    - View all reports
+    - Manage users/departments
+    - Override assignments
+    - System settings;
+  }
+}
+
+package "Warning Letter System" {
+  
+  rectangle "Warning Suggestion\n(UCUA Officers)" UCUA_COLOR {
+    :Suggest warning letters
+    - Only for unsafe_act
+    - Requires violator ID
+    - Set severity level
+    - Generate WL-XXX ID
+    - Status: pending;
+  }
+  
+  rectangle "Warning Approval\n(Admin)" ADMIN_COLOR {
+    :Review suggestions
+    - Approve/reject warnings
+    - Edit warning message
+    - Add admin notes
+    - Status: approved/rejected;
+  }
+  
+  rectangle "Warning Delivery\n(System)" {
+    :Send warning letters
+    - Internal: Email delivery
+    - External: Manual delivery
+    - CC to HOD
+    - Track escalations
+    - Status: sent;
+  }
+}
+
+package "Data Flow & Privacy" {
+  rectangle "Privacy Controls" {
+    :Anonymous reporting
+    - Hide user identity in UI
+    - Maintain user_id internally
+    - Confidential dept remarks
+    - Protected resolution notes;
+  }
+  
+  rectangle "Status Tracking" {
+    :Report status flow
+    pending → in_progress → resolved
+    
+    :Warning status flow
+    pending → approved/rejected → sent;
+  }
+  
+  rectangle "ID Generation" {
+    :Standardized formats
+    - Reports: RPT-001, RPT-002...
+    - Warnings: WL-001, WL-002...
+    - Recommendations: RL-001, RL-002...;
+  }
+}
+
+' Connections
+RegularAuth --> "Report Submission\n(Regular Users)"
+DeptAuth --> "Department Processing\n(Departments)"
+UCUAAuth --> "UCUA Review\n(UCUA Officers)"
+UCUAAuth --> "Warning Suggestion\n(UCUA Officers)"
+AdminAuth --> "Admin Oversight\n(Admin)"
+AdminAuth --> "Warning Approval\n(Admin)"
+
+"Report Submission\n(Regular Users)" --> "UCUA Review\n(UCUA Officers)"
+"UCUA Review\n(UCUA Officers)" --> "Department Processing\n(Departments)"
+"Department Processing\n(Departments)" --> "Warning Suggestion\n(UCUA Officers)"
+"Warning Suggestion\n(UCUA Officers)" --> "Warning Approval\n(Admin)"
+"Warning Approval\n(Admin)" --> "Warning Delivery\n(System)"
+
+"Report Submission\n(Regular Users)" ..> "Privacy Controls"
+"Department Processing\n(Departments)" ..> "Privacy Controls"
+"UCUA Review\n(UCUA Officers)" ..> "Status Tracking"
+"Warning Suggestion\n(UCUA Officers)" ..> "ID Generation"
+
+note bottom
+  **Key System Features:**
+  - Multi-guard authentication with OTP
+  - Role-based access control
+  - Anonymous reporting with privacy protection
+  - Standardized ID formats (RPT-XXX, WL-XXX)
+  - Escalation rules for repeat violations
+  - Email notifications and manual delivery options
+  - Comprehensive audit trail and status tracking
+end note
+
+@enduml

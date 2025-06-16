@@ -1,0 +1,127 @@
+@startuml Report Submission Workflow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Report Submission Workflow
+
+start
+
+:Regular User logs in;
+:Navigate to Submit Report page;
+
+:Fill report form:
+- Employee ID (auto-populated from user.worker_id)
+- Phone number
+- Location
+- Incident date/time (past dates only)
+- Description
+- Category (unsafe_condition OR unsafe_act)
+- Specific unsafe condition/act
+- Optional attachment
+- Anonymous reporting checkbox;
+
+note right
+  **Form Validations:**
+  - Employee ID auto-populated
+  - Date/time must be in past
+  - Category determines fields shown
+  - Attachment optional (max 5MB)
+  - Anonymous option available
+end note
+
+if (Form validation passes?) then (Yes)
+  :Create Report record:
+  - Generate RPT-XXX ID
+  - Set status = 'pending'
+  - Set user_id for tracking
+  - Set department from user
+  - Store unsafe_condition OR unsafe_act
+  - Set is_anonymous flag;
+  
+  :Save report to database;
+  :Show success message;
+  
+  :Report enters system workflow;
+  
+  partition "UCUA Officer Review" {
+    :UCUA Officer views pending reports;
+    :Review report details;
+    
+    if (Report requires department assignment?) then (Yes)
+      :Navigate to Assign Departments page;
+      :Select appropriate department;
+      :Set deadline (future date);
+      :Add assignment remarks;
+      :Update status = 'in_progress';
+      :Send notification to department;
+      
+      partition "Department Processing" {
+        :Department receives notification;
+        :Department views assigned report;
+        :Review incident details;
+        
+        if (Investigation needed?) then (Yes)
+          :Conduct investigation;
+          :Identify violator (if unsafe_act);
+          :Add department remarks;
+          :Set violator identification flag;
+        else (No)
+          :Add department remarks;
+        endif
+        
+        if (Ready to resolve?) then (Yes)
+          :Add resolution notes;
+          :Set resolution date;
+          :Update status = 'resolved';
+          :Set resolved_at timestamp;
+          :Notify user of resolution;
+        else (No)
+          :Continue investigation;
+        endif
+      }
+    else (No)
+      :UCUA Officer handles directly;
+      if (Requires warning letter?) then (Yes)
+        :Suggest warning letter;
+        :Set warning details;
+        :Submit for admin approval;
+      else (No)
+        :Mark as resolved;
+      endif
+    endif
+  }
+  
+else (No)
+  :Show validation errors;
+  :Return to form;
+  stop
+endif
+
+if (Report resolved?) then (Yes)
+  :User can view resolution notes;
+  :System tracks completion;
+  stop
+else (No)
+  :Report continues in workflow;
+  :Status tracking continues;
+  stop
+endif
+
+note bottom
+  **Status Flow:**
+  pending → in_progress → resolved
+  
+  **Privacy Features:**
+  - Anonymous reports hide user identity in UI
+  - user_id still stored for internal tracking
+  - Department remarks confidential from users
+  - Resolution notes visible to report submitter
+  
+  **ID Format:**
+  - Reports: RPT-001, RPT-002, etc.
+  - Auto-generated with zero-padding
+end note
+
+@enduml

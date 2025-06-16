@@ -1,0 +1,245 @@
+@startuml Deployment Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Deployment Architecture
+
+!define WEB_COLOR #E3F2FD
+!define APP_COLOR #E8F5E8
+!define DB_COLOR #FFF3E0
+!define EXTERNAL_COLOR #F3E5F5
+
+package "Client Layer" WEB_COLOR {
+  actor "Regular Users" as Users
+  actor "Admin Users" as Admin
+  actor "UCUA Officers" as UCUA
+  actor "Department Users" as Dept
+  
+  rectangle "Web Browsers" as Browsers {
+    :Chrome, Firefox, Safari, Edge
+    JavaScript enabled
+    Session cookies
+    CSRF tokens;
+  }
+}
+
+package "Load Balancer / Reverse Proxy" {
+  rectangle "Nginx / Apache" as WebServer {
+    :SSL/TLS Termination
+    Static file serving
+    Request routing
+    Rate limiting
+    Security headers;
+  }
+}
+
+package "Application Layer" APP_COLOR {
+  
+  rectangle "Web Server" as AppServer {
+    :PHP 8.1+ with FPM
+    Laravel 11.x Framework
+    Composer dependencies
+    Artisan commands;
+  }
+  
+  rectangle "Application Instances" as AppInstances {
+    :Instance 1: Main App
+    - Controllers
+    - Middleware
+    - Services
+    - Models
+    
+    Instance 2: Queue Worker
+    - Email processing
+    - Notification sending
+    - Background jobs;
+  }
+  
+  rectangle "File Storage" as FileSystem {
+    :Local Storage:
+    - Report attachments
+    - Profile pictures
+    - Log files
+    - Session files;
+  }
+  
+  rectangle "Cache Layer" as Cache {
+    :Redis / Memcached
+    - Session storage
+    - Application cache
+    - Rate limiting
+    - OTP storage;
+  }
+}
+
+package "Database Layer" DB_COLOR {
+  
+  rectangle "Primary Database" as PrimaryDB {
+    :MySQL 8.0+
+    - All application tables
+    - User data
+    - Reports & warnings
+    - Audit logs;
+  }
+  
+  rectangle "Database Backup" as BackupDB {
+    :Automated Backups
+    - Daily full backups
+    - Transaction log backups
+    - Point-in-time recovery
+    - Offsite storage;
+  }
+}
+
+package "External Services" EXTERNAL_COLOR {
+  
+  rectangle "Email Service" as EmailSvc {
+    :SMTP Server / Service
+    - OTP delivery
+    - Warning letters
+    - Notifications
+    - System alerts;
+  }
+  
+  rectangle "Monitoring & Logging" as Monitoring {
+    :Application Monitoring
+    - Error tracking
+    - Performance metrics
+    - Uptime monitoring
+    - Log aggregation;
+  }
+  
+  rectangle "Security Services" as Security {
+    :Security Tools
+    - Firewall
+    - Intrusion detection
+    - SSL certificates
+    - Vulnerability scanning;
+  }
+}
+
+package "Development & Deployment" {
+  
+  rectangle "Version Control" as VCS {
+    :Git Repository
+    - Source code
+    - Configuration
+    - Database migrations
+    - Deployment scripts;
+  }
+  
+  rectangle "CI/CD Pipeline" as CICD {
+    :Automated Deployment
+    - Code testing
+    - Build process
+    - Database migrations
+    - Zero-downtime deployment;
+  }
+  
+  rectangle "Environment Management" as EnvMgmt {
+    :Environment Configs
+    - Production
+    - Staging
+    - Development
+    - Testing;
+  }
+}
+
+' Network Connections
+Users --> Browsers
+Admin --> Browsers
+UCUA --> Browsers
+Dept --> Browsers
+
+Browsers --> WebServer : HTTPS (443)
+WebServer --> AppServer : HTTP (80/8080)
+
+AppServer --> AppInstances
+AppInstances --> FileSystem
+AppInstances --> Cache
+AppInstances --> PrimaryDB
+
+PrimaryDB --> BackupDB
+AppInstances --> EmailSvc
+AppInstances --> Monitoring
+
+WebServer --> Security
+AppServer --> Security
+
+VCS --> CICD
+CICD --> AppServer
+EnvMgmt --> AppServer
+
+note as DeploymentNote
+  **Deployment Specifications:**
+  
+  **Minimum Server Requirements:**
+  - CPU: 2+ cores
+  - RAM: 4GB+ (8GB recommended)
+  - Storage: 50GB+ SSD
+  - PHP 8.1+ with extensions:
+    - mbstring, openssl, pdo_mysql
+    - tokenizer, xml, ctype, json
+    - bcmath, fileinfo, gd
+  
+  **Network Requirements:**
+  - HTTPS/SSL certificate
+  - Port 443 (HTTPS) open
+  - Port 80 (HTTP) for redirects
+  - SMTP access for email
+  
+  **Security Considerations:**
+  - Regular security updates
+  - Database access restrictions
+  - File permission hardening
+  - Environment variable protection
+  - Regular backup verification
+end note
+
+note as ScalingNote
+  **Scaling Options:**
+  
+  **Horizontal Scaling:**
+  - Multiple app server instances
+  - Load balancer distribution
+  - Shared file storage (NFS/S3)
+  - Database read replicas
+  
+  **Vertical Scaling:**
+  - Increase server resources
+  - Optimize database queries
+  - Enable PHP OPcache
+  - Implement Redis caching
+  
+  **High Availability:**
+  - Database clustering
+  - Application redundancy
+  - Automated failover
+  - Health check monitoring
+end note
+
+note as BackupStrategy
+  **Backup & Recovery:**
+  
+  **Database Backups:**
+  - Daily full backups
+  - Hourly incremental backups
+  - 30-day retention policy
+  - Automated restore testing
+  
+  **File Backups:**
+  - Application files
+  - User uploads
+  - Configuration files
+  - Log files
+  
+  **Disaster Recovery:**
+  - RTO: 4 hours
+  - RPO: 1 hour
+  - Offsite backup storage
+  - Recovery procedures documented
+end note
+
+@enduml

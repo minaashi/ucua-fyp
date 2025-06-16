@@ -1,0 +1,314 @@
+@startuml UCUA System Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Technical Architecture
+
+!define FRONTEND_COLOR #E3F2FD
+!define BACKEND_COLOR #E8F5E8
+!define DATABASE_COLOR #FFF3E0
+!define SECURITY_COLOR #FCE4EC
+!define EXTERNAL_COLOR #F3E5F5
+
+package "Frontend Layer" FRONTEND_COLOR {
+  
+  package "View Templates (Blade)" {
+    rectangle "Authentication Views" as AuthViews {
+      :login.blade.php
+      ucua-login.blade.php
+      admin-login.blade.php
+      department/login.blade.php
+      otp-verification.blade.php;
+    }
+    
+    rectangle "Dashboard Views" as DashViews {
+      :dashboard.blade.php (Users)
+      admin/dashboard.blade.php
+      ucua-officer/dashboard.blade.php
+      department/dashboard.blade.php;
+    }
+    
+    rectangle "Report Views" as ReportViews {
+      :reports/create.blade.php
+      reports/show.blade.php
+      reports/index.blade.php
+      admin/reports.blade.php;
+    }
+    
+    rectangle "Layout Templates" as Layouts {
+      :layouts/app.blade.php
+      layouts/admin.blade.php
+      layouts/guest.blade.php
+      layouts/auth.blade.php;
+    }
+  }
+  
+  package "Frontend Assets" {
+    rectangle "JavaScript" as JS {
+      :app.js (Vue.js entry)
+      bootstrap.js (Axios, CSRF)
+      ucua-utilities.js
+      ExampleComponent.vue;
+    }
+    
+    rectangle "CSS Frameworks" as CSS {
+      :Bootstrap 4.5.2
+      Tailwind CSS
+      Font Awesome 6.0
+      Custom SCSS;
+    }
+    
+    rectangle "Build Tools" as Build {
+      :Vite (bundler)
+      Laravel Mix
+      PostCSS
+      Autoprefixer;
+    }
+  }
+}
+
+package "Backend Layer" BACKEND_COLOR {
+  
+  package "HTTP Layer" {
+    rectangle "Routes" as Routes {
+      :web.php
+      - Authentication routes
+      - User routes
+      - Admin routes
+      - UCUA routes
+      - Department routes;
+    }
+    
+    rectangle "Middleware Stack" as Middleware {
+      :RedirectIfAuthenticated
+      EnsureEmailVerified
+      AdminMiddleware
+      DepartmentAuth
+      RoleMiddleware (Spatie)
+      CSRF Protection;
+    }
+  }
+  
+  package "Application Layer" {
+    rectangle "Controllers" as Controllers {
+      :Auth Controllers:
+      - LoginController
+      - UCUALoginController
+      - RegisterController
+      - LoginOtpController
+      
+      Dashboard Controllers:
+      - DashboardController
+      - AdminDashboardController
+      - UCUADashboardController
+      - Department/DashboardController
+      
+      Feature Controllers:
+      - ReportController
+      - AdminWarningController
+      - ProfileController;
+    }
+    
+    rectangle "Services" as Services {
+      :OtpService
+      NotificationService
+      ViolationEscalationService
+      WarningAnalyticsService;
+    }
+    
+    rectangle "Requests" as Requests {
+      :StoreRemarkRequest
+      Form validation
+      Authorization logic;
+    }
+  }
+  
+  package "Domain Layer" {
+    rectangle "Models (Eloquent)" as Models {
+      :User (Authenticatable)
+      Department (Authenticatable)
+      Report
+      Warning
+      Remark
+      Reminder
+      Role (Spatie)
+      Permission (Spatie);
+    }
+    
+    rectangle "Policies" as Policies {
+      :ReportPolicy
+      Role-based authorization;
+    }
+  }
+}
+
+package "Database Layer" DATABASE_COLOR {
+  
+  rectangle "MySQL Database" as DB {
+    :Core Tables:
+    - users
+    - departments
+    - reports
+    - warnings
+    - remarks
+    - reminders
+    
+    Spatie Permission Tables:
+    - roles
+    - permissions
+    - model_has_roles
+    - model_has_permissions
+    
+    System Tables:
+    - migrations
+    - password_reset_tokens
+    - sessions;
+  }
+  
+  rectangle "Eloquent ORM" as ORM {
+    :Model Relationships:
+    - User belongsTo Department
+    - Report belongsTo User
+    - Report hasMany Remarks
+    - Warning belongsTo Report
+    - User hasMany Reports
+    - Department hasMany Users;
+  }
+  
+  rectangle "Migrations" as Migrations {
+    :Database versioning
+    Schema management
+    Rollback capability;
+  }
+}
+
+package "Authentication & Security" SECURITY_COLOR {
+  
+  rectangle "Multi-Guard System" as Guards {
+    :web guard (session)
+    - Users, Admin, UCUA
+    - Provider: users table
+    
+    department guard (session)
+    - Departments only
+    - Provider: departments table;
+  }
+  
+  rectangle "Role & Permission System" as RBAC {
+    :Spatie Laravel Permission
+    - admin role
+    - ucua_officer role
+    - port_worker role
+    - department_head role
+    
+    Guard-specific roles
+    Permission inheritance;
+  }
+  
+  rectangle "OTP System" as OTP {
+    :6-character secure OTP
+    5-minute expiration
+    Email delivery
+    User & Department support;
+  }
+  
+  rectangle "Security Features" as Security {
+    :CSRF Protection
+    Email Verification
+    Password Hashing
+    Session Management
+    Input Validation;
+  }
+}
+
+package "External Services" EXTERNAL_COLOR {
+  
+  rectangle "Email Services" as Email {
+    :Laravel Mail
+    - OTP delivery
+    - Warning letters
+    - Notifications
+    - SMTP configuration;
+  }
+  
+  rectangle "File Storage" as Storage {
+    :Local file system
+    Report attachments
+    Profile pictures
+    Public assets;
+  }
+  
+  rectangle "Notification System" as Notifications {
+    :Laravel Notifications
+    - Email notifications
+    - Database notifications
+    - Real-time alerts;
+  }
+}
+
+package "Configuration & Environment" {
+  rectangle "Laravel Framework" as Framework {
+    :Laravel 11.x
+    PHP 8.1+
+    Composer dependencies
+    Artisan commands;
+  }
+  
+  rectangle "Environment Config" as Config {
+    :.env configuration
+    config/ files
+    Service providers
+    Middleware registration;
+  }
+}
+
+' Connections
+AuthViews --> Controllers
+DashViews --> Controllers
+ReportViews --> Controllers
+Layouts --> AuthViews
+Layouts --> DashViews
+
+JS --> Controllers : AJAX/HTTP
+CSS --> AuthViews
+Build --> JS
+Build --> CSS
+
+Routes --> Middleware
+Middleware --> Controllers
+Controllers --> Services
+Controllers --> Models
+Services --> Models
+Requests --> Controllers
+
+Models --> ORM
+ORM --> DB
+Migrations --> DB
+
+Guards --> Models
+RBAC --> Guards
+OTP --> Email
+Security --> Guards
+
+Controllers --> Email
+Controllers --> Storage
+Controllers --> Notifications
+
+Framework --> Controllers
+Framework --> Models
+Config --> Framework
+
+note bottom
+  **Architecture Highlights:**
+  - **MVC Pattern**: Clear separation of concerns
+  - **Multi-Guard Auth**: Separate authentication for users vs departments
+  - **Role-Based Access**: Spatie permission system with guard-specific roles
+  - **Service Layer**: Business logic separated from controllers
+  - **ORM Integration**: Eloquent relationships for data integrity
+  - **Asset Pipeline**: Vite for modern frontend build process
+  - **Security First**: CSRF, email verification, OTP, input validation
+end note
+
+@enduml

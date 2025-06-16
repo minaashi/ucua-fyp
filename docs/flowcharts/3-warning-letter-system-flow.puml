@@ -1,0 +1,126 @@
+@startuml Warning Letter System Flow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+
+title UCUA Safety Reporting System - Warning Letter System Flow
+
+start
+
+:UCUA Officer reviews resolved report;
+
+if (Report category = unsafe_act?) then (Yes)
+  if (Violator identified?) then (Yes)
+    :UCUA Officer suggests warning letter;
+    
+    :Fill warning suggestion form:
+    - Warning type (minor/moderate/severe)
+    - Reason for warning
+    - Suggested corrective action
+    - Set status = 'pending';
+    
+    :Generate WL-XXX ID;
+    :Submit suggestion to admin;
+    
+    partition "Admin Approval Process" {
+      :Admin reviews warning suggestion;
+      :Check violator identification;
+      
+      if (Admin decision?) then (Approve)
+        :Admin fills approval form:
+        - Warning message
+        - Admin notes
+        - Set status = 'approved'
+        - Set approved_by & approved_at;
+        
+        :Check violator type;
+        
+        if (Internal violator?) then (Yes - System User)
+          :Violator has user account;
+          :Has email address;
+          :Can send via email;
+          
+          :Send warning letter email:
+          - To: violator email
+          - CC: HOD email
+          - Include warning content
+          - No PDF attachment;
+          
+          if (Email sent successfully?) then (Yes)
+            :Update status = 'sent';
+            :Set sent_at timestamp;
+            :Set email_delivery_status = 'sent';
+            
+            :Check escalation rules;
+            if (3+ warnings in 3 months?) then (Yes)
+              :Trigger escalation process;
+              :Notify HOD and offender;
+              :Create escalation record;
+            else (No)
+              :No escalation needed;
+            endif
+            
+          else (No)
+            :Set email_delivery_status = 'failed';
+            :Log error for retry;
+          endif
+          
+        else (No - External violator)
+          :Violator not in system;
+          :No email address;
+          :Manual delivery required;
+          
+          :Mark as 'External' status;
+          :Admin handles manual delivery;
+          :Update delivery tracking manually;
+        endif
+        
+      else (Reject)
+        :Admin fills rejection form:
+        - Admin notes (required)
+        - Set status = 'rejected'
+        - Set approved_by & approved_at;
+        
+        :Notify UCUA Officer of rejection;
+        stop
+      endif
+    }
+    
+  else (No)
+    :Cannot create warning letter;
+    :Investigation required first;
+    :Department must identify violator;
+    stop
+  endif
+  
+else (No - unsafe_condition)
+  :Warning letters not applicable;
+  :Unsafe conditions don't target individuals;
+  stop
+endif
+
+note right
+  **Warning Letter Rules:**
+  - Only for unsafe_act violations
+  - Requires violator identification
+  - Three severity levels: minor, moderate, severe
+  - Escalation: 3 warnings in 3 months
+  - Reset: 6 months violation-free
+end note
+
+note bottom
+  **ID Format:**
+  - Warning Letters: WL-001, WL-002, etc.
+  - Auto-generated with zero-padding
+  
+  **Delivery Methods:**
+  - Internal violators: Email delivery
+  - External violators: Manual delivery
+  - CC to HOD for internal violators
+  
+  **Status Flow:**
+  pending → approved/rejected → sent (if approved)
+end note
+
+@enduml
