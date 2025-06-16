@@ -197,14 +197,49 @@
                                         @php
                                             $violator = $report->getViolatorForWarning();
                                             $isInternalViolator = $violator && isset($violator->id) && !empty($violator->email);
+
+                                            // Check if current UCUA officer has already suggested warnings for this report
+                                            $existingWarnings = $report->warnings()->where('suggested_by', Auth::id())->get();
+                                            $hasExistingWarnings = $existingWarnings->count() > 0;
+
+                                            // Get available warning types (types not yet suggested by this officer)
+                                            $suggestedTypes = $existingWarnings->pluck('type')->toArray();
+                                            $availableTypes = array_diff(['minor', 'moderate', 'severe'], $suggestedTypes);
+                                            $availableTypesArray = array_values($availableTypes); // Reset array keys
                                         @endphp
+
                                         @if($isInternalViolator)
-                                            <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
-                                                    class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full hover:bg-yellow-200 transition-colors duration-200"
-                                                    title="Suggest Warning Letter">
-                                                <i class="fas fa-exclamation-triangle mr-1"></i>
-                                                Warning
-                                            </button>
+                                            @if(!$hasExistingWarnings)
+                                                <!-- No warnings suggested yet - show normal warning button -->
+                                                <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                        class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full hover:bg-yellow-200 transition-colors duration-200"
+                                                        title="Suggest Warning Letter">
+                                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                    Warning
+                                                </button>
+                                            @elseif(count($availableTypesArray) > 0)
+                                                <!-- Some warnings suggested, but escalation possible -->
+                                                <div class="flex items-center gap-1">
+                                                    <span class="inline-flex items-center px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full"
+                                                          title="You have suggested {{ $existingWarnings->count() }} warning(s): {{ implode(', ', $suggestedTypes) }}">
+                                                        <i class="fas fa-layer-group mr-1"></i>
+                                                        {{ $existingWarnings->count() }} Warning{{ $existingWarnings->count() > 1 ? 's' : '' }}
+                                                    </span>
+                                                    <button onclick="suggestWarning({{ $report->id }}, '{{ $report->status }}', 'RPT-{{ str_pad($report->id, 3, '0', STR_PAD_LEFT) }}')"
+                                                            class="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full hover:bg-red-200 transition-colors duration-200"
+                                                            title="Escalate to {{ count($availableTypesArray) > 0 ? ucfirst($availableTypesArray[0]) : 'Next' }} Warning">
+                                                        <i class="fas fa-arrow-up mr-1"></i>
+                                                        Escalate
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <!-- All warning types suggested -->
+                                                <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+                                                      title="All warning levels suggested: {{ implode(', ', $suggestedTypes) }}">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                    All Warnings Suggested
+                                                </span>
+                                            @endif
                                         @elseif($violator && !$isInternalViolator)
                                             <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
                                                   title="Warning letters are only available for internal employees">
@@ -375,8 +410,69 @@ function suggestWarning(reportId, status, reportCode) {
     $('#warning_reason').val('');
     $('#suggested_action').val('');
 
+    // Hide existing warnings alert initially
+    $('#existingWarningsAlert').hide();
+    $('#existingWarningsList').empty();
+
+    // Fetch existing warnings for this report
+    fetch(`/ucua/reports/${reportId}/existing-warnings`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.warnings.length > 0) {
+                // Show existing warnings
+                let warningsHtml = '<div class="row">';
+                data.warnings.forEach(warning => {
+                    const badgeClass = warning.type === 'minor' ? 'badge-warning' :
+                                     (warning.type === 'moderate' ? 'badge-orange' : 'badge-danger');
+                    const statusClass = warning.status === 'pending' ? 'badge-secondary' :
+                                       (warning.status === 'approved' ? 'badge-success' :
+                                        (warning.status === 'rejected' ? 'badge-danger' : 'badge-primary'));
+
+                    warningsHtml += `
+                        <div class="col-md-6 mb-2">
+                            <div class="border rounded p-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge ${badgeClass}">${warning.type.charAt(0).toUpperCase() + warning.type.slice(1)}</span>
+                                    <span class="badge ${statusClass}">${warning.status.charAt(0).toUpperCase() + warning.status.slice(1)}</span>
+                                </div>
+                                <small class="text-muted">${warning.reason.substring(0, 80)}${warning.reason.length > 80 ? '...' : ''}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+                warningsHtml += '</div>';
+
+                $('#existingWarningsList').html(warningsHtml);
+                $('#existingWarningsAlert').show();
+
+                // Update warning type options to show only available escalation options
+                updateWarningTypeOptions(data.suggested_types);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching existing warnings:', error);
+        });
+
     // Show suggest warning modal
     $('#suggestWarningModal').modal('show');
+}
+
+function updateWarningTypeOptions(suggestedTypes) {
+    const warningTypeSelect = $('#warning_type');
+    const options = warningTypeSelect.find('option');
+
+    // Reset all options to enabled
+    options.prop('disabled', false);
+
+    // Disable already suggested types
+    suggestedTypes.forEach(type => {
+        warningTypeSelect.find(`option[value="${type}"]`).prop('disabled', true);
+    });
+
+    // If all types are suggested, show a message
+    if (suggestedTypes.length >= 3) {
+        warningTypeSelect.after('<small class="text-warning mt-1">All warning levels have been suggested for this report.</small>');
+    }
 }
 
 function sendReminder(reportId, status, reportCode) {

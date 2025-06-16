@@ -74,6 +74,23 @@
             </div>
         </form>
     </div>
+
+    <!-- Reports with Multiple Warnings Alert -->
+    @if(count($reportsWithMultipleWarnings) > 0)
+        <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        <span class="font-medium">{{ count($reportsWithMultipleWarnings) }} report{{ count($reportsWithMultipleWarnings) > 1 ? 's have' : ' has' }} multiple warning letters.</span>
+                        This may indicate escalation scenarios or multiple violations in the same incident.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
     <!-- Warning Letters Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
         <div class="bg-white rounded-lg shadow-md p-3 sm:p-4">
@@ -122,9 +139,20 @@
                                 {{ $warning->formatted_id }}
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                                <a href="{{ route('admin.reports.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800">
-                                    RPT-{{ str_pad($warning->report->id, 4, '0', STR_PAD_LEFT) }}
-                                </a>
+                                <div class="flex flex-col">
+                                    <a href="{{ route('admin.reports.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                        RPT-{{ str_pad($warning->report->id, 4, '0', STR_PAD_LEFT) }}
+                                    </a>
+                                    @if(in_array($warning->report->id, $reportsWithMultipleWarnings))
+                                        @php
+                                            $warningCount = $warning->report->warnings()->count();
+                                            $warningSequence = $warning->report->warnings()->where('created_at', '<=', $warning->created_at)->count();
+                                        @endphp
+                                        <span class="text-xs text-orange-600 font-medium">
+                                            <i class="fas fa-layer-group mr-1"></i>Warning {{ $warningSequence }} of {{ $warningCount }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
@@ -344,9 +372,20 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Report:</span>
-                            <a href="{{ route('admin.reports.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800">
-                                RPT-{{ str_pad($warning->report->id, 4, '0', STR_PAD_LEFT) }}
-                            </a>
+                            <div class="text-right">
+                                <a href="{{ route('admin.reports.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    RPT-{{ str_pad($warning->report->id, 4, '0', STR_PAD_LEFT) }}
+                                </a>
+                                @if(in_array($warning->report->id, $reportsWithMultipleWarnings))
+                                    @php
+                                        $warningCount = $warning->report->warnings()->count();
+                                        $warningSequence = $warning->report->warnings()->where('created_at', '<=', $warning->created_at)->count();
+                                    @endphp
+                                    <div class="text-xs text-orange-600 font-medium mt-1">
+                                        <i class="fas fa-layer-group mr-1"></i>Warning {{ $warningSequence }} of {{ $warningCount }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Type:</span>

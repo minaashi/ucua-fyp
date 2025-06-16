@@ -32,6 +32,23 @@
                         <span>Resolved Reports</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('department.notifications') }}"
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
+                        <i class="fas fa-bell w-5 {{ $unreadNotificationsCount > 0 ? 'animate-bounce text-red-500' : '' }}"></i>
+                        <span class="ml-2">Notifications</span>
+                        @if($unreadNotificationsCount > 0)
+                            <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $unreadNotificationsCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('help.department') }}"
+                       class="flex items-center px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-question-circle w-5"></i>
+                        <span>Help</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>
@@ -89,9 +106,15 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         @if($report->created_at && $report->resolved_at)
                                             @php
-                                                $resolutionTime = round($report->created_at->diffInDays($report->resolved_at));
+                                                // Calculate resolution time properly
+                                                $resolutionTime = $report->created_at->diffInDays($report->resolved_at, false);
+                                                $resolutionTime = round($resolutionTime);
                                             @endphp
-                                            @if($resolutionTime == 0)
+                                            @if($resolutionTime < 0)
+                                                <span class="text-orange-600 font-semibold" title="Resolution date is earlier than report creation date">
+                                                    <i class="fas fa-exclamation-triangle mr-1"></i>Data Issue
+                                                </span>
+                                            @elseif($resolutionTime == 0)
                                                 <span class="text-green-600 font-semibold">Same day</span>
                                             @elseif($resolutionTime <= 3)
                                                 <span class="text-green-600">{{ $resolutionTime }} {{ $resolutionTime == 1 ? 'day' : 'days' }}</span>

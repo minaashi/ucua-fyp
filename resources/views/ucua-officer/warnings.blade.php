@@ -12,31 +12,70 @@
             </div>
         </div>
         <div class="bg-white rounded-b-lg shadow-md p-8 mt-2">
-            <!-- Basic Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
+            <!-- Enhanced Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
                     <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-yellow-200 mr-4">
-                            <i class="fas fa-exclamation-triangle text-yellow-700 text-xl"></i>
+                        <div class="p-2 rounded-full bg-yellow-200 mr-3">
+                            <i class="fas fa-exclamation-triangle text-yellow-700 text-sm"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-yellow-800">Total Suggestions</h3>
-                            <p class="text-3xl font-bold text-yellow-600">{{ $totalWarnings }}</p>
+                            <h3 class="text-sm font-semibold text-yellow-800">Total</h3>
+                            <p class="text-xl font-bold text-yellow-600">{{ $totalWarnings }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
                     <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-orange-200 mr-4">
-                            <i class="fas fa-clock text-orange-700 text-xl"></i>
+                        <div class="p-2 rounded-full bg-orange-200 mr-3">
+                            <i class="fas fa-clock text-orange-700 text-sm"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-orange-800">Pending Review</h3>
-                            <p class="text-3xl font-bold text-orange-600">{{ $pendingWarnings }}</p>
+                            <h3 class="text-sm font-semibold text-orange-800">Pending</h3>
+                            <p class="text-xl font-bold text-orange-600">{{ $pendingWarnings }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div class="flex items-center">
+                        <div class="p-2 rounded-full bg-green-200 mr-3">
+                            <i class="fas fa-check text-green-700 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-green-800">Approved</h3>
+                            <p class="text-xl font-bold text-green-600">{{ $approvedWarnings }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div class="flex items-center">
+                        <div class="p-2 rounded-full bg-purple-200 mr-3">
+                            <i class="fas fa-paper-plane text-purple-700 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-purple-800">Sent</h3>
+                            <p class="text-xl font-bold text-purple-600">{{ $sentWarnings }}</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Reports with Multiple Warnings Alert -->
+            @if(count($reportsWithMultipleWarnings) > 0)
+                <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <span class="font-medium">You have suggested multiple warnings for {{ count($reportsWithMultipleWarnings) }} report{{ count($reportsWithMultipleWarnings) > 1 ? 's' : '' }}.</span>
+                                This may indicate escalation scenarios or multiple violations in the same incident.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
 
 
@@ -62,9 +101,20 @@
                                 {{ $warning->formatted_id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-900">
-                                <a href="{{ route('ucua.report.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                    RPT-{{ str_pad($warning->report->id, 3, '0', STR_PAD_LEFT) }}
-                                </a>
+                                <div class="flex flex-col">
+                                    <a href="{{ route('ucua.report.show', $warning->report->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                        RPT-{{ str_pad($warning->report->id, 3, '0', STR_PAD_LEFT) }}
+                                    </a>
+                                    @if(in_array($warning->report->id, $reportsWithMultipleWarnings))
+                                        @php
+                                            $warningCount = $warning->report->warnings()->where('suggested_by', Auth::id())->count();
+                                            $warningSequence = $warning->report->warnings()->where('suggested_by', Auth::id())->where('created_at', '<=', $warning->created_at)->count();
+                                        @endphp
+                                        <span class="text-xs text-orange-600 font-medium">
+                                            <i class="fas fa-layer-group mr-1"></i>Your warning {{ $warningSequence }} of {{ $warningCount }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full

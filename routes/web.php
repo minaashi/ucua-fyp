@@ -179,6 +179,7 @@ Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')-
     });
     Route::get('/warnings', [UCUADashboardController::class, 'warningsPage'])->name('warnings');
     Route::get('/warnings/{warning}/details', [UCUADashboardController::class, 'getWarningDetails'])->name('warnings.details');
+    Route::get('/reports/{report}/existing-warnings', [UCUADashboardController::class, 'getExistingWarnings'])->name('reports.existing-warnings');
     Route::get('/reminders', [UCUADashboardController::class, 'remindersPage'])->name('reminders');
 
     // Warning Analytics Routes
