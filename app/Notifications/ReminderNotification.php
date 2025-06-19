@@ -72,9 +72,9 @@ class ReminderNotification extends Notification
     }
 
     /**
-     * Get the array representation of the notification.
+     * Get the database representation of the notification.
      */
-    public function toArray($notifiable): array
+    public function toDatabase($notifiable): array
     {
         return [
             'type' => 'reminder',
@@ -93,6 +93,14 @@ class ReminderNotification extends Notification
             'link' => $this->getDepartmentReportUrl(),
             'created_at' => $this->reminder->created_at->toISOString()
         ];
+    }
+
+    /**
+     * Get the array representation of the notification.
+     */
+    public function toArray($notifiable): array
+    {
+        return $this->toDatabase($notifiable);
     }
 
     /**

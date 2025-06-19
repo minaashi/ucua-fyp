@@ -102,7 +102,7 @@ class WarningLetterMail extends Mailable // implements ShouldQueue // Removed fo
             return $rendered['subject'];
         }
 
-        return "Safety Warning Letter {$this->warning->formatted_id} - Report {$this->warning->report->display_id}";
+        return "Safety Warning Letter {$this->warning->formatted_id}";
     }
 
     /**

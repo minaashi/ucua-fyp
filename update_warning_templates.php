@@ -33,7 +33,7 @@ Violation Details:
 - Employee ID: {{employee_id}}
 - Department: {{department}}
 - Unsafe Act: {{violation_description}}
-- Report ID: {{report_id}}
+- Warning Letter ID: {{warning_id}}
 
 UNSAFE ACT IDENTIFIED:
 The following unsafe behavior was observed that could lead to injury or incident. This serves as a reminder that all safety procedures must be followed at all times.
@@ -71,7 +71,7 @@ Violation Details:
 - Employee ID: {{employee_id}}
 - Department: {{department}}
 - Unsafe Act: {{violation_description}}
-- Report ID: {{report_id}}
+- Warning Letter ID: {{warning_id}}
 
 SERIOUS UNSAFE ACT VIOLATION:
 The unsafe behavior observed poses significant risk to yourself and others. This is a formal warning that requires immediate corrective action.
@@ -113,7 +113,7 @@ Violation Details:
 - Employee ID: {{employee_id}}
 - Department: {{department}}
 - Severe Unsafe Act: {{violation_description}}
-- Report ID: {{report_id}}
+- Warning Letter ID: {{warning_id}}
 
 CRITICAL UNSAFE ACT VIOLATION:
 The unsafe behavior demonstrated poses immediate and serious danger to yourself, colleagues, and the port operations. This constitutes your FINAL WARNING.
