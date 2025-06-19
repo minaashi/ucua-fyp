@@ -102,7 +102,7 @@ class CleanTestSeeder extends Seeder
         $admin = User::create([
             'name' => 'UCUA Admin',
             'email' => 'nursyahminabintimosdy@gmail.com',
-            'password' => Hash::make('Admin@123'),
+            'password' => Hash::make('Admin@UCUA03'),
             'department_id' => $departments[0]->id,
             'is_admin' => true,
             'worker_id' => 'ADM001',

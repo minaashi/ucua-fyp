@@ -37,7 +37,7 @@ try {
         'email' => 'nursyahminabintimosdy@gmail.com'
     ], [
         'name' => 'Admin User',
-        'password' => bcrypt('Admin@123'),
+        'password' => bcrypt('Admin@UCUA03'),
         'department_id' => $department->id,
         'is_admin' => true,
         'is_ucua_officer' => false,

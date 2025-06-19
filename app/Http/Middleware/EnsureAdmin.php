@@ -12,7 +12,7 @@ class EnsureAdmin
         // Check if user has admin role
         if ($request->user() && !$request->user()->hasRole('admin')) {
             // redirect the user to a different page if not an admin
-            return redirect('/home'); 
+            return redirect('/dashboard');
         }
 
         return $next($request);

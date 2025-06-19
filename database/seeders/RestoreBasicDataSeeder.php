@@ -111,7 +111,7 @@ class RestoreBasicDataSeeder extends Seeder
         $admin = User::create([
             'name' => 'Nursyahmin Abinti Mosdy',
             'email' => 'nursyahminabintimosdy@gmail.com',
-            'password' => Hash::make('Admin@123'),
+            'password' => Hash::make('Admin@UCUA03'),
             'worker_id' => 'ADM001',
             'department_id' => $departments[0]->id, // Operations
             'email_verified_at' => now()
