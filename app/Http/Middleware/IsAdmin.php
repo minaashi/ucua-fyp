@@ -18,7 +18,7 @@ class IsAdmin
     if (auth()->check() && auth()->user()->is_admin) {
         return $next($request);
     }
-    return redirect('/home'); // Redirect non-admins to home
+    return redirect('/dashboard'); // Redirect non-admins to dashboard
 }
 
 }

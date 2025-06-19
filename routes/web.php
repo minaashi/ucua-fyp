@@ -244,6 +244,19 @@ Route::middleware(['auth:department'])->group(function () {
     Route::get('/department/help/search', [HelpController::class, 'departmentSearch'])->name('help.department.search');
 });
 
+// HOD (Head of Department) Routes - for User models with department_head role
+Route::middleware(['auth', 'role:department_head'])->prefix('hod')->name('hod.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\HODController::class, 'index'])->name('dashboard');
+    Route::get('/pending-reports', [App\Http\Controllers\HODController::class, 'pendingReports'])->name('pending-reports');
+    Route::get('/resolved-reports', [App\Http\Controllers\HODController::class, 'resolvedReports'])->name('resolved-reports');
+    Route::get('/report/{report}', [App\Http\Controllers\HODController::class, 'showReport'])->name('report.show');
+
+    // Notification routes
+    Route::get('/notifications', [App\Http\Controllers\HODController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\HODController::class, 'markNotificationAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\HODController::class, 'markAllNotificationsAsRead'])->name('notifications.mark-all-read');
+});
+
 // Login OTP Verification Routes
 Route::get('/login/otp', [App\Http\Controllers\Auth\LoginOtpController::class, 'showOtpForm'])->name('login.otp.form');
 Route::post('/login/otp/verify', [App\Http\Controllers\Auth\LoginOtpController::class, 'verifyOtp'])->name('login.otp.verify');

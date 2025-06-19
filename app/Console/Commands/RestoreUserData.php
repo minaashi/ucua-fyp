@@ -129,7 +129,7 @@ class RestoreUserData extends Command
             ['email' => 'nursyahminabintimosdy@gmail.com'],
             [
                 'name' => 'Admin User',
-                'password' => Hash::make('Admin@123'),
+                'password' => Hash::make('Admin@UCUA03'),
                 'is_admin' => true,
                 'is_ucua_officer' => false,
                 'department_id' => $departments['safety']->id,

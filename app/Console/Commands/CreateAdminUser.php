@@ -54,7 +54,7 @@ class CreateAdminUser extends Command
         $adminUser = User::create([
             'name' => 'System Admin',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('Admin@123'),
+            'password' => Hash::make('Admin@UCUA03'),
             'email_verified_at' => now()
         ]);
 
@@ -63,7 +63,7 @@ class CreateAdminUser extends Command
 
         $this->info('✓ Admin user created successfully!');
         $this->info('Email: admin@gmail.com');
-        $this->info('Password: Admin@123');
+        $this->info('Password: Admin@UCUA03');
         $this->info('Name: ' . $adminUser->name);
         $this->info('ID: ' . $adminUser->id);
     }

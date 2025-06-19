@@ -125,9 +125,14 @@ class UCUADashboardController extends Controller
 
             $department = Department::where('id', $request->department_id)->first();
 
-            // Notify users belonging to the assigned department who have the 'department_head' role
+            // Notify department (for department guard users)
+            $department->notify(new ReportAssignedToDepartmentNotification($report, $ucuaOfficer));
+
+            // Notify HOD users belonging to the assigned department who have the 'department_head' role
             $departmentUsers = User::where('department_id', $department->id)
-                                    ->where('name', $department->head_name)
+                                    ->whereHas('roles', function($query) {
+                                        $query->where('name', 'department_head');
+                                    })
                                     ->get();
 
             foreach ($departmentUsers as $user) {
@@ -465,16 +470,28 @@ class UCUADashboardController extends Controller
                 'department_email' => $department->email
             ]);
 
-            // Send notification to department
+            // Send notification to department (for department guard users)
             $department->notify(new ReminderNotification($reminder));
-            Log::info('Main notification sent');
+            Log::info('Department notification sent');
 
-            // Also send to department head if different email
+            // Send notification to HOD users (User models with department_head role)
+            $hodUsers = User::where('department_id', $department->id)
+                ->whereHas('roles', function($query) {
+                    $query->where('name', 'department_head');
+                })
+                ->get();
+
+            foreach ($hodUsers as $hodUser) {
+                $hodUser->notify(new ReminderNotification($reminder));
+                Log::info('HOD user notification sent', ['hod_email' => $hodUser->email]);
+            }
+
+            // Also send to department head email if different (for email-only notifications)
             if ($department->head_email && $department->head_email !== $department->email) {
-                Log::info('Sending to department head', ['head_email' => $department->head_email]);
+                Log::info('Sending to department head email', ['head_email' => $department->head_email]);
                 \Illuminate\Support\Facades\Notification::route('mail', $department->head_email)
                     ->notify(new ReminderNotification($reminder));
-                Log::info('Head notification sent');
+                Log::info('Head email notification sent');
             }
 
             Log::info('Reminder notification sent successfully', [

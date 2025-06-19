@@ -114,7 +114,7 @@ class BasicDataWithDepartmentUsersSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'nursyahminabintimosdy@gmail.com',
             'worker_id' => 'ADM001',
-            'password' => Hash::make('Admin@123'),
+            'password' => Hash::make('Admin@UCUA03'),
             'department_id' => $departments[0]->id, // UCUA Department
             'email_verified_at' => now(),
         ]);
