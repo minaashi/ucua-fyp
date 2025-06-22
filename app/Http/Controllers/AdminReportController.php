@@ -153,7 +153,8 @@ class AdminReportController extends Controller
     {
         $request->validate([
             'report_id' => 'required|exists:reports,id',
-            'content' => 'required|string|max:1000',
+            'content' => 'required_without:remarks|string|max:1000',
+            'remarks' => 'required_without:content|string|max:1000',
             'parent_id' => 'nullable|exists:remarks,id',
             'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,txt'
         ]);
@@ -165,9 +166,12 @@ class AdminReportController extends Controller
             $attachment = $request->hasFile('attachment') ? $request->file('attachment') : null;
             $parentId = $request->input('parent_id');
 
+            // Handle both 'content' and 'remarks' field names for compatibility
+            $content = $request->input('content') ?: $request->input('remarks');
+
             $remarkService->addAdminRemark(
                 $report,
-                $request->content,
+                $content,
                 null,
                 $attachment,
                 $parentId

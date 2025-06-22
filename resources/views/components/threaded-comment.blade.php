@@ -85,17 +85,10 @@
                     <button type="button"
                             class="text-sm text-blue-600 hover:text-blue-800 font-medium reply-btn"
                             data-comment-id="{{ $comment->id }}"
-                            data-author-name="{{ $comment->authorName }}"
-                            onclick="console.log('UCUA Reply button clicked for comment {{ $comment->id }}'); toggleUCUAReplyForm({{ $comment->id }});">
+                            data-author-name="{{ $comment->authorName }}">
                         <i class="fas fa-reply mr-1"></i>
                         Reply
                     </button>
-                @else
-                    <!-- Debug: Show why reply button is hidden -->
-                    <span class="text-xs text-gray-400">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Max depth reached ({{ $currentDepth }}/{{ $maxDepth }})
-                    </span>
                 @endif
                 
                 <!-- Reply Count -->
@@ -115,12 +108,8 @@
     </div>
 
     <!-- Reply Form (Hidden by default) -->
-    <div class="reply-form mt-3 hidden" id="reply-form-{{ $comment->id }}" data-debug="Reply form for comment {{ $comment->id }}">
+    <div class="reply-form mt-3 hidden" id="reply-form-{{ $comment->id }}">
         <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div class="text-xs text-gray-500 mb-2">
-                <i class="fas fa-bug mr-1"></i>
-                Debug: Reply form for comment ID {{ $comment->id }}
-            </div>
             <form method="POST" action="{{ route('ucua.add-remarks') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="report_id" value="{{ $report->id }}">
@@ -182,44 +171,14 @@
 @once
 @push('scripts')
 <script>
-// UCUA comment reply functionality
-function toggleUCUAReplyForm(commentId) {
-    console.log('toggleUCUAReplyForm called for comment:', commentId);
-
-    const replyForm = document.getElementById(`reply-form-${commentId}`);
-
-    if (!replyForm) {
-        console.error('Reply form not found for comment:', commentId);
-        return;
-    }
-
-    // Hide all other reply forms
-    document.querySelectorAll('.reply-form').forEach(form => {
-        if (form.id !== `reply-form-${commentId}`) {
-            form.classList.add('hidden');
-        }
-    });
-
-    // Toggle current reply form
-    replyForm.classList.toggle('hidden');
-
-    // Focus on textarea if showing
-    if (!replyForm.classList.contains('hidden')) {
-        const textarea = replyForm.querySelector('textarea[name="content"]');
-        if (textarea) {
-            setTimeout(() => textarea.focus(), 100);
-        }
-    }
-}
-
-// Global comment reply functionality
-window.CommentReplyHandler = window.CommentReplyHandler || {
+// Unified comment reply functionality for all user types
+window.UnifiedCommentReplyHandler = window.UnifiedCommentReplyHandler || {
     initialized: false,
 
     init: function() {
         if (this.initialized) return;
 
-        console.log('Initializing Comment Reply Handler');
+        console.log('Initializing Unified Comment Reply Handler');
 
         // Use event delegation for better performance and dynamic content
         document.addEventListener('click', function(event) {
@@ -281,10 +240,10 @@ window.CommentReplyHandler = window.CommentReplyHandler || {
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-        window.CommentReplyHandler.init();
+        window.UnifiedCommentReplyHandler.init();
     });
 } else {
-    window.CommentReplyHandler.init();
+    window.UnifiedCommentReplyHandler.init();
 }
 </script>
 @endpush
