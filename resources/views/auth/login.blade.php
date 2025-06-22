@@ -81,7 +81,7 @@ use Illuminate\Support\Facades\Route;
     </div>
 
     <footer class="auth-footer">
-        <p class="mb-0">&copy; {{ date('Y') }} Copyright: Nursyahmina Mosdy, Dr Cik Feresa Mohd Foozy</p>
+        <p class="mb-0">&copy; {{ date('Y') }} Copyright: Nursyahmina Mosdy</p>
     </footer>
 </div>
 
