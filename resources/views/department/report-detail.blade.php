@@ -120,9 +120,10 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Attachment</label>
                         <div class="flex items-center space-x-2">
                             <i class="fas fa-paperclip text-gray-500"></i>
-                            <a href="{{ asset('storage/' . $report->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                            <a href="{{ route('attachment.view', ['filename' => basename($report->attachment)]) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
                                 View Attachment
                             </a>
+                            <span class="text-xs text-gray-500">({{ basename($report->attachment) }})</span>
                         </div>
                     </div>
                     @endif

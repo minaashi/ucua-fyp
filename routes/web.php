@@ -26,6 +26,23 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Route to serve attachment files
+Route::get('/attachment/{filename}', function ($filename) {
+    $path = storage_path('app/public/reports/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404, 'File not found');
+    }
+
+    $mimeType = mime_content_type($path);
+    $headers = [
+        'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . $filename . '"'
+    ];
+
+    return response()->file($path, $headers);
+})->name('attachment.view');
+
 // Department Routes
 Route::group(['prefix' => 'department'], function () {
     // Public routes (no auth required)
