@@ -32,6 +32,7 @@ class ReportController extends Controller
     // Show all reports (for Admin)
     public function index()
     {
+        $this->authorize('viewAny', Report::class);
         $reports = Report::all();  // Get all reports from the database
         return view('reports.index', compact('reports'));
     }
@@ -40,12 +41,14 @@ class ReportController extends Controller
     public function show($id)
     {
         $report = Report::findOrFail($id);  // Find the report by ID
+        $this->authorize('view', $report);
         return view('reports.show', compact('report'));
     }
 
     // Show form for creating a new report (User-side)
     public function create()
     {
+        $this->authorize('create', Report::class);
         $departments = \App\Models\Department::where('is_active', true)->get();
         return view('reports.create', compact('departments'));
     }
@@ -53,6 +56,8 @@ class ReportController extends Controller
     // Store a new report in the database (User-side)
     public function store(Request $request)
     {
+        $this->authorize('create', Report::class);
+
         $validated = $request->validate([
             'employee_id' => 'required|string',
             'location' => 'required|string',
@@ -134,18 +139,21 @@ class ReportController extends Controller
     public function edit($id)
     {
         $report = Report::findOrFail($id);  // Find the report by ID
+        $this->authorize('update', $report);
         return view('reports.edit', compact('report'));
     }
 
     // Update the specified report in the database
     public function update(Request $request, $id)
     {
+        $report = Report::findOrFail($id);  // Find the report
+        $this->authorize('update', $report);
+
         $validated = $request->validate([
-            'title' => 'required|string|max:255',  
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
 
-        $report = Report::findOrFail($id);  // Find the report
         $report->update($validated);  // Update the report in the database
 
         return redirect()->route('reports.index');  // Redirect to reports list
@@ -155,6 +163,7 @@ class ReportController extends Controller
     public function destroy($id)
     {
         $report = Report::findOrFail($id);  // Find the report by ID
+        $this->authorize('delete', $report);
         $report->delete();  // Delete the report
 
         return redirect()->route('reports.index');  // Redirect to reports list
@@ -202,6 +211,7 @@ class ReportController extends Controller
             DB::beginTransaction();
 
             $report = Report::findOrFail($request->report_id);
+            $this->authorize('assignDepartment', $report);
 
             // Update with department name, deadline, and status
             $report->update([

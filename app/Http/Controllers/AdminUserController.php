@@ -17,6 +17,7 @@ class AdminUserController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
         $query = User::with(['roles', 'department'])->latest();
 
         // Apply search filter if provided
@@ -53,6 +54,8 @@ class AdminUserController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -122,6 +125,8 @@ class AdminUserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -160,6 +165,8 @@ class AdminUserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
+
         // Prevent deleting the last admin
         if ($user->hasRole('admin') && User::role('admin')->count() <= 1) {
             return redirect()->back()->with('error', 'Cannot delete the last admin user.');

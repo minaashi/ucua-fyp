@@ -78,7 +78,7 @@ Route::group(['prefix' => 'department'], function () {
 Auth::routes();
 
 // User-Specific Routes
-Route::middleware(['auth', 'email.verified'])->group(function () {
+Route::middleware(['auth', 'email.verified', 'security'])->group(function () {
     // User Dashboard
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
@@ -113,7 +113,7 @@ Route::prefix('admin')->group(function () {
     });
 
     // Protected Admin Routes
-    Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::middleware(['auth', 'role:admin', 'security'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
         // Reports Routes
@@ -170,7 +170,7 @@ Route::prefix('admin')->group(function () {
 });
 
 // UCUA Officer Routes
-Route::middleware(['auth', 'role:ucua_officer'])->prefix('ucua')->name('ucua.')->group(function () {
+Route::middleware(['auth', 'role:ucua_officer', 'security'])->prefix('ucua')->name('ucua.')->group(function () {
     Route::get('/dashboard', [UCUADashboardController::class, 'index'])->name('dashboard');
     Route::get('/report/{report}', [UCUADashboardController::class, 'showReport'])->name('report.show');
     Route::get('/assign-departments', [UCUADashboardController::class, 'assignDepartmentsPage'])->name('assign-departments-page');
@@ -262,7 +262,7 @@ Route::middleware(['auth:department'])->group(function () {
 });
 
 // HOD (Head of Department) Routes - for User models with department_head role
-Route::middleware(['auth', 'role:department_head'])->prefix('hod')->name('hod.')->group(function () {
+Route::middleware(['auth', 'role:department_head', 'security'])->prefix('hod')->name('hod.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\HODController::class, 'index'])->name('dashboard');
     Route::get('/pending-reports', [App\Http\Controllers\HODController::class, 'pendingReports'])->name('pending-reports');
     Route::get('/resolved-reports', [App\Http\Controllers\HODController::class, 'resolvedReports'])->name('resolved-reports');

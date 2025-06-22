@@ -82,12 +82,8 @@ class DashboardController extends Controller
 
     public function showReportDetails(Report $report)
     {
-        $user = Auth::user();
-
-        // Ensure the user can only view their own reports
-        if ($report->user_id !== $user->id) {
-            abort(403, 'Unauthorized access to this report.');
-        }
+        // Use policy to check authorization
+        $this->authorize('view', $report);
 
         // Load the report with related data
         $report->load([

@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'department.auth' => \App\Http\Middleware\DepartmentAuth::class,
         'department.head' => \App\Http\Middleware\DepartmentHeadMiddleware::class,
         'department.login' => \App\Http\Middleware\EnsureDepartmentLogin::class,
+        'security' => \App\Http\Middleware\SecurityMiddleware::class,
     ];
 }

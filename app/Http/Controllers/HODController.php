@@ -142,13 +142,11 @@ class HODController extends Controller
      */
     public function showReport(Report $report)
     {
+        // Use policy to check authorization
+        $this->authorize('view', $report);
+
         $user = Auth::user();
         $department = $user->department;
-
-        // Ensure the report belongs to this HOD's department
-        if ($report->handling_department_id !== $department->id) {
-            return redirect()->route('hod.dashboard')->with('error', 'You can only view reports assigned to your department.');
-        }
 
         $report->load([
             'user',
