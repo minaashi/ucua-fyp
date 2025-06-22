@@ -84,7 +84,7 @@
             @yield('content')
         </main>
         <footer class="bg-blue-800 text-white p-4 mt-auto">
-            <p class="text-center text-xs sm:text-sm">Copyright © 2025 Nursyahmina Mosdy, Dr Cik.Feresa Mohd Foozy</p>
+            <p class="text-center text-xs sm:text-sm">Copyright © 2025 Nursyahmina Mosdy</p>
         </footer>
     </div>
 </div>
