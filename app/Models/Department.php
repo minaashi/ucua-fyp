@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -23,6 +22,10 @@ class Department extends Authenticatable
         'otp',
         'otp_expires_at',
         'worker_id_identifier',
+        'last_activity_at',
+        'last_login_at',
+        'last_login_ip',
+        'session_id',
     ];
 
     protected $hidden = [
@@ -30,7 +33,10 @@ class Department extends Authenticatable
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'last_activity_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'otp_expires_at' => 'datetime'
     ];
 
     public function reports()
@@ -85,5 +91,57 @@ class Department extends Authenticatable
     {
         $prefix = $this->getWorkerIdPrefix();
         return str_starts_with($workerId, $prefix);
+    }
+
+    /**
+     * Update department's last activity timestamp
+     */
+    public function updateLastActivity(): void
+    {
+        $this->update([
+            'last_activity_at' => now()
+        ]);
+    }
+
+    /**
+     * Update department's login information
+     */
+    public function updateLoginInfo(string $ipAddress, string $sessionId): void
+    {
+        $this->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $ipAddress,
+            'session_id' => $sessionId,
+            'last_activity_at' => now()
+        ]);
+    }
+
+    /**
+     * Check if department session is active
+     */
+    public function isSessionActive(): bool
+    {
+        if (!$this->session_id) {
+            return false;
+        }
+
+        // Check if session exists in sessions table
+        $sessionExists = \DB::table('sessions')
+            ->where('id', $this->session_id)
+            ->exists();
+
+        return $sessionExists;
+    }
+
+    /**
+     * Get time since last activity in minutes
+     */
+    public function getTimeSinceLastActivity(): int
+    {
+        if (!$this->last_activity_at) {
+            return 0;
+        }
+
+        return $this->last_activity_at->diffInMinutes(now());
     }
 }

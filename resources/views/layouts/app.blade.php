@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @if(auth()->check())
+        <meta name="user-authenticated" content="true">
+        <meta name="session-lifetime" content="{{ config('session.lifetime') }}">
+        <meta name="user-id" content="{{ auth()->id() }}">
+    @endif
+
     <title>@yield('title', config('app.name', 'Laravel'))</title>
 
     <!-- Bootstrap 4 CSS -->
@@ -63,6 +69,11 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <!-- UCUA Utilities -->
     <script src="{{ asset('js/ucua-utilities.js') }}"></script>
+
+    <!-- Session Management -->
+    @if(auth()->check())
+        <script src="{{ asset('js/session-manager.js') }}"></script>
+    @endif
 
     <!-- Global JavaScript Utilities -->
     <script>

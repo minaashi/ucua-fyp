@@ -30,6 +30,7 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \App\Http\Middleware\SessionSecurityMiddleware::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -70,5 +71,6 @@ class Kernel extends HttpKernel
         'department.head' => \App\Http\Middleware\DepartmentHeadMiddleware::class,
         'department.login' => \App\Http\Middleware\EnsureDepartmentLogin::class,
         'security' => \App\Http\Middleware\SecurityMiddleware::class,
+        'session.security' => \App\Http\Middleware\SessionSecurityMiddleware::class,
     ];
 }

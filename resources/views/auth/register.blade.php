@@ -9,7 +9,7 @@
                 <div class="welcome-container">
                     <div class="welcome-text">
                         <h2 class="text-white fw-bold mb-3">Welcome to UCUA Reporting System</h2>
-                        <p class="text-white-50 mb-4">Join our safety management system and help create a safer workplace for everyone.</p>
+                        <p class="text-white-50 mb-4">Join our safety management system and help create a safer workplace for everyone</p>
                         <div class="feature-list">
                             <div class="feature-item">
                                 <i class="fas fa-shield-alt"></i>

@@ -51,8 +51,14 @@ class LoginOtpController extends Controller
             $result = $this->otpService->verifyDepartmentOtp($email, $otp);
             
             if ($result['success']) {
+                $department = $result['department'];
+
                 // Login with department guard
-                Auth::guard('department')->login($result['department']);
+                Auth::guard('department')->login($department);
+
+                // Update login tracking
+                $department->updateLoginInfo($request->ip(), $request->session()->getId());
+
                 return redirect()->intended(route('department.dashboard'))->with('status', 'Login successful!');
             }
         } else {
@@ -64,7 +70,10 @@ class LoginOtpController extends Controller
                 
                 // Login with web guard
                 Auth::login($user);
-                
+
+                // Update login tracking
+                $user->updateLoginInfo($request->ip(), $request->session()->getId());
+
                 // Redirect based on user role
                 if ($userType === 'admin' && $user->hasRole('admin')) {
                     return redirect()->intended(route('admin.dashboard'))->with('status', 'Login successful!');

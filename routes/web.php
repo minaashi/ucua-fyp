@@ -279,6 +279,11 @@ Route::get('/login/otp', [App\Http\Controllers\Auth\LoginOtpController::class, '
 Route::post('/login/otp/verify', [App\Http\Controllers\Auth\LoginOtpController::class, 'verifyOtp'])->name('login.otp.verify');
 Route::post('/login/otp/resend', [App\Http\Controllers\Auth\LoginOtpController::class, 'resendOtp'])->name('login.otp.resend');
 
+// Session Management Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/api/extend-session', [App\Http\Controllers\SessionController::class, 'extendSession'])->name('session.extend');
+});
+
 
 
 
